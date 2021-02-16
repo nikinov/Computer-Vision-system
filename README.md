@@ -1,3 +1,3 @@
 # WickonHightech
 
-optical inspections systems
+optical inspections systems.
