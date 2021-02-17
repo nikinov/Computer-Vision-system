@@ -1,0 +1,54 @@
+﻿Nainstalovat Anaconda (ideálně verze 3.x) je ke stažení na oficiálních webových stránkách: https://www.anaconda.com/distribution/#download-section 
+(Anaconda si sama nainstalujie i Python 3.x.)
+
+Nainstalovat knihovnu tensorflow, zatim pouze CPU verze - spustit Anaconda prompt
+"pip install tensorflow==1.14"
+// v případě, že je nainstalována Cuda  a cudNN dle návodu (brzy přiložím) lze obdobně instalovat pomocí příkazu "pip install tensorflow-gpu==1.14"
+
+Před začátkem použití kódu je nutné rozbalit zazipované soubory TestFile do stejné složky a ve složce Training data rozzipovat soubory opět do stejné složky.
+
+Nyní jste již připraveni používat model neuronové sítě Inception. 
+Otevřete složku Inception_trained_model. V této složce se nachází 3 pythonovské skripty retrain.py, detekce.py a detekce2.py, složky: Training data a TestFile 
+
+Přes příkazovou řádku "Anaconda prompt" změňte cestu do daného souboru(Inception_trained_model)
+příkazem "cd C:\Wision\CSharpSource\Tools\NeuralNetwork\Inception_trained_model" (může se lišit v případě použití jiného počítače).
+
+Do složky Training data uložte data po složkách do klasifikačních kategorií, v příkladu jsou vytvořeny složky Bad a Good.
+
+Nyní v příkazové řádce Anaconda prompt zadejte příkaz pro trénování modelu: 
+python retrain.py --bottleneck_dir=bottlenecks --how_many_training_steps=1500 --model_dir=inception --summaries_dir=training_summaries/basic --output_graph=retrained_graph.pb --output_labels=retrained_labels.txt --image_dir=Training_data
+
+Další části příkazu mají tento význam:
+--bottleneck_dir vytvoří složku bottlenecks s "uzávěry" pro neuronovou síť pro uložení modelu do grafu
+--how_many_training_steps - počet epoch při trénování modelu (neměl by být overtrained 1500 epoch je příliš)
+--model_dir=inception stáhne z internetu model inception a vytvoří pro něj složku v adresáři
+--summaries_dir =  training_summaries/basic, vytvoří složku pro natrénované parametry modelu
+--output_graph=retrained_graph.pb, vytvoří uložený model ve formátu grafu s příponou .pb
+--output_labels, vytvoří textový soubor s názvy všech kategorií (složek v Training data)
+--image_dir="cesta do složky Training data"
+
+Po určité době by se měl vytvořit natrénovaný model. Pokud jsou složky vytvořeny, tak je obsah přepsán, pokud nebudou existovat automaticky se vytvoří
+
+========================================================================================
+DETEKCE
+========================================================================================
+
+Nyní můžeme v příkazové řádce anaconda prompt pomocí příkazu testovat jednotlivé obrázky, které budou ve stejné složce
+Ujistěte se, že jste v příkazové řádce v adrese složky Iception_trained_model, v jiném případě si cestu zvolte přes výše zmíněný "cd" příkaz.
+
+Pro testování jednotlivého obrázku lze použít příkaz
+python detekce.py nazevobrazku.jpg
+
+skript lze otevřít v programu spyder a upravit tak, aby se nemuselo volat přes příkazový řádek.
+
+========================================================================================
+PROGRAM PRO ROZŘAZENÍ
+========================================================================================
+Do složky Testfile uložte všechny obrázky jež chcete otestovat ve formátu .jpg (bohužel inception neumí pracovat s .bmp) a vytvořte v této složce složky s názvy kategorií, které chcete klasifikovat 
+(shodné názvy které jsou v Training data) a jednu složku "NotSorted". 
+Nyní ve spyderu otevřete skript detekce2.py a můžete spustit jej spustit. Program sám roztřídí(nakopíruje) všechny obrázky .jpg v Testfile do 
+jednotlivých složek s kategoriemi. Přičemž kritéria třídění lze stanovit v podmínce v části "if score > 0.85". 
+
+
+
+
