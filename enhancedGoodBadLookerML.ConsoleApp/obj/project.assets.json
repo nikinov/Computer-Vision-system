@@ -1734,22 +1734,6 @@
         "runtime": {
           "lib/netstandard2.0/TensorFlow.NET.dll": {}
         }
-      },
-      "enhancedGoodBadLookerML.Model/1.0.0": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v2.0",
-        "dependencies": {
-          "Microsoft.ML": "1.5.0-preview2",
-          "Microsoft.ML.ImageAnalytics": "1.5.0-preview2",
-          "Microsoft.ML.Vision": "1.5.0-preview2",
-          "SciSharp.TensorFlow.Redist": "1.14.0"
-        },
-        "compile": {
-          "bin/placeholder/enhancedGoodBadLookerML.Model.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/enhancedGoodBadLookerML.Model.dll": {}
-        }
       }
     }
   },
@@ -6045,36 +6029,35 @@
         "tensorflow.net.0.11.8.1.nupkg.sha512",
         "tensorflow.net.nuspec"
       ]
-    },
-    "enhancedGoodBadLookerML.Model/1.0.0": {
-      "type": "project",
-      "path": "../enhancedGoodBadLookerML.Model/enhancedGoodBadLookerML.Model.csproj",
-      "msbuildProject": "../enhancedGoodBadLookerML.Model/enhancedGoodBadLookerML.Model.csproj"
     }
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
+      "C:\\Users\\Ryzen7-EXT\\Documents\\Github\\WickonHightech\\enhancedGoodBadLookerML.Model\\enhancedGoodBadLookerML.Model.csproj",
       "Microsoft.ML >= 1.5.0-preview2",
       "Microsoft.ML.ImageAnalytics >= 1.5.0-preview2",
       "Microsoft.ML.Vision >= 1.5.0-preview2",
-      "SciSharp.TensorFlow.Redist >= 1.14.0",
-      "enhancedGoodBadLookerML.Model >= 1.0.0"
+      "SciSharp.TensorFlow.Redist >= 1.14.0"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\novel\\.nuget\\packages\\": {}
+    "C:\\Users\\Ryzen7-EXT\\.nuget\\packages\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\Windows\\MLGit\\WickonHightech\\enhancedGoodBadLookerML.ConsoleApp\\enhancedGoodBadLookerML.ConsoleApp.csproj",
+      "projectUniqueName": "C:\\Users\\Ryzen7-EXT\\Documents\\Github\\WickonHightech\\enhancedGoodBadLookerML.ConsoleApp\\enhancedGoodBadLookerML.ConsoleApp.csproj",
       "projectName": "enhancedGoodBadLookerML.ConsoleApp",
-      "projectPath": "E:\\Windows\\MLGit\\WickonHightech\\enhancedGoodBadLookerML.ConsoleApp\\enhancedGoodBadLookerML.ConsoleApp.csproj",
-      "packagesPath": "C:\\Users\\novel\\.nuget\\packages\\",
-      "outputPath": "E:\\Windows\\MLGit\\WickonHightech\\enhancedGoodBadLookerML.ConsoleApp\\obj\\",
+      "projectPath": "C:\\Users\\Ryzen7-EXT\\Documents\\Github\\WickonHightech\\enhancedGoodBadLookerML.ConsoleApp\\enhancedGoodBadLookerML.ConsoleApp.csproj",
+      "packagesPath": "C:\\Users\\Ryzen7-EXT\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Ryzen7-EXT\\Documents\\Github\\WickonHightech\\enhancedGoodBadLookerML.ConsoleApp\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+      ],
       "configFilePaths": [
-        "C:\\Users\\novel\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Ryzen7-EXT\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -6088,8 +6071,8 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "projectReferences": {
-            "E:\\Windows\\MLGit\\WickonHightech\\enhancedGoodBadLookerML.Model\\enhancedGoodBadLookerML.Model.csproj": {
-              "projectPath": "E:\\Windows\\MLGit\\WickonHightech\\enhancedGoodBadLookerML.Model\\enhancedGoodBadLookerML.Model.csproj"
+            "C:\\Users\\Ryzen7-EXT\\Documents\\Github\\WickonHightech\\enhancedGoodBadLookerML.Model\\enhancedGoodBadLookerML.Model.csproj": {
+              "projectPath": "C:\\Users\\Ryzen7-EXT\\Documents\\Github\\WickonHightech\\enhancedGoodBadLookerML.Model\\enhancedGoodBadLookerML.Model.csproj"
             }
           }
         }
@@ -6136,8 +6119,19 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1105",
+      "level": "Error",
+      "message": "Unable to find project information for 'C:\\Users\\Ryzen7-EXT\\Documents\\Github\\WickonHightech\\enhancedGoodBadLookerML.Model\\enhancedGoodBadLookerML.Model.csproj'. If you are using Visual Studio, this may be because the project is unloaded or not part of the current solution so run a restore from the command-line. Otherwise, the project file may be invalid or missing targets required for restore.",
+      "libraryId": "C:\\Users\\Ryzen7-EXT\\Documents\\Github\\WickonHightech\\enhancedGoodBadLookerML.Model\\enhancedGoodBadLookerML.Model.csproj",
+      "targetGraphs": [
+        ".NETCoreApp,Version=v3.1"
+      ]
+    }
+  ]
 }
