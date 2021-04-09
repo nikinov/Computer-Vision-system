@@ -8,7 +8,7 @@ using Microsoft.ML.OnnxRuntime;
 using System.Drawing;
 using System.IO;
 
-namespace ClassLibraryDetector
+namespace ONNXDetector
 {
     public class Detector
     {
@@ -22,7 +22,7 @@ namespace ClassLibraryDetector
             var emptyData = new List<ModelInput>();
 
             var data = context.Data.LoadFromEnumerable(emptyData);
-            
+
             var pipeline = context.Transforms.ResizeImages(resizing: Microsoft.ML.Transforms.Image.ImageResizingEstimator.ResizingKind.Fill,
                 outputColumnName: "data", imageHeight: 300, imageWidth: 300,
                 inputColumnName: nameof(ModelInput.image))

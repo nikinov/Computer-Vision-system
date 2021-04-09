@@ -1,12 +1,12 @@
-﻿using Microsoft.ML.Transforms.Image;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
+using Microsoft.ML.Transforms.Image;
 
-namespace ClassLibraryDetector
+namespace ONNXDetector
 {
     class ModelInput
     {

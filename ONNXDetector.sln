@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLibraryDetector", "ClassLibraryDetector.csproj", "{A2077440-1636-49BD-A599-499582E56E1B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ONNXDetector", "ONNXDetector.csproj", "{1E43CF08-0E63-4784-A553-C25B8E3E0155}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A2077440-1636-49BD-A599-499582E56E1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A2077440-1636-49BD-A599-499582E56E1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A2077440-1636-49BD-A599-499582E56E1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A2077440-1636-49BD-A599-499582E56E1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E43CF08-0E63-4784-A553-C25B8E3E0155}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E43CF08-0E63-4784-A553-C25B8E3E0155}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E43CF08-0E63-4784-A553-C25B8E3E0155}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E43CF08-0E63-4784-A553-C25B8E3E0155}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {70D3341A-114A-45E2-A96E-988C3D7A0871}
+		SolutionGuid = {2BAA4ACC-8FFB-4809-B32A-27FB4BB51DA1}
 	EndGlobalSection
 EndGlobal
