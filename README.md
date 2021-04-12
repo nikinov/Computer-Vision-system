@@ -36,7 +36,7 @@ detector.GetPredictionLabel(bitmapImage) // returns the predicted string label
  - this is a quick demo on how to use the Custom Vision Rest api to train and get an ONNX mdoel
 
 ### how to use
-you can call CreateAndTrain, it will make a folder with an ONNX model and a labels file that you can then use in the Prediction
+you can call CreateAndTrain, it will make a folder with an ONNX model and a labels file that you can then use in the Prediction,
 you can optionally specify the trainingEndpoint, trainingKey, predictionResourceId for your own account
 
 ```C#
