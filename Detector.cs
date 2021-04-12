@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.ML;
-using Microsoft.ML.OnnxRuntime;
 using System.Drawing;
 using System.IO;
-using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Prediction;
 using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Training;
 using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Training.Models;
 using System.Threading;
+using System.Net;
 
 namespace ONNXDetector
 {
@@ -19,27 +16,20 @@ namespace ONNXDetector
         private PredictionEngine<ModelInput, ModelPrediction> predictionEngine = null;
         private string[] labels = null;
 
-
         /*
          custom vision objects
          */
         // You can obtain these values from the Keys and Endpoint page for your Custom Vision resource in the Azure Portal.
-        private static string trainingEndpoint = "https://westeurope.api.cognitive.microsoft.com/";
-        private static string trainingKey = "44a1cdd0f2194aabbb23b158752bf9eb";
-        // You can obtain these values from the Keys and Endpoint page for your Custom Vision Prediction resource in the Azure Portal.
-        private static string predictionEndpoint = "<your prediction endpoint here>";
-        private static string predictionKey = "<your prediction key here>";
+        public string trainingEndpoint = "https://westeurope.api.cognitive.microsoft.com/";
+        public string trainingKey = "44a1cdd0f2194aabbb23b158752bf9eb";
         // You can obtain this value from the Properties page for your Custom Vision Prediction resource in the Azure Portal. See the "Resource ID" field. This typically has a value such as:
         // /subscriptions/<your subscription ID>/resourceGroups/<your resource group>/providers/Microsoft.CognitiveServices/accounts/<your Custom Vision prediction resource name>
-        private static string predictionResourceId = "/subscriptions/70bfdebf-70f6-44e5-829b-4cb8e034b648/resourceGroups/Wickon/providers/Microsoft.CognitiveServices/accounts/WickonDetector";
+        public string predictionResourceId = "/subscriptions/70bfdebf-70f6-44e5-829b-4cb8e034b648/resourceGroups/Wickon/providers/Microsoft.CognitiveServices/accounts/WickonDetector";
 
-        private static List<string> hemlockImages;
-        private static List<string> japaneseCherryImages;
-        private static Tag hemlockTag;
-        private static Tag japaneseCherryTag;
+        private static List<ImageSet> imagePaths = new List<ImageSet>();
+        private static List<Tag> labelTags = new List<Tag>();
         private static Iteration iteration;
-        private static string publishedModelName = "treeClassModel";
-        private static MemoryStream testImage;
+        CustomVisionTrainingClient trainingApi = null;
         /*
          custom vision objects
          */
@@ -49,15 +39,7 @@ namespace ONNXDetector
             /*
              custom vision calls
              */
-            CustomVisionTrainingClient trainingApi = AuthenticateTraining(trainingEndpoint, trainingKey);
-            CustomVisionPredictionClient predictionApi = AuthenticatePrediction(predictionEndpoint, predictionKey);
 
-            Project project = CreateProject(trainingApi);
-            AddTags(trainingApi, project);
-            UploadImages(trainingApi, project);
-            TrainProject(trainingApi, project);
-            PublishIteration(trainingApi, project);
-            TestIteration(predictionApi, project);
             /*
              custom vision calls
              */
@@ -113,6 +95,37 @@ namespace ONNXDetector
             return "None";
         }
 
+        public void CreateAndTrainModel(string projectName, string trainingAssetDir)
+        {
+            trainingApi = AuthenticateTraining(trainingEndpoint, trainingKey);
+            Project project = CreateProject(trainingApi, projectName);
+            AddTags(trainingApi, project, trainingAssetDir);
+            LoadImagesFromDisk(labelTags, trainingAssetDir);
+            foreach(Tag tag in labelTags)
+            {
+                UploadImages(trainingApi, project, tag);
+            }
+            TrainProject(trainingApi, project);
+            PublishIteration(trainingApi, project, projectName);
+            Export export = new Export(platform: "ONNX");
+            while (export.Status == "Exporting")
+            {
+                Console.WriteLine("Exporting...");
+                Thread.Sleep(1000);
+            }
+            if (export.Status == "Done")
+            {
+                 using (var client = new WebClient())
+                 {
+                    client.DownloadFile(export.DownloadUri, "model");
+                 }
+            }
+            else if (export.Status == "Failed")
+            {
+                throw new Exception("the model was not exported");
+            }
+        }
+
         private static CustomVisionTrainingClient AuthenticateTraining(string endpoint, string trainingKey)
         {
             // Create the Api, passing in the training key
@@ -122,56 +135,43 @@ namespace ONNXDetector
             };
             return trainingApi;
         }
-        private static CustomVisionPredictionClient AuthenticatePrediction(string endpoint, string predictionKey)
-        {
-            // Create a prediction endpoint, passing in the obtained prediction key
-            CustomVisionPredictionClient predictionApi = new CustomVisionPredictionClient(new Microsoft.Azure.CognitiveServices.Vision.CustomVision.Prediction.ApiKeyServiceClientCredentials(predictionKey))
-            {
-                Endpoint = endpoint
-            };
-            return predictionApi;
-        }
 
-        private static Project CreateProject(CustomVisionTrainingClient trainingApi)
+        private static Project CreateProject(CustomVisionTrainingClient trainingApi, string projectName)
         {
             // Create a new project
             Console.WriteLine("Creating new project:");
-            return trainingApi.CreateProject("My New Project");
+            return trainingApi.CreateProject(projectName);
         }
 
-        private static void AddTags(CustomVisionTrainingClient trainingApi, Project project)
+        private static void AddTags(CustomVisionTrainingClient trainingApi, Project project, string path)
         {
+            var directories = Directory.GetDirectories(path);
             // Make two tags in the new project
-            hemlockTag = trainingApi.CreateTag(project.Id, "Hemlock");
-            japaneseCherryTag = trainingApi.CreateTag(project.Id, "Japanese Cherry");
+            foreach (string tag in directories)
+            {
+                labelTags.Add(trainingApi.CreateTag(project.Id, tag));
+            }
         }
 
-        private static void LoadImagesFromDisk()
+        private static void LoadImagesFromDisk(List<Tag> labels, string assetPath)
         {
             // this loads the images to be uploaded from disk into memory
-            hemlockImages = Directory.GetFiles(Path.Combine("Images", "Hemlock")).ToList();
-            japaneseCherryImages = Directory.GetFiles(Path.Combine("Images", "Japanese Cherry")).ToList();
-            testImage = new MemoryStream(File.ReadAllBytes(Path.Combine("Images", "Test\\test_image.jpg")));
+            foreach(Tag label in labels)
+            {
+                imagePaths.Add(new ImageSet() { imagePaths = Directory.GetFiles(Path.Combine(assetPath, label.Name)).ToList() });
+            }
         }
 
-        private static void UploadImages(CustomVisionTrainingClient trainingApi, Project project)
+        private static void UploadImages(CustomVisionTrainingClient trainingApi, Project project, Tag tag)
         {
-            // Add some images to the tags
-            Console.WriteLine("\tUploading images");
-            LoadImagesFromDisk();
-
             // Images can be uploaded one at a time
-            foreach (var image in hemlockImages)
+            foreach (var image in imagePaths[labelTags.IndexOf(tag)].imagePaths)
             {
                 using (var stream = new MemoryStream(File.ReadAllBytes(image)))
                 {
-                    trainingApi.CreateImagesFromData(project.Id, stream, new List<Guid>() { hemlockTag.Id });
+                    trainingApi.CreateImagesFromData(project.Id, stream, new List<Guid>() { tag.Id });
                 }
             }
-
-            // Or uploaded in a single batch 
-            var imageFiles = japaneseCherryImages.Select(img => new ImageFileCreateEntry(Path.GetFileName(img), File.ReadAllBytes(img))).ToList();
-            trainingApi.CreateImagesFromFiles(project.Id, new ImageFileCreateBatch(imageFiles, new List<Guid>() { japaneseCherryTag.Id }));
 
         }
 
@@ -184,34 +184,23 @@ namespace ONNXDetector
             // The returned iteration will be in progress, and can be queried periodically to see when it has completed
             while (iteration.Status == "Training")
             {
-                Console.WriteLine("Waiting 10 seconds for training to complete...");
+                Console.WriteLine("iterating...");
                 Thread.Sleep(10000);
 
                 // Re-query the iteration to get it's updated status
                 iteration = trainingApi.GetIteration(project.Id, iteration.Id);
             }
         }
-        private static void PublishIteration(CustomVisionTrainingClient trainingApi, Project project)
+        private void PublishIteration(CustomVisionTrainingClient trainingApi, Project project, string projectName)
         {
-            trainingApi.PublishIteration(project.Id, iteration.Id, publishedModelName, predictionResourceId);
+            trainingApi.PublishIteration(project.Id, iteration.Id, "M" + projectName, predictionResourceId);
             Console.WriteLine("Done!\n");
 
             // Now there is a trained endpoint, it can be used to make a prediction
         }
-
-        private static void TestIteration(CustomVisionPredictionClient predictionApi, Project project)
-        {
-            // Make a prediction against the new project
-            Console.WriteLine("Making a prediction:");
-            var result = predictionApi.ClassifyImage(project.Id, publishedModelName, testImage);
-
-            // Loop over each prediction and write out the results
-            foreach (var c in result.Predictions)
-            {
-                Console.WriteLine($"\t{c.TagName}: {c.Probability:P1}");
-            }
-        }
-
-
+    }
+    class ImageSet
+    {
+        public List<string> imagePaths;
     }
 }
