@@ -41,9 +41,9 @@ you can optionally specify the trainingEndpoint, trainingKey, predictionResource
 
 ```C#
 // specifying the optional parameters
-string labelPath = "../../../labels.txt";
-string modelPath = "../../../model.onnx";
-string[] testFilesBMP = new[] { "../../../Test/BrownTest1.bmp" };
+detector.labelPath = "../../../labels.txt";
+detector.modelPath = "../../../model.onnx";
+detector.testFilesBMP = new[] { "../../../Test/BrownTest1.bmp" };
 
 // creating and training a model on my data
 detector.CreateAndTrainModel("MyProjectName", "MyAssetDirectory");
