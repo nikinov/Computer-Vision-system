@@ -5,8 +5,13 @@ Optical inspections systems.
 
 # How to Use
 
-add the libuarry ONNXDetector ... incomplete!
+add the libuarry ONNXDetector
+ - using System.Drawing;
 
-# How to build
+initialize the detector in main and call init
+ - Detector detector = new Detector();
+ - detector.Init("../../../model.onnx", "../../../Labels.txt");
 
-... incomplete!
+to predict an image on the onnx model run one of the following
+ - detector.GetPrediction(bitmapImage) returns a float array
+ - detector.GetPredictionLabel(bitmapImage) returns the predicted string label
