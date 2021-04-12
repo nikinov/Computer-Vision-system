@@ -6,7 +6,7 @@ Optical inspections systems.
 # How to Use
 
 add the libuarry ONNXDetector
- - using System.Drawing;
+ - using ONNXDetector;
 
 initialize the detector in main and call init
  - Detector detector = new Detector();
