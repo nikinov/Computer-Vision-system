@@ -41,9 +41,12 @@ you can optionally specify the trainingEndpoint, trainingKey, predictionResource
 
 ```C#
 // specifying the optional parameters
-detector.labelPath = "../../../labels.txt";
-detector.modelPath = "../../../model.onnx";
-detector.testFilesBMP = new[] { "../../../Test/BrownTest1.bmp" };
+// You can obtain these values from the Keys and Endpoint page for your Custom Vision resource in the Azure Portal.
+detector.trainingEndpoint = "https://westeurope.api.cognitive.microsoft.com/";
+detector.trainingKey = "44a1cdd0f2194aabbb23b158752bf9eb";
+// You can obtain this value from the Properties page for your Custom Vision Prediction resource in the Azure Portal. See the "Resource ID" field. This typically has a value such as:
+// /subscriptions/<your subscription ID>/resourceGroups/<your resource group>/providers/Microsoft.CognitiveServices/accounts/<your Custom Vision prediction resource name>
+detector.predictionResourceId = "/subscriptions/70bfdebf-70f6-44e5-829b-4cb8e034b648/resourceGroups/Wickon/providers/Microsoft.CognitiveServices/accounts/WickonDetector";
 
 // creating and training a model on my data
 detector.CreateAndTrainModel("MyProjectName", "MyAssetDirectory");
