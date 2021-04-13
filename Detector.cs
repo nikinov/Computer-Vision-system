@@ -101,7 +101,7 @@ namespace ONNXDetector
             Project project = CreateProject(trainingApi, projectName);
             AddTags(trainingApi, project, trainingAssetDir);
             LoadImagesFromDisk(labelTags, trainingAssetDir);
-            foreach(Tag tag in labelTags)
+            foreach (Tag tag in labelTags)
             {
                 UploadImages(trainingApi, project, tag);
             }
@@ -115,10 +115,10 @@ namespace ONNXDetector
             }
             if (export.Status == "Done")
             {
-                 using (var client = new WebClient())
-                 {
+                using (var client = new WebClient())
+                {
                     client.DownloadFile(export.DownloadUri, "model");
-                 }
+                }
             }
             else if (export.Status == "Failed")
             {
@@ -149,15 +149,17 @@ namespace ONNXDetector
             // Make two tags in the new project
             foreach (string tag in directories)
             {
-                labelTags.Add(trainingApi.CreateTag(project.Id, tag));
+                string dirName = new DirectoryInfo(tag).Name;
+                labelTags.Add(trainingApi.CreateTag(project.Id, dirName));
             }
         }
 
         private static void LoadImagesFromDisk(List<Tag> labels, string assetPath)
         {
             // this loads the images to be uploaded from disk into memory
-            foreach(Tag label in labels)
+            foreach (Tag label in labels)
             {
+                // error System.IO.DirectoryNotFoundException: 'Could not find a part of the path 'C:\Users\Ryzen7-EXT\Documents\Assets\_Bad_Brown'.'
                 imagePaths.Add(new ImageSet() { imagePaths = Directory.GetFiles(Path.Combine(assetPath, label.Name)).ToList() });
             }
         }
