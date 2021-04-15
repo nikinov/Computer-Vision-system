@@ -29,13 +29,14 @@ namespace WindowsFormsTestApp
 		{
 			// initialise detector
 			
-			Bitmap bitmapImage = new Bitmap("");
+			var bitmapImage = new Bitmap("../../BrownTest1.bmp");
 
 			// predict on bitmap with a float array output
-			Console.WriteLine(_detector.GetPrediction(bitmapImage));
+			var r = string.Join(@", ", _detector.GetPrediction(bitmapImage).Select(f => (f).ToString(@"0.000 %")));
+			richTextBox1.AppendText(r + Environment.NewLine);
 
 			// predict on bitmap with a string label output
-			Console.WriteLine(_detector.GetPredictionLabel(bitmapImage));
+			richTextBox1.AppendText(_detector.GetPredictionLabel(bitmapImage) + Environment.NewLine);
 		}
 
 		
