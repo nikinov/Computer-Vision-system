@@ -12,3 +12,8 @@ The following NuGet packages must be installed to OnnxDetector project:
 
 The following NuGet packages must be installed to project which uses OnnxDetector:
 	Google.Protobuf (>3.11.4)
+
+
+
+If exception "Unable to load DLL 'onnxruntime'" occurs then copy the onnxruntime.dll manually to bin folder.
+(or reinstall Microsoft.ML.OnnxRuntime NuGet package)
