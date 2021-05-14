@@ -23,3 +23,7 @@ Make sure you have installed all of the following prerequisites on your developm
 
 you can follow [this tutorial](https://learnopencv.com/image-classification-using-transfer-learning-in-pytorch/) for the python script
 as well as [this tutorial](https://www.youtube.com/watch?v=Dk88zv1KYMI) for deploymant in C++
+
+## integration
+
+comming soon
