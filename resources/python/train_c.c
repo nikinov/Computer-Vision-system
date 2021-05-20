@@ -900,6 +900,18 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_GetAttrStr(PyObject* obj, PyObject
 /* GetBuiltinName.proto */
 static PyObject *__Pyx_GetBuiltinName(PyObject *name);
 
+/* RaiseDoubleKeywords.proto */
+static void __Pyx_RaiseDoubleKeywordsError(const char* func_name, PyObject* kw_name);
+
+/* ParseKeywords.proto */
+static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
+    PyObject *kwds2, PyObject *values[], Py_ssize_t num_pos_args,\
+    const char* function_name);
+
+/* RaiseArgTupleInvalid.proto */
+static void __Pyx_RaiseArgtupleInvalid(const char* func_name, int exact,
+    Py_ssize_t num_min, Py_ssize_t num_max, Py_ssize_t num_found);
+
 /* PyDictVersioning.proto */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 #define __PYX_DICT_VERSION_INIT  ((PY_UINT64_T) -1)
@@ -1033,18 +1045,6 @@ static CYTHON_INLINE int __Pyx_IterFinish(void);
 
 /* UnpackItemEndCheck.proto */
 static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected);
-
-/* RaiseDoubleKeywords.proto */
-static void __Pyx_RaiseDoubleKeywordsError(const char* func_name, PyObject* kw_name);
-
-/* ParseKeywords.proto */
-static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
-    PyObject *kwds2, PyObject *values[], Py_ssize_t num_pos_args,\
-    const char* function_name);
-
-/* RaiseArgTupleInvalid.proto */
-static void __Pyx_RaiseArgtupleInvalid(const char* func_name, int exact,
-    Py_ssize_t num_min, Py_ssize_t num_max, Py_ssize_t num_found);
 
 /* PyIntBinop.proto */
 #if !CYTHON_COMPILING_IN_PYPY
@@ -1425,7 +1425,7 @@ static const char __pyx_k_start[] = "start";
 static const char __pyx_k_torch[] = "torch";
 static const char __pyx_k_train[] = "train";
 static const char __pyx_k_valid[] = "valid";
-static const char __pyx_k_Assets[] = "../Assets";
+static const char __pyx_k_Assets[] = "../../Assets";
 static const char __pyx_k_Linear[] = "Linear";
 static const char __pyx_k_Resize[] = "Resize";
 static const char __pyx_k_cuda_0[] = "cuda:0";
@@ -1548,6 +1548,7 @@ static const char __pyx_k_torch_utils_data[] = "torch.utils.data";
 static const char __pyx_k_train_model_prep[] = "train.model_prep";
 static const char __pyx_k_RandomResizedCrop[] = "RandomResizedCrop";
 static const char __pyx_k_matplotlib_pyplot[] = "matplotlib.pyplot";
+static const char __pyx_k_model_output_path[] = "model_output_path";
 static const char __pyx_k_test_image_tensor[] = "test_image_tensor";
 static const char __pyx_k_train_data_loader[] = "train_data_loader";
 static const char __pyx_k_valid_data_loader[] = "valid_data_loader";
@@ -1671,6 +1672,7 @@ static PyObject *__pyx_n_s_mean;
 static PyObject *__pyx_n_s_metaclass;
 static PyObject *__pyx_n_s_model;
 static PyObject *__pyx_kp_s_model_2;
+static PyObject *__pyx_n_s_model_output_path;
 static PyObject *__pyx_n_s_model_prep;
 static PyObject *__pyx_kp_s_models;
 static PyObject *__pyx_n_s_models_2;
@@ -1772,7 +1774,7 @@ static PyObject *__pyx_n_s_xlabel;
 static PyObject *__pyx_n_s_ylabel;
 static PyObject *__pyx_n_s_ylim;
 static PyObject *__pyx_n_s_zero_grad;
-static PyObject *__pyx_pf_7train_c_5train___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7train_c_5train___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_dataset_path, PyObject *__pyx_v_model_output_path); /* proto */
 static PyObject *__pyx_pf_7train_c_5train_2model_prep(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_resnet_type); /* proto */
 static PyObject *__pyx_pf_7train_c_5train_4train_and_validate(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_model, PyObject *__pyx_v_loss_criterion, PyObject *__pyx_v_optimizer, PyObject *__pyx_v_epochs, PyObject *__pyx_v_show_results); /* proto */
 static PyObject *__pyx_pf_7train_c_5train_6compute_test_set_accuracy(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_model, PyObject *__pyx_v_loss_criterion); /* proto */
@@ -1812,42 +1814,111 @@ static PyObject *__pyx_tuple__10;
 static PyObject *__pyx_tuple__11;
 static PyObject *__pyx_tuple__14;
 static PyObject *__pyx_tuple__16;
-static PyObject *__pyx_tuple__18;
+static PyObject *__pyx_tuple__17;
 static PyObject *__pyx_tuple__19;
-static PyObject *__pyx_tuple__21;
+static PyObject *__pyx_tuple__20;
 static PyObject *__pyx_tuple__22;
-static PyObject *__pyx_tuple__24;
-static PyObject *__pyx_tuple__26;
+static PyObject *__pyx_tuple__23;
+static PyObject *__pyx_tuple__25;
+static PyObject *__pyx_tuple__27;
 static PyObject *__pyx_codeobj__15;
-static PyObject *__pyx_codeobj__17;
-static PyObject *__pyx_codeobj__20;
-static PyObject *__pyx_codeobj__23;
-static PyObject *__pyx_codeobj__25;
+static PyObject *__pyx_codeobj__18;
+static PyObject *__pyx_codeobj__21;
+static PyObject *__pyx_codeobj__24;
+static PyObject *__pyx_codeobj__26;
 /* Late includes */
 
 /* "train_c.pyx":17
  * 
  * class train:
- *     def __init__(self):             # <<<<<<<<<<<<<<
+ *     def __init__(self, dataset_path="../../Assets", model_output_path="../models"):             # <<<<<<<<<<<<<<
  *         # prepare the data and the transforms
  *         self.image_transforms = {
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7train_c_5train_1__init__(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
-static PyMethodDef __pyx_mdef_7train_c_5train_1__init__ = {"__init__", (PyCFunction)__pyx_pw_7train_c_5train_1__init__, METH_O, 0};
-static PyObject *__pyx_pw_7train_c_5train_1__init__(PyObject *__pyx_self, PyObject *__pyx_v_self) {
+static PyObject *__pyx_pw_7train_c_5train_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7train_c_5train_1__init__ = {"__init__", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_7train_c_5train_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7train_c_5train_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_v_self = 0;
+  PyObject *__pyx_v_dataset_path = 0;
+  PyObject *__pyx_v_model_output_path = 0;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__init__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_7train_c_5train___init__(__pyx_self, ((PyObject *)__pyx_v_self));
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_dataset_path,&__pyx_n_s_model_output_path,0};
+    PyObject* values[3] = {0,0,0};
+    values[1] = ((PyObject *)((PyObject*)__pyx_kp_s_Assets));
+    values[2] = ((PyObject *)((PyObject*)__pyx_kp_s_models));
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_self)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dataset_path);
+          if (value) { values[1] = value; kw_args--; }
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_model_output_path);
+          if (value) { values[2] = value; kw_args--; }
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 17, __pyx_L3_error)
+      }
+    } else {
+      switch (PyTuple_GET_SIZE(__pyx_args)) {
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+    }
+    __pyx_v_self = values[0];
+    __pyx_v_dataset_path = values[1];
+    __pyx_v_model_output_path = values[2];
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 1, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 17, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("train_c.train.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_7train_c_5train___init__(__pyx_self, __pyx_v_self, __pyx_v_dataset_path, __pyx_v_model_output_path);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7train_c_5train___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
+static PyObject *__pyx_pf_7train_c_5train___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_dataset_path, PyObject *__pyx_v_model_output_path) {
   PyObject *__pyx_v_train_directory = NULL;
   PyObject *__pyx_v_valid_directory = NULL;
   PyObject *__pyx_v_test_directory = NULL;
@@ -2576,7 +2647,7 @@ static PyObject *__pyx_pf_7train_c_5train___init__(CYTHON_UNUSED PyObject *__pyx
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "train_c.pyx":19
- *     def __init__(self):
+ *     def __init__(self, dataset_path="../../Assets", model_output_path="../models"):
  *         # prepare the data and the transforms
  *         self.image_transforms = {             # <<<<<<<<<<<<<<
  *             'train': transforms.Compose([
@@ -2588,20 +2659,20 @@ static PyObject *__pyx_pf_7train_c_5train___init__(CYTHON_UNUSED PyObject *__pyx
   /* "train_c.pyx":44
  *             ])
  *         }
- *         self.dataset_path = "../Assets"             # <<<<<<<<<<<<<<
- *         self.pt_path = "../models"
+ *         self.dataset_path = dataset_path             # <<<<<<<<<<<<<<
+ *         self.pt_path = model_output_path
  * 
  */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_dataset_path, __pyx_kp_s_Assets) < 0) __PYX_ERR(0, 44, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_dataset_path, __pyx_v_dataset_path) < 0) __PYX_ERR(0, 44, __pyx_L1_error)
 
   /* "train_c.pyx":45
  *         }
- *         self.dataset_path = "../Assets"
- *         self.pt_path = "../models"             # <<<<<<<<<<<<<<
+ *         self.dataset_path = dataset_path
+ *         self.pt_path = model_output_path             # <<<<<<<<<<<<<<
  * 
  *         # create train valid and test directory
  */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_pt_path, __pyx_kp_s_models) < 0) __PYX_ERR(0, 45, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_pt_path, __pyx_v_model_output_path) < 0) __PYX_ERR(0, 45, __pyx_L1_error)
 
   /* "train_c.pyx":48
  * 
@@ -3342,7 +3413,7 @@ static PyObject *__pyx_pf_7train_c_5train___init__(CYTHON_UNUSED PyObject *__pyx
   /* "train_c.pyx":17
  * 
  * class train:
- *     def __init__(self):             # <<<<<<<<<<<<<<
+ *     def __init__(self, dataset_path="../../Assets", model_output_path="../models"):             # <<<<<<<<<<<<<<
  *         # prepare the data and the transforms
  *         self.image_transforms = {
  */
@@ -9156,6 +9227,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_metaclass, __pyx_k_metaclass, sizeof(__pyx_k_metaclass), 0, 0, 1, 1},
   {&__pyx_n_s_model, __pyx_k_model, sizeof(__pyx_k_model), 0, 0, 1, 1},
   {&__pyx_kp_s_model_2, __pyx_k_model_2, sizeof(__pyx_k_model_2), 0, 0, 1, 0},
+  {&__pyx_n_s_model_output_path, __pyx_k_model_output_path, sizeof(__pyx_k_model_output_path), 0, 0, 1, 1},
   {&__pyx_n_s_model_prep, __pyx_k_model_prep, sizeof(__pyx_k_model_prep), 0, 0, 1, 1},
   {&__pyx_kp_s_models, __pyx_k_models, sizeof(__pyx_k_models), 0, 0, 1, 0},
   {&__pyx_n_s_models_2, __pyx_k_models_2, sizeof(__pyx_k_models_2), 0, 0, 1, 1},
@@ -9371,14 +9443,17 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "train_c.pyx":17
  * 
  * class train:
- *     def __init__(self):             # <<<<<<<<<<<<<<
+ *     def __init__(self, dataset_path="../../Assets", model_output_path="../models"):             # <<<<<<<<<<<<<<
  *         # prepare the data and the transforms
  *         self.image_transforms = {
  */
-  __pyx_tuple__14 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_train_directory, __pyx_n_s_valid_directory, __pyx_n_s_test_directory, __pyx_n_s_k, __pyx_n_s_v); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_tuple__14 = PyTuple_Pack(8, __pyx_n_s_self, __pyx_n_s_dataset_path, __pyx_n_s_model_output_path, __pyx_n_s_train_directory, __pyx_n_s_valid_directory, __pyx_n_s_test_directory, __pyx_n_s_k, __pyx_n_s_v); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__14);
   __Pyx_GIVEREF(__pyx_tuple__14);
-  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_train_c_pyx, __pyx_n_s_init, 17, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(3, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_train_c_pyx, __pyx_n_s_init, 17, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_tuple__16 = PyTuple_Pack(2, ((PyObject*)__pyx_kp_s_Assets), ((PyObject*)__pyx_kp_s_models)); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__16);
+  __Pyx_GIVEREF(__pyx_tuple__16);
 
   /* "train_c.pyx":80
  *         self.resnet = models.resnet152()
@@ -9387,13 +9462,13 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *         """
  *         Function to prepare the model
  */
-  __pyx_tuple__16 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_resnet_type, __pyx_n_s_param); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 80, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__16);
-  __Pyx_GIVEREF(__pyx_tuple__16);
-  __pyx_codeobj__17 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_train_c_pyx, __pyx_n_s_model_prep, 80, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__17)) __PYX_ERR(0, 80, __pyx_L1_error)
-  __pyx_tuple__18 = PyTuple_Pack(1, ((PyObject *)Py_None)); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 80, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__18);
-  __Pyx_GIVEREF(__pyx_tuple__18);
+  __pyx_tuple__17 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_resnet_type, __pyx_n_s_param); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__17);
+  __Pyx_GIVEREF(__pyx_tuple__17);
+  __pyx_codeobj__18 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__17, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_train_c_pyx, __pyx_n_s_model_prep, 80, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__18)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __pyx_tuple__19 = PyTuple_Pack(1, ((PyObject *)Py_None)); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__19);
+  __Pyx_GIVEREF(__pyx_tuple__19);
 
   /* "train_c.pyx":115
  *         self.optimizer = optim.Adam(self.resnet.parameters())
@@ -9402,13 +9477,13 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *         """
  *         Function to train and validate model
  */
-  __pyx_tuple__19 = PyTuple_Pack(33, __pyx_n_s_self, __pyx_n_s_model, __pyx_n_s_loss_criterion, __pyx_n_s_optimizer, __pyx_n_s_epochs, __pyx_n_s_show_results, __pyx_n_s_start, __pyx_n_s_history, __pyx_n_s_best_loss, __pyx_n_s_best_epoch, __pyx_n_s_best_model, __pyx_n_s_epoch, __pyx_n_s_epoch_start, __pyx_n_s_train_loss, __pyx_n_s_train_acc, __pyx_n_s_valid_loss, __pyx_n_s_valid_acc, __pyx_n_s_i, __pyx_n_s_inputs, __pyx_n_s_labels, __pyx_n_s_outputs, __pyx_n_s_loss, __pyx_n_s_ret, __pyx_n_s_predictions, __pyx_n_s_correct_counts, __pyx_n_s_acc, __pyx_n_s_j, __pyx_n_s_avg_train_loss, __pyx_n_s_avg_train_acc, __pyx_n_s_avg_valid_loss, __pyx_n_s_avg_valid_acc, __pyx_n_s_epoch_end, __pyx_n_s_num_epochs); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 115, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__19);
-  __Pyx_GIVEREF(__pyx_tuple__19);
-  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(6, 0, 33, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_train_c_pyx, __pyx_n_s_train_and_validate, 115, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 115, __pyx_L1_error)
-  __pyx_tuple__21 = PyTuple_Pack(5, ((PyObject *)Py_None), ((PyObject *)Py_None), ((PyObject *)Py_None), ((PyObject *)__pyx_int_25), ((PyObject *)Py_False)); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 115, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__21);
-  __Pyx_GIVEREF(__pyx_tuple__21);
+  __pyx_tuple__20 = PyTuple_Pack(33, __pyx_n_s_self, __pyx_n_s_model, __pyx_n_s_loss_criterion, __pyx_n_s_optimizer, __pyx_n_s_epochs, __pyx_n_s_show_results, __pyx_n_s_start, __pyx_n_s_history, __pyx_n_s_best_loss, __pyx_n_s_best_epoch, __pyx_n_s_best_model, __pyx_n_s_epoch, __pyx_n_s_epoch_start, __pyx_n_s_train_loss, __pyx_n_s_train_acc, __pyx_n_s_valid_loss, __pyx_n_s_valid_acc, __pyx_n_s_i, __pyx_n_s_inputs, __pyx_n_s_labels, __pyx_n_s_outputs, __pyx_n_s_loss, __pyx_n_s_ret, __pyx_n_s_predictions, __pyx_n_s_correct_counts, __pyx_n_s_acc, __pyx_n_s_j, __pyx_n_s_avg_train_loss, __pyx_n_s_avg_train_acc, __pyx_n_s_avg_valid_loss, __pyx_n_s_avg_valid_acc, __pyx_n_s_epoch_end, __pyx_n_s_num_epochs); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__20);
+  __Pyx_GIVEREF(__pyx_tuple__20);
+  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(6, 0, 33, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_train_c_pyx, __pyx_n_s_train_and_validate, 115, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_tuple__22 = PyTuple_Pack(5, ((PyObject *)Py_None), ((PyObject *)Py_None), ((PyObject *)Py_None), ((PyObject *)__pyx_int_25), ((PyObject *)Py_False)); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__22);
+  __Pyx_GIVEREF(__pyx_tuple__22);
 
   /* "train_c.pyx":267
  *         return best_model
@@ -9417,10 +9492,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *         '''
  *         Function to compute the accuracy on the test set
  */
-  __pyx_tuple__22 = PyTuple_Pack(16, __pyx_n_s_self, __pyx_n_s_model, __pyx_n_s_loss_criterion, __pyx_n_s_test_acc, __pyx_n_s_test_loss, __pyx_n_s_j, __pyx_n_s_inputs, __pyx_n_s_labels, __pyx_n_s_outputs, __pyx_n_s_loss, __pyx_n_s_ret, __pyx_n_s_predictions, __pyx_n_s_correct_counts, __pyx_n_s_acc, __pyx_n_s_avg_test_loss, __pyx_n_s_avg_test_acc); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(0, 267, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__22);
-  __Pyx_GIVEREF(__pyx_tuple__22);
-  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(3, 0, 16, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_train_c_pyx, __pyx_n_s_compute_test_set_accuracy, 267, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 267, __pyx_L1_error)
+  __pyx_tuple__23 = PyTuple_Pack(16, __pyx_n_s_self, __pyx_n_s_model, __pyx_n_s_loss_criterion, __pyx_n_s_test_acc, __pyx_n_s_test_loss, __pyx_n_s_j, __pyx_n_s_inputs, __pyx_n_s_labels, __pyx_n_s_outputs, __pyx_n_s_loss, __pyx_n_s_ret, __pyx_n_s_predictions, __pyx_n_s_correct_counts, __pyx_n_s_acc, __pyx_n_s_avg_test_loss, __pyx_n_s_avg_test_acc); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(0, 267, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__23);
+  __Pyx_GIVEREF(__pyx_tuple__23);
+  __pyx_codeobj__24 = (PyObject*)__Pyx_PyCode_New(3, 0, 16, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__23, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_train_c_pyx, __pyx_n_s_compute_test_set_accuracy, 267, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__24)) __PYX_ERR(0, 267, __pyx_L1_error)
 
   /* "train_c.pyx":316
  *         print("Test accuracy : " + str(avg_test_acc))
@@ -9429,13 +9504,13 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *         '''
  *         Function to predict the class of a single test image
  */
-  __pyx_tuple__24 = PyTuple_Pack(13, __pyx_n_s_self, __pyx_n_s_test_image_name, __pyx_n_s_model, __pyx_n_s_transform, __pyx_n_s_test_image, __pyx_n_s_test_image_tensor, __pyx_n_s_out, __pyx_n_s_ps, __pyx_n_s_topk, __pyx_n_s_topclass, __pyx_n_s_cls, __pyx_n_s_score, __pyx_n_s_i); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(0, 316, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__24);
-  __Pyx_GIVEREF(__pyx_tuple__24);
-  __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(3, 0, 13, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_train_c_pyx, __pyx_n_s_predict, 316, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) __PYX_ERR(0, 316, __pyx_L1_error)
-  __pyx_tuple__26 = PyTuple_Pack(1, ((PyObject *)Py_None)); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(0, 316, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__26);
-  __Pyx_GIVEREF(__pyx_tuple__26);
+  __pyx_tuple__25 = PyTuple_Pack(13, __pyx_n_s_self, __pyx_n_s_test_image_name, __pyx_n_s_model, __pyx_n_s_transform, __pyx_n_s_test_image, __pyx_n_s_test_image_tensor, __pyx_n_s_out, __pyx_n_s_ps, __pyx_n_s_topk, __pyx_n_s_topclass, __pyx_n_s_cls, __pyx_n_s_score, __pyx_n_s_i); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(0, 316, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__25);
+  __Pyx_GIVEREF(__pyx_tuple__25);
+  __pyx_codeobj__26 = (PyObject*)__Pyx_PyCode_New(3, 0, 13, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__25, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_train_c_pyx, __pyx_n_s_predict, 316, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__26)) __PYX_ERR(0, 316, __pyx_L1_error)
+  __pyx_tuple__27 = PyTuple_Pack(1, ((PyObject *)Py_None)); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(0, 316, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__27);
+  __Pyx_GIVEREF(__pyx_tuple__27);
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -9944,7 +10019,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  * class train:             # <<<<<<<<<<<<<<
- *     def __init__(self):
+ *     def __init__(self, dataset_path="../../Assets", model_output_path="../models"):
  *         # prepare the data and the transforms
  */
   __pyx_t_2 = __Pyx_Py3MetaclassPrepare((PyObject *) NULL, __pyx_empty_tuple, __pyx_n_s_train, __pyx_n_s_train, (PyObject *) NULL, __pyx_n_s_train_c, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 16, __pyx_L1_error)
@@ -9953,12 +10028,13 @@ if (!__Pyx_RefNanny) {
   /* "train_c.pyx":17
  * 
  * class train:
- *     def __init__(self):             # <<<<<<<<<<<<<<
+ *     def __init__(self, dataset_path="../../Assets", model_output_path="../models"):             # <<<<<<<<<<<<<<
  *         # prepare the data and the transforms
  *         self.image_transforms = {
  */
   __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_7train_c_5train_1__init__, 0, __pyx_n_s_train___init, NULL, __pyx_n_s_train_c, __pyx_d, ((PyObject *)__pyx_codeobj__15)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_1, __pyx_tuple__16);
   if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_1) < 0) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
@@ -9969,9 +10045,9 @@ if (!__Pyx_RefNanny) {
  *         """
  *         Function to prepare the model
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_7train_c_5train_3model_prep, 0, __pyx_n_s_train_model_prep, NULL, __pyx_n_s_train_c, __pyx_d, ((PyObject *)__pyx_codeobj__17)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_7train_c_5train_3model_prep, 0, __pyx_n_s_train_model_prep, NULL, __pyx_n_s_train_c, __pyx_d, ((PyObject *)__pyx_codeobj__18)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 80, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_1, __pyx_tuple__18);
+  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_1, __pyx_tuple__19);
   if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_model_prep, __pyx_t_1) < 0) __PYX_ERR(0, 80, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
@@ -9982,9 +10058,9 @@ if (!__Pyx_RefNanny) {
  *         """
  *         Function to train and validate model
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_7train_c_5train_5train_and_validate, 0, __pyx_n_s_train_train_and_validate, NULL, __pyx_n_s_train_c, __pyx_d, ((PyObject *)__pyx_codeobj__20)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_7train_c_5train_5train_and_validate, 0, __pyx_n_s_train_train_and_validate, NULL, __pyx_n_s_train_c, __pyx_d, ((PyObject *)__pyx_codeobj__21)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 115, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_1, __pyx_tuple__21);
+  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_1, __pyx_tuple__22);
   if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_train_and_validate, __pyx_t_1) < 0) __PYX_ERR(0, 115, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
@@ -9995,7 +10071,7 @@ if (!__Pyx_RefNanny) {
  *         '''
  *         Function to compute the accuracy on the test set
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_7train_c_5train_7compute_test_set_accuracy, 0, __pyx_n_s_train_compute_test_set_accuracy, NULL, __pyx_n_s_train_c, __pyx_d, ((PyObject *)__pyx_codeobj__23)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_7train_c_5train_7compute_test_set_accuracy, 0, __pyx_n_s_train_compute_test_set_accuracy, NULL, __pyx_n_s_train_c, __pyx_d, ((PyObject *)__pyx_codeobj__24)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_compute_test_set_accuracy, __pyx_t_1) < 0) __PYX_ERR(0, 267, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -10007,9 +10083,9 @@ if (!__Pyx_RefNanny) {
  *         '''
  *         Function to predict the class of a single test image
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_7train_c_5train_9predict, 0, __pyx_n_s_train_predict, NULL, __pyx_n_s_train_c, __pyx_d, ((PyObject *)__pyx_codeobj__25)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 316, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_7train_c_5train_9predict, 0, __pyx_n_s_train_predict, NULL, __pyx_n_s_train_c, __pyx_d, ((PyObject *)__pyx_codeobj__26)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 316, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_1, __pyx_tuple__26);
+  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_1, __pyx_tuple__27);
   if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_predict, __pyx_t_1) < 0) __PYX_ERR(0, 316, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
@@ -10017,7 +10093,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  * class train:             # <<<<<<<<<<<<<<
- *     def __init__(self):
+ *     def __init__(self, dataset_path="../../Assets", model_output_path="../models"):
  *         # prepare the data and the transforms
  */
   __pyx_t_1 = __Pyx_Py3ClassCreate(((PyObject*)&__Pyx_DefaultClassType), __pyx_n_s_train, __pyx_empty_tuple, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 16, __pyx_L1_error)
@@ -10105,6 +10181,148 @@ static PyObject *__Pyx_GetBuiltinName(PyObject *name) {
 #endif
     }
     return result;
+}
+
+/* RaiseDoubleKeywords */
+static void __Pyx_RaiseDoubleKeywordsError(
+    const char* func_name,
+    PyObject* kw_name)
+{
+    PyErr_Format(PyExc_TypeError,
+        #if PY_MAJOR_VERSION >= 3
+        "%s() got multiple values for keyword argument '%U'", func_name, kw_name);
+        #else
+        "%s() got multiple values for keyword argument '%s'", func_name,
+        PyString_AsString(kw_name));
+        #endif
+}
+
+/* ParseKeywords */
+static int __Pyx_ParseOptionalKeywords(
+    PyObject *kwds,
+    PyObject **argnames[],
+    PyObject *kwds2,
+    PyObject *values[],
+    Py_ssize_t num_pos_args,
+    const char* function_name)
+{
+    PyObject *key = 0, *value = 0;
+    Py_ssize_t pos = 0;
+    PyObject*** name;
+    PyObject*** first_kw_arg = argnames + num_pos_args;
+    while (PyDict_Next(kwds, &pos, &key, &value)) {
+        name = first_kw_arg;
+        while (*name && (**name != key)) name++;
+        if (*name) {
+            values[name-argnames] = value;
+            continue;
+        }
+        name = first_kw_arg;
+        #if PY_MAJOR_VERSION < 3
+        if (likely(PyString_Check(key))) {
+            while (*name) {
+                if ((CYTHON_COMPILING_IN_PYPY || PyString_GET_SIZE(**name) == PyString_GET_SIZE(key))
+                        && _PyString_Eq(**name, key)) {
+                    values[name-argnames] = value;
+                    break;
+                }
+                name++;
+            }
+            if (*name) continue;
+            else {
+                PyObject*** argname = argnames;
+                while (argname != first_kw_arg) {
+                    if ((**argname == key) || (
+                            (CYTHON_COMPILING_IN_PYPY || PyString_GET_SIZE(**argname) == PyString_GET_SIZE(key))
+                             && _PyString_Eq(**argname, key))) {
+                        goto arg_passed_twice;
+                    }
+                    argname++;
+                }
+            }
+        } else
+        #endif
+        if (likely(PyUnicode_Check(key))) {
+            while (*name) {
+                int cmp = (**name == key) ? 0 :
+                #if !CYTHON_COMPILING_IN_PYPY && PY_MAJOR_VERSION >= 3
+                    (__Pyx_PyUnicode_GET_LENGTH(**name) != __Pyx_PyUnicode_GET_LENGTH(key)) ? 1 :
+                #endif
+                    PyUnicode_Compare(**name, key);
+                if (cmp < 0 && unlikely(PyErr_Occurred())) goto bad;
+                if (cmp == 0) {
+                    values[name-argnames] = value;
+                    break;
+                }
+                name++;
+            }
+            if (*name) continue;
+            else {
+                PyObject*** argname = argnames;
+                while (argname != first_kw_arg) {
+                    int cmp = (**argname == key) ? 0 :
+                    #if !CYTHON_COMPILING_IN_PYPY && PY_MAJOR_VERSION >= 3
+                        (__Pyx_PyUnicode_GET_LENGTH(**argname) != __Pyx_PyUnicode_GET_LENGTH(key)) ? 1 :
+                    #endif
+                        PyUnicode_Compare(**argname, key);
+                    if (cmp < 0 && unlikely(PyErr_Occurred())) goto bad;
+                    if (cmp == 0) goto arg_passed_twice;
+                    argname++;
+                }
+            }
+        } else
+            goto invalid_keyword_type;
+        if (kwds2) {
+            if (unlikely(PyDict_SetItem(kwds2, key, value))) goto bad;
+        } else {
+            goto invalid_keyword;
+        }
+    }
+    return 0;
+arg_passed_twice:
+    __Pyx_RaiseDoubleKeywordsError(function_name, key);
+    goto bad;
+invalid_keyword_type:
+    PyErr_Format(PyExc_TypeError,
+        "%.200s() keywords must be strings", function_name);
+    goto bad;
+invalid_keyword:
+    PyErr_Format(PyExc_TypeError,
+    #if PY_MAJOR_VERSION < 3
+        "%.200s() got an unexpected keyword argument '%.200s'",
+        function_name, PyString_AsString(key));
+    #else
+        "%s() got an unexpected keyword argument '%U'",
+        function_name, key);
+    #endif
+bad:
+    return -1;
+}
+
+/* RaiseArgTupleInvalid */
+static void __Pyx_RaiseArgtupleInvalid(
+    const char* func_name,
+    int exact,
+    Py_ssize_t num_min,
+    Py_ssize_t num_max,
+    Py_ssize_t num_found)
+{
+    Py_ssize_t num_expected;
+    const char *more_or_less;
+    if (num_found < num_min) {
+        num_expected = num_min;
+        more_or_less = "at least";
+    } else {
+        num_expected = num_max;
+        more_or_less = "at most";
+    }
+    if (exact) {
+        more_or_less = "exactly";
+    }
+    PyErr_Format(PyExc_TypeError,
+                 "%.200s() takes %.8s %" CYTHON_FORMAT_SSIZE_T "d positional argument%.1s (%" CYTHON_FORMAT_SSIZE_T "d given)",
+                 func_name, more_or_less, num_expected,
+                 (num_expected == 1) ? "" : "s", num_found);
 }
 
 /* PyDictVersioning */
@@ -10537,148 +10755,6 @@ static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected) {
         return __Pyx_IterFinish();
     }
     return 0;
-}
-
-/* RaiseDoubleKeywords */
-static void __Pyx_RaiseDoubleKeywordsError(
-    const char* func_name,
-    PyObject* kw_name)
-{
-    PyErr_Format(PyExc_TypeError,
-        #if PY_MAJOR_VERSION >= 3
-        "%s() got multiple values for keyword argument '%U'", func_name, kw_name);
-        #else
-        "%s() got multiple values for keyword argument '%s'", func_name,
-        PyString_AsString(kw_name));
-        #endif
-}
-
-/* ParseKeywords */
-static int __Pyx_ParseOptionalKeywords(
-    PyObject *kwds,
-    PyObject **argnames[],
-    PyObject *kwds2,
-    PyObject *values[],
-    Py_ssize_t num_pos_args,
-    const char* function_name)
-{
-    PyObject *key = 0, *value = 0;
-    Py_ssize_t pos = 0;
-    PyObject*** name;
-    PyObject*** first_kw_arg = argnames + num_pos_args;
-    while (PyDict_Next(kwds, &pos, &key, &value)) {
-        name = first_kw_arg;
-        while (*name && (**name != key)) name++;
-        if (*name) {
-            values[name-argnames] = value;
-            continue;
-        }
-        name = first_kw_arg;
-        #if PY_MAJOR_VERSION < 3
-        if (likely(PyString_Check(key))) {
-            while (*name) {
-                if ((CYTHON_COMPILING_IN_PYPY || PyString_GET_SIZE(**name) == PyString_GET_SIZE(key))
-                        && _PyString_Eq(**name, key)) {
-                    values[name-argnames] = value;
-                    break;
-                }
-                name++;
-            }
-            if (*name) continue;
-            else {
-                PyObject*** argname = argnames;
-                while (argname != first_kw_arg) {
-                    if ((**argname == key) || (
-                            (CYTHON_COMPILING_IN_PYPY || PyString_GET_SIZE(**argname) == PyString_GET_SIZE(key))
-                             && _PyString_Eq(**argname, key))) {
-                        goto arg_passed_twice;
-                    }
-                    argname++;
-                }
-            }
-        } else
-        #endif
-        if (likely(PyUnicode_Check(key))) {
-            while (*name) {
-                int cmp = (**name == key) ? 0 :
-                #if !CYTHON_COMPILING_IN_PYPY && PY_MAJOR_VERSION >= 3
-                    (__Pyx_PyUnicode_GET_LENGTH(**name) != __Pyx_PyUnicode_GET_LENGTH(key)) ? 1 :
-                #endif
-                    PyUnicode_Compare(**name, key);
-                if (cmp < 0 && unlikely(PyErr_Occurred())) goto bad;
-                if (cmp == 0) {
-                    values[name-argnames] = value;
-                    break;
-                }
-                name++;
-            }
-            if (*name) continue;
-            else {
-                PyObject*** argname = argnames;
-                while (argname != first_kw_arg) {
-                    int cmp = (**argname == key) ? 0 :
-                    #if !CYTHON_COMPILING_IN_PYPY && PY_MAJOR_VERSION >= 3
-                        (__Pyx_PyUnicode_GET_LENGTH(**argname) != __Pyx_PyUnicode_GET_LENGTH(key)) ? 1 :
-                    #endif
-                        PyUnicode_Compare(**argname, key);
-                    if (cmp < 0 && unlikely(PyErr_Occurred())) goto bad;
-                    if (cmp == 0) goto arg_passed_twice;
-                    argname++;
-                }
-            }
-        } else
-            goto invalid_keyword_type;
-        if (kwds2) {
-            if (unlikely(PyDict_SetItem(kwds2, key, value))) goto bad;
-        } else {
-            goto invalid_keyword;
-        }
-    }
-    return 0;
-arg_passed_twice:
-    __Pyx_RaiseDoubleKeywordsError(function_name, key);
-    goto bad;
-invalid_keyword_type:
-    PyErr_Format(PyExc_TypeError,
-        "%.200s() keywords must be strings", function_name);
-    goto bad;
-invalid_keyword:
-    PyErr_Format(PyExc_TypeError,
-    #if PY_MAJOR_VERSION < 3
-        "%.200s() got an unexpected keyword argument '%.200s'",
-        function_name, PyString_AsString(key));
-    #else
-        "%s() got an unexpected keyword argument '%U'",
-        function_name, key);
-    #endif
-bad:
-    return -1;
-}
-
-/* RaiseArgTupleInvalid */
-static void __Pyx_RaiseArgtupleInvalid(
-    const char* func_name,
-    int exact,
-    Py_ssize_t num_min,
-    Py_ssize_t num_max,
-    Py_ssize_t num_found)
-{
-    Py_ssize_t num_expected;
-    const char *more_or_less;
-    if (num_found < num_min) {
-        num_expected = num_min;
-        more_or_less = "at least";
-    } else {
-        num_expected = num_max;
-        more_or_less = "at most";
-    }
-    if (exact) {
-        more_or_less = "exactly";
-    }
-    PyErr_Format(PyExc_TypeError,
-                 "%.200s() takes %.8s %" CYTHON_FORMAT_SSIZE_T "d positional argument%.1s (%" CYTHON_FORMAT_SSIZE_T "d given)",
-                 func_name, more_or_less, num_expected,
-                 (num_expected == 1) ? "" : "s", num_found);
 }
 
 /* PyIntBinop */

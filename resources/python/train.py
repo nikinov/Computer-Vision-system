@@ -14,7 +14,7 @@ from PIL import Image
 
 
 class train:
-    def __init__(self):
+    def __init__(self, dataset_path="../../Assets", model_output_path="../models"):
         # prepare the data and the transforms
         self.image_transforms = {
             'train': transforms.Compose([
@@ -41,8 +41,8 @@ class train:
                                      [0.229, 0.224, 0.225])
             ])
         }
-        self.dataset_path = "../../Assets"
-        self.pt_path = "../models"
+        self.dataset_path = dataset_path
+        self.pt_path = model_output_path
 
         # create train valid and test directory
         train_directory = os.path.join(self.dataset_path, 'train')
@@ -81,7 +81,6 @@ class train:
         """
         Function to prepare the model
         :param resnet_type: type of resnet model
-        :return:
         """
 
         if resnet_type == None:
@@ -114,7 +113,7 @@ class train:
 
     def train_and_validate(self, model=None, loss_criterion=None, optimizer=None, epochs=25, show_results=False):
         """
-        Function to train and validate model
+        Train and validate the model
         :param model: the model to train
         :param loss_criterion: the loss function
         :param optimizer: the optimizer for the model
@@ -313,13 +312,12 @@ class train:
 
         print("Test accuracy : " + str(avg_test_acc))
 
-    def predict(self, test_image_name, model=None):
+    def predict(self, test_image_path, model=None):
         '''
-        Function to predict the class of a single test image
+        Predict the class of a single test image
         Parameters
             :param model: Model to test
-            :param test_image_name: Test image
-
+            :param test_image_path: Test image path, default=trained resnet model
         '''
 
         if model == None:
@@ -327,7 +325,7 @@ class train:
 
         transform = self.image_transforms['test']
 
-        test_image = Image.open(test_image_name)
+        test_image = Image.open(test_image_path)
         plt.imshow(test_image)
 
         test_image_tensor = transform(test_image)

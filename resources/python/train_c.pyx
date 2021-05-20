@@ -14,8 +14,12 @@ from PIL import Image
 
 
 class train:
-    def __init__(self):
-        # prepare the data and the transforms
+    def __init__(self, dataset_path="../../Assets", model_output_path="../models"):
+        """
+        initialise train
+        :param dataset_path: path for the assets
+        :param model_output_path: model output path
+        """
         self.image_transforms = {
             'train': transforms.Compose([
                 transforms.RandomResizedCrop(size=256, scale=(0.8, 1.0)),
@@ -41,8 +45,8 @@ class train:
                                      [0.229, 0.224, 0.225])
             ])
         }
-        self.dataset_path = "../../Assets"
-        self.pt_path = "../models"
+        self.dataset_path = dataset_path
+        self.pt_path = model_output_path
 
         # create train valid and test directory
         train_directory = os.path.join(self.dataset_path, 'train')
@@ -79,9 +83,8 @@ class train:
 
     def model_prep(self, resnet_type=None):
         """
-        Function to prepare the model
+        Prepare the model
         :param resnet_type: type of resnet model
-        :return:
         """
 
         if resnet_type == None:
