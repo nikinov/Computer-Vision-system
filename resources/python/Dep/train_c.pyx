@@ -349,3 +349,4 @@ class train:
             for i in range(3):
                 print("Predcition", i + 1, ":", self.idx_to_class[topclass.cpu().numpy()[0][i]], ", Score: ",
                       topk.cpu().numpy()[0][i])
+
