@@ -1,3 +1,9 @@
+#
+#   find docs on here:
+#   https://github.com/nikinov/WickonHightech/tree/Torch
+#
+
+
 import torch, torchvision
 from torchvision import datasets, models, transforms
 import torch.nn as nn
