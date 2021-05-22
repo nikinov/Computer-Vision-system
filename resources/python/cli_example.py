@@ -9,5 +9,6 @@ def make_model():
 def main():
     parser = ap.ArgumentParser()
     parser.add_argument("data_path", help="make model", type=str)
+    parser.add_argument("out_path", help="define output path", type=str)
 
 
