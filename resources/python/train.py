@@ -184,7 +184,7 @@ class train:
                 model.eval()
 
                 # Validation loop
-                for j, (inputs, labels) in self.val_data:
+                for (inputs, labels) in self.val_data:
                     inputs = inputs.to(self.device)
                     labels = labels.to(self.device)
 
