@@ -1,7 +1,8 @@
-from train_c import train
+from train import train
+from train_c import train as train2
 
-obj = train()
+tr = train()
 
-obj.model_prep()
-obj.train_and_validate()
+tr.model_prep()
 
+tr.train_and_validate()
