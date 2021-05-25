@@ -44,8 +44,6 @@ initialise train
 tr = train(dataset_path, out_path)
 ```
 - prepare the and the data model for training
-first make a directory structure simmilar to this
-<img width="168" alt="Screenshot 2021-05-20 at 22 28 34" src="https://user-images.githubusercontent.com/54107324/119044622-b8c66f00-b9ba-11eb-91e4-de6c396ccf86.png">
 a directory that countains a 3 subdirectories each containing a subdirectory for each class. Call tr.model_prep() for model prep and tr.train_and_validate() for training and validation
 
 ```python
@@ -82,4 +80,26 @@ tr.predict('testimage.png')
 
 ### integration
 
-comming soon
+For integrating learning in C# call the following function. You can find an example in [source](https://github.com/nikinov/WickonHightech/tree/Torch/scr/Detector)
+```C#
+
+/// <summary>
+/// Function interacts with a python training script and makes a model.pt file, all params are optional
+/// </summary>
+/// <param name="pythonPath">python path</param>
+/// <param name="scriptPath">the pathe to the cli python intervafe script</param>
+/// <param name="dataPath">path to your data or assets</param>
+/// <param name="outPath">the path where the model.pt file will be outputed</param>
+/// <param name="epoch">how many times will the training script go throught the data</param>
+
+using ModelMaker;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Maker.MakeModel();
+        Console.ReadKey();
+    }
+}
+```
