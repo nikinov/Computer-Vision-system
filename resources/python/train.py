@@ -98,6 +98,40 @@ class train:
         self.loss_func = nn.NLLLoss()
         self.optimizer = optim.Adam(self.resnet.parameters())
 
+    def training_loop(self, inputs, labels, model, loss_criterion, u_loss, u_acc, train=False):
+        inputs = inputs.to(self.device)
+        labels = labels.to(self.device)
+
+        if train:
+            # Clean existing gradients
+            self.optimizer.zero_grad()
+        # Forward pass - compute outputs on input data using the model
+        outputs = model(inputs)
+
+        # Compute loss
+        loss = loss_criterion(outputs, labels)
+        if train:
+            # Backpropagate the gradients
+            loss.backward()
+
+            # Update the parameters
+            self.optimizer.step()
+
+        # Compute the total loss for the batch and add it to train_loss
+        u_loss += loss.item() * inputs.size(0)
+
+        # Compute the accuracy
+        ret, predictions = torch.max(outputs.data, 1)
+        correct_counts = predictions.eq(labels.data.view_as(predictions))
+
+        # Convert correct_counts to float and then compute the mean
+        acc = torch.mean(correct_counts.type(torch.FloatTensor))
+
+        # Compute total accuracy in the whole batch and add to train_acc
+        u_acc += acc.item() * inputs.size(0)
+
+        return u_loss, u_acc, loss, acc
+
     def train_and_validate(self, model=None, loss_criterion=None, optimizer=None, epochs=25, show_results=False):
         """
         Train and validate the model
@@ -140,38 +174,7 @@ class train:
 
                 # check if the index of image is for training
                 if i in self.train_idx:
-                    inputs = inputs.to(self.device)
-                    labels = labels.to(self.device)
-
-                    # Clean existing gradients
-                    self.optimizer.zero_grad()
-
-                    # Forward pass - compute outputs on input data using the model
-                    outputs = model(inputs)
-
-                    # Compute loss
-                    loss = loss_criterion(outputs, labels)
-
-                    # Backpropagate the gradients
-                    loss.backward()
-
-                    # Update the parameters
-                    self.optimizer.step()
-
-                    # Compute the total loss for the batch and add it to train_loss
-                    train_loss += loss.item() * inputs.size(0)
-
-                    # Compute the accuracy
-                    ret, predictions = torch.max(outputs.data, 1)
-                    correct_counts = predictions.eq(labels.data.view_as(predictions))
-
-                    # Convert correct_counts to float and then compute the mean
-                    acc = torch.mean(correct_counts.type(torch.FloatTensor))
-
-                    # Compute total accuracy in the whole batch and add to train_acc
-                    train_acc += acc.item() * inputs.size(0)
-
-                    # print("Batch number: {:03d}, Training: Loss: {:.4f}, Accuracy: {:.4f}".format(i, loss.item(), acc.item()))
+                    train_loss, train_acc, loss, acc = self.training_loop(inputs, labels, model, loss_criterion, train_loss, train_acc, True)
                 elif i in self.val_idx:
                     self.val_data.append([inputs, labels])
                 elif i in self.test_data:
@@ -185,27 +188,7 @@ class train:
 
                 # Validation loop
                 for (inputs, labels) in self.val_data:
-                    inputs = inputs.to(self.device)
-                    labels = labels.to(self.device)
-
-                    # Forward pass - compute outputs on input data using the model
-                    outputs = model(inputs)
-
-                    # Compute loss
-                    loss = loss_criterion(outputs, labels)
-
-                    # Compute the total loss for the batch and add it to valid_loss
-                    valid_loss += loss.item() * inputs.size(0)
-
-                    # Calculate validation accuracy
-                    ret, predictions = torch.max(outputs.data, 1)
-                    correct_counts = predictions.eq(labels.data.view_as(predictions))
-
-                    # Convert correct_counts to float and then compute the mean
-                    acc = torch.mean(correct_counts.type(torch.FloatTensor))
-
-                    # Compute total accuracy in the whole batch and add to valid_acc
-                    valid_acc += acc.item() * inputs.size(0)
+                    valid_loss, valid_acc, loss, acc = self.training_loop(inputs, labels, model, loss_criterion, valid_loss, valid_acc)
 
                     # print("Validation Batch number: {:03d}, Validation: Loss: {:.4f}, Accuracy: {:.4f}".format(j, loss.item(), acc.item()))
             if valid_loss < best_loss:
@@ -275,29 +258,10 @@ class train:
             model.eval()
 
             # Validation loop
-            for j, (inputs, labels) in enumerate(self.test_data):
-                inputs = inputs.to(self.device)
-                labels = labels.to(self.device)
-
-                # Forward pass - compute outputs on input data using the model
-                outputs = model(inputs)
-
-                # Compute loss
-                loss = loss_criterion(outputs, labels)
-
-                # Compute the total loss for the batch and add it to valid_loss
-                test_loss += loss.item() * inputs.size(0)
-
-                # Calculate validation accuracy
-                ret, predictions = torch.max(outputs.data, 1)
-                correct_counts = predictions.eq(labels.data.view_as(predictions))
-
-                # Convert correct_counts to float and then compute the mean
-                acc = torch.mean(correct_counts.type(torch.FloatTensor))
-
-                # Compute total accuracy in the whole batch and add to valid_acc
-                test_acc += acc.item() * inputs.size(0)
-
+            j = 0
+            for (inputs, labels) in self.test_data:
+                j+=1
+                test_loss, test_acc, loss, acc = self.training_loop(inputs, labels, model, loss_criterion, test_loss, test_acc)
                 print("Test Batch number: {:03d}, Test: Loss: {:.4f}, Accuracy: {:.4f}".format(j, loss.item(),
                                                                                                acc.item()))
 
