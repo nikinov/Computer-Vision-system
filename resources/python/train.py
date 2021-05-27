@@ -2,6 +2,8 @@
 #   find docs on here:
 #   https://github.com/nikinov/WickonHightech/tree/Torch
 #
+#   Nicholas Novelle, May 2021 :)
+#
 
 
 import torch, torchvision
@@ -23,7 +25,7 @@ from sklearn.model_selection import train_test_split
 class train:
     def __init__(self, dataset_path="../Assets", model_output_path="../models"):
         # prepare the data and the transforms
-        self.image_transforms = transforms.Compose([
+        self.train_image_transforms = transforms.Compose([
                 transforms.RandomResizedCrop(size=256, scale=(0.8, 1.0)),
                 transforms.RandomRotation(degrees=15),
                 transforms.RandomHorizontalFlip(),
@@ -31,6 +33,14 @@ class train:
                 transforms.ToTensor(),
                 transforms.Normalize([0.485, 0.456, 0.406],
                                      [0.229, 0.224, 0.225])])
+        self.valid_test_image_transforms =  transforms.Compose([
+            transforms.Resize(size=256),
+            transforms.CenterCrop(size=224),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406],
+                                 [0.229, 0.224, 0.225])])
+
+
         self.dataset_path = dataset_path
         self.pt_path = model_output_path
 
@@ -41,10 +51,21 @@ class train:
         self.num_classes = len(os.listdir(dataset_path))
 
         # Load Data from folders
-        dataset = datasets.ImageFolder(dataset_path, self.image_transforms)
+        dataset = datasets.ImageFolder(dataset_path)
         self.train_idx, val_idx = train_test_split(list(range(len(dataset))), test_size=0.2)
         self.val_idx, self.test_idx = train_test_split(list(range(len(Subset(dataset, val_idx)))), test_size=0.2)
         self.data = dataset
+
+        self.val_data = []
+        self.train_data = []
+        self.test_data = []
+        for i, (inputs, labels) in enumerate(self.data):
+            if i in self.val_idx:
+                self.val_data.append([self.valid_test_image_transforms(inputs), labels])
+            if i in self.train_idx:
+                self.train_data.append([self.train_image_transforms(inputs), labels])
+            if i in self.test_idx:
+                self.test_data.append([self.valid_test_image_transforms(inputs), labels])
 
         # Size of Data, to be used for calculating Average Loss and Accuracy
         self.train_data_size = len(self.train_idx)
@@ -52,7 +73,9 @@ class train:
         self.test_data_size = len(self.test_idx)
 
         # Create iterators for the Data loaded using DataLoader module
-        self.data_loader = DataLoader(self.data, batch_size=self.bs, shuffle=True)
+        self.train_data_loader = DataLoader(self.train_data, batch_size=self.bs, shuffle=True)
+        self.valid_data_loader = DataLoader(self.val_data, batch_size=self.bs, shuffle=False)
+        self.test_data_loader = DataLoader(self.test_data, batch_size=self.bs, shuffle=False)
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.idx_to_class = {}
@@ -99,38 +122,57 @@ class train:
         self.optimizer = optim.Adam(self.resnet.parameters())
 
     def training_loop(self, inputs, labels, model, loss_criterion, u_loss, u_acc, train=False):
-        inputs = inputs.to(self.device)
-        labels = labels.to(self.device)
+        """
+        Function for iterating through the model
+        :param inputs: image input
+        :param labels: labels for the model
+        :param model: NN model
+        :param loss_criterion: loss function
+        :param u_loss: loss value
+        :param u_acc: accuracy value
+        :param train: set if training is enabled
+        :return: test loss, test accuracy, loss accuracy
+        """
+        grad_mode = torch.enable_grad()
 
-        if train:
-            # Clean existing gradients
-            self.optimizer.zero_grad()
-        # Forward pass - compute outputs on input data using the model
-        outputs = model(inputs)
+        # Validation - No gradient tracking needed
+        if not train:
+            # Set to evaluation mode
+            model.eval()
+            grad_mode = torch.no_grad()
+        with grad_mode:
+            inputs = inputs.to(self.device)
+            labels = labels.to(self.device)
 
-        # Compute loss
-        loss = loss_criterion(outputs, labels)
-        if train:
-            # Backpropagate the gradients
-            loss.backward()
+            if train:
+                # Clean existing gradients
+                self.optimizer.zero_grad()
+            # Forward pass - compute outputs on input data using the model
+            outputs = model(inputs)
 
-            # Update the parameters
-            self.optimizer.step()
+            # Compute loss
+            loss = loss_criterion(outputs, labels)
+            if train:
+                # Backpropagate the gradients
+                loss.backward()
 
-        # Compute the total loss for the batch and add it to train_loss
-        u_loss += loss.item() * inputs.size(0)
+                # Update the parameters
+                self.optimizer.step()
 
-        # Compute the accuracy
-        ret, predictions = torch.max(outputs.data, 1)
-        correct_counts = predictions.eq(labels.data.view_as(predictions))
+            # Compute the total loss for the batch and add it to train_loss
+            u_loss += loss.item() * inputs.size(0)
 
-        # Convert correct_counts to float and then compute the mean
-        acc = torch.mean(correct_counts.type(torch.FloatTensor))
+            # Compute the accuracy
+            ret, predictions = torch.max(outputs.data, 1)
+            correct_counts = predictions.eq(labels.data.view_as(predictions))
 
-        # Compute total accuracy in the whole batch and add to train_acc
-        u_acc += acc.item() * inputs.size(0)
+            # Convert correct_counts to float and then compute the mean
+            acc = torch.mean(correct_counts.type(torch.FloatTensor))
 
-        return u_loss, u_acc, loss, acc
+            # Compute total accuracy in the whole batch and add to train_acc
+            u_acc += acc.item() * inputs.size(0)
+
+            return u_loss, u_acc, loss, acc
 
     def train_and_validate(self, model=None, loss_criterion=None, optimizer=None, epochs=25, show_results=False):
         """
@@ -169,26 +211,13 @@ class train:
             valid_loss = 0.0
             valid_acc = 0.0
 
+            # train loop
+            for inputs, labels in self.train_data_loader:
+                train_loss, train_acc, loss, acc = self.training_loop(inputs, labels, model, loss_criterion, train_loss, train_acc, True)
 
-            for i, (inputs, labels) in enumerate(self.data_loader):
-
-                # check if the index of image is for training
-                if i in self.train_idx:
-                    train_loss, train_acc, loss, acc = self.training_loop(inputs, labels, model, loss_criterion, train_loss, train_acc, True)
-                elif i in self.val_idx:
-                    self.val_data.append([inputs, labels])
-                elif i in self.test_data:
-                    self.test_data.append([inputs, labels])
-
-            # Validation - No gradient tracking needed
-            with torch.no_grad():
-
-                # Set to evaluation mode
-                model.eval()
-
-                # Validation loop
-                for (inputs, labels) in self.val_data:
-                    valid_loss, valid_acc, loss, acc = self.training_loop(inputs, labels, model, loss_criterion, valid_loss, valid_acc)
+            # Validation loop
+            for inputs, labels in self.val_data:
+                valid_loss, valid_acc, loss, acc = self.training_loop(inputs, labels, model, loss_criterion, valid_loss, valid_acc)
 
                     # print("Validation Batch number: {:03d}, Validation: Loss: {:.4f}, Accuracy: {:.4f}".format(j, loss.item(), acc.item()))
             if valid_loss < best_loss:
@@ -252,18 +281,13 @@ class train:
         test_acc = 0.0
         test_loss = 0.0
 
-        # Validation - No gradient tracking needed
-        with torch.no_grad():
-            # Set to evaluation mode
-            model.eval()
-
-            # Validation loop
-            j = 0
-            for (inputs, labels) in self.test_data:
-                j+=1
-                test_loss, test_acc, loss, acc = self.training_loop(inputs, labels, model, loss_criterion, test_loss, test_acc)
-                print("Test Batch number: {:03d}, Test: Loss: {:.4f}, Accuracy: {:.4f}".format(j, loss.item(),
-                                                                                               acc.item()))
+        # Validation loop
+        j = 0
+        for inputs, labels in self.test_data_loader:
+            j+=1
+            test_loss, test_acc, loss, acc = self.training_loop(inputs, labels, model, loss_criterion, test_loss, test_acc)
+            print("Test Batch number: {:03d}, Test: Loss: {:.4f}, Accuracy: {:.4f}".format(j, loss.item(),
+                                                                                           acc.item()))
 
         # Find average test loss and test accuracy
         avg_test_loss = test_loss / self.test_data_size
@@ -282,7 +306,7 @@ class train:
         if model == None:
             model = self.resnet
 
-        transform = self.image_transforms['test']
+        transform = self.train_image_transforms['test']
 
         test_image = Image.open(test_image_path)
         plt.imshow(test_image)

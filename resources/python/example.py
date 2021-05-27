@@ -1,4 +1,5 @@
 from train import train
+import torch
 
 tr = train()
 
