@@ -51,8 +51,8 @@ class train:
 
         # Load Data from folders
         dataset = datasets.ImageFolder(dataset_path)
-        self.train_idx, val_idx = train_test_split(list(range(len(dataset))), test_size=0.2)
-        self.val_idx, self.test_idx = train_test_split(list(range(len(Subset(dataset, val_idx)))), test_size=0.2)
+        self.train_idx, val_idx = train_test_split(list(range(len(dataset))), test_size=0.2, shuffle=False)
+        self.val_idx, self.test_idx = train_test_split(list(range(len(Subset(dataset, val_idx)))), test_size=0.2, shuffle=False)
         self.data = dataset
 
         self.val_data = []
