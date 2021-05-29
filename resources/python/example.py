@@ -1,7 +1,7 @@
 from train import train
 import torch
 
-tr = train(load_saved_data=True)
+tr = train(save_to_txt=True)
 
 #tr.model_prep()
 

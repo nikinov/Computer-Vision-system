@@ -22,7 +22,7 @@ from PIL import Image
 from sklearn.model_selection import train_test_split
 
 class train:
-    def __init__(self, dataset_path="../Assets", model_output_path="../models"):
+    def __init__(self, dataset_path="../Assets", model_output_path="../models", use_file_for_dirs_and_labels=False):
         # prepare the data and the transforms
         self.train_image_transforms = transforms.Compose([
                 transforms.RandomResizedCrop(size=256, scale=(0.8, 1.0)),
@@ -54,6 +54,11 @@ class train:
         self.train_idx, val_idx = train_test_split(list(range(len(dataset))), test_size=0.2, shuffle=False)
         self.val_idx, self.test_idx = train_test_split(list(range(len(Subset(dataset, val_idx)))), test_size=0.2, shuffle=False)
         self.data = dataset
+
+        if use_file_for_dirs_and_labels and not os.path.exists("data_dir_and_label_info.txt"):
+            f = open("data_dir_and_label_info.txt", "w")
+            for im in dataset.imgs:
+                f.write(str(im) + "\n")
 
         self.val_data = []
         self.train_data = []
