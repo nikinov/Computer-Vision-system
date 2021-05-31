@@ -3,7 +3,7 @@ import time
 
 t = time.time()
 # use_config=true is more performant
-tr = train(use_config=True)
+tr = train(save_config=True)
 print(time.time() - t)
 #tr.model_prep()
 

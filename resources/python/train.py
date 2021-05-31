@@ -1,5 +1,5 @@
 #
-#   find docs on here:
+#   find docs here:
 #   https://github.com/nikinov/WickonHightech/tree/Torch
 #
 #   Nicholas Novelle, May 2021 :)
