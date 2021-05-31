@@ -7,7 +7,7 @@
       "inheritEnvironments": [ "msvc_x64_x64" ],
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "-DCMAKE_PREFIX_PATH=C:\\\\Users\\\\Ryzen7-EXT\\\\Documents\\\\Github\\\\WickonHightech\\\\resources\\\\C++\\\\Predictor\\\\libtorch",
+      "cmakeCommandArgs": "-DCMAKE_PREFIX_PATH=\"C:\\Users\\Ryzen7-EXT\\Documents\\Github\\WickonHightech\\resources\\C++\\Predictor\\lib\\libtorch\"",
       "buildCommandArgs": "",
       "ctestCommandArgs": ""
     }

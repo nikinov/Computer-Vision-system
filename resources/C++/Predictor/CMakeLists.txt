@@ -5,11 +5,14 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("Predictor")
 
-find_package(Torch REQUIRED)
+find_package(torch REQUIRED)
+find_package(OpenCV REQUIRED)
+include_directories(&{OpenCV_INCLUDE_DIRS})
 
 # Add source to this project's executable.
-add_executable (Predictor "Predictor.cpp" "Predictor.h")
+add_executable (Predictor "src/Main.cpp" "headers/Predictor.h")
 target_link_libraries(Predictor "${TORCH_LIBRARIES}")
+target_link_libraries(Predictor "${OpenCV_LIBS}")
 
 if (MSVC)
   file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
