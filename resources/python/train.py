@@ -61,11 +61,11 @@ class train:
             for line in f.readlines():
                 ln_split = line.split(",")
                 if ln_split[2].replace('\n', '') == 'r':
-                    self.train_data.append([Image.open(ln_split[0]), int(ln_split[1])])
+                    self.train_data.append([self.train_image_transforms(Image.open(ln_split[0])), int(ln_split[1])])
                 if ln_split[2].replace('\n', '') == 'v':
-                    self.val_data.append([Image.open(ln_split[0]), int(ln_split[1])])
+                    self.val_data.append([self.valid_test_image_transforms(Image.open(ln_split[0])), int(ln_split[1])])
                 if ln_split[2].replace('\n', '') == 't':
-                    self.train_data.append([Image.open(ln_split[0]), int(ln_split[1])])
+                    self.train_data.append([self.valid_test_image_transforms(Image.open(ln_split[0])), int(ln_split[1])])
                 if ln_split[1] not in temp_class:
                     temp_class.append(ln_split[1])
 
@@ -79,7 +79,7 @@ class train:
             dataset = datasets.ImageFolder(dataset_path)
             self.data = dataset
 
-            label_split = [[]] * (self.num_classes)
+            label_split = [[]] * self.num_classes
             self.train_idx = []
             self.val_idx = []
             self.test_idx = []
@@ -150,8 +150,6 @@ class train:
             self.idx_to_class[i] = dir
             i += 1
         self.resnet = models.resnet152()
-        self.val_data = []
-        self.test_data = []
 
     def model_prep(self, resnet_type=None):
         """
@@ -200,7 +198,6 @@ class train:
         :return: test loss, test accuracy, loss accuracy
         """
         grad_mode = torch.enable_grad()
-
         # Validation - No gradient tracking needed
         if not train:
             # Set to evaluation mode
@@ -282,7 +279,7 @@ class train:
                 train_loss, train_acc, loss, acc = self.training_loop(inputs, labels, model, loss_criterion, train_loss, train_acc, True)
 
             # Validation loop
-            for inputs, labels in self.val_data:
+            for inputs, labels in self.valid_data_loader:
                 valid_loss, valid_acc, loss, acc = self.training_loop(inputs, labels, model, loss_criterion, valid_loss, valid_acc)
 
             if valid_loss < best_loss:
@@ -371,7 +368,7 @@ class train:
         if model == None:
             model = self.resnet
 
-        transform = self.train_image_transforms['test']
+        transform = self.valid_test_image_transforms
 
         test_image = Image.open(test_image_path)
         plt.imshow(test_image)
