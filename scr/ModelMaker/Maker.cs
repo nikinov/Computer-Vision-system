@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.IO;
 
 namespace ModelMaker
 {
@@ -55,5 +57,9 @@ namespace ModelMaker
             Console.WriteLine("Res:");
             Console.WriteLine(result);
         }
+    }
+    public class Predictor
+    {
+        [DllImport(Directory.GetCurrentDirectory(Path.Combine(Directory.GetCurrentDirectory(), "..\\..\\..\\")))]
     }
 }

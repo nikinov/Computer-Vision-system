@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,8 @@ namespace Detector
     {
         static void Main(string[] args)
         {
-            Maker.MakeModel();
+            Console.WriteLine(Path.Combine(Directory.GetCurrentDirectory(),"..\\..\\"));
+            //Maker.MakeModel();
             Console.ReadKey();
         }
     }
