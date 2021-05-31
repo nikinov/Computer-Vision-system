@@ -40,6 +40,8 @@ out_path = "/models"
 initialise train
 :param dataset_path: path for the assets, default="../../Assets"
 :param model_output_path: model output path, default="../models"
+:param save_config: if we wanna save the data config into txt, default=False
+:param use_config: if we wanna use the data config from txt, default=False
 """
 tr = train(dataset_path, out_path)
 ```
@@ -91,6 +93,8 @@ For integrating learning in C# call the following function. You can find an exam
 /// <param name="dataPath">path to your data or assets</param>
 /// <param name="outPath">the path where the model.pt file will be outputed</param>
 /// <param name="epoch">how many times will the training script go throught the data</param>
+/// <param name="save_config">if we want to save data config into a txt file</param>
+/// <param name="use_config">if we want to use a txt file with a data config</param>
 
 using ModelMaker;
 
