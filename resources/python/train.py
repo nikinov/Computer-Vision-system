@@ -5,24 +5,21 @@
 #   Nicholas Novelle, May 2021 :)
 #
 
-import torch, torchvision
+import torch
 from torchvision import datasets, models, transforms
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader, Subset
+from torch.utils.data import DataLoader
 from torchsummary import summary
 
-import numpy as np
 import matplotlib.pyplot as plt
 import os
-import threading
 import time
 
 from PIL import Image
-from sklearn.model_selection import train_test_split
 
 class train:
-    def __init__(self, dataset_path="../Assets", model_output_path="../models", use_file_for_dirs_and_labels=False):
+    def __init__(self, dataset_path="../Assets", model_output_path="../models", save_config=False, use_config=False):
         # prepare the data and the transforms
         self.train_image_transforms = transforms.Compose([
                 transforms.RandomResizedCrop(size=256, scale=(0.8, 1.0)),
@@ -39,42 +36,107 @@ class train:
             transforms.Normalize([0.485, 0.456, 0.406],
                                  [0.229, 0.224, 0.225])])
 
+        os_exists = os.path.exists("data_dir_and_label_info.txt")
 
-        self.dataset_path = dataset_path
-        self.pt_path = model_output_path
-
-        # batch size
-        self.bs = 32
-
-        # number of classes
-        self.num_classes = len(os.listdir(dataset_path))
-
-        # Load Data from folders
-        dataset = datasets.ImageFolder(dataset_path)
-        self.train_idx, val_idx = train_test_split(list(range(len(dataset))), test_size=0.2, shuffle=False)
-        self.val_idx, self.test_idx = train_test_split(list(range(len(Subset(dataset, val_idx)))), test_size=0.2, shuffle=False)
-        self.data = dataset
-
-        if use_file_for_dirs_and_labels and not os.path.exists("data_dir_and_label_info.txt"):
-            f = open("data_dir_and_label_info.txt", "w")
-            for im in dataset.imgs:
-                f.write(str(im) + "\n")
+        split_size = {
+            "train": 70,
+            "val": 90,
+            "test": 100
+        }
 
         self.val_data = []
         self.train_data = []
         self.test_data = []
-        for i, (inputs, labels) in enumerate(self.data):
-            if i in self.val_idx:
-                self.val_data.append([self.valid_test_image_transforms(inputs), labels])
-            if i in self.train_idx:
-                self.train_data.append([self.train_image_transforms(inputs), labels])
-            if i in self.test_idx:
-                self.test_data.append([self.valid_test_image_transforms(inputs), labels])
+
+        # batch size
+        self.bs = 32
+        self.dataset_path = dataset_path
+        self.pt_path = model_output_path
+        self.data = []
+        if use_config and os_exists:
+            # get the data about the images from txt file
+            f = open("data_dir_and_label_info.txt", "r")
+            dataset = []
+            temp_class = []
+            for line in f.readlines():
+                ln_split = line.split(",")
+                if ln_split[2].replace('\n', '') == 'r':
+                    self.train_data.append([Image.open(ln_split[0]), int(ln_split[1])])
+                if ln_split[2].replace('\n', '') == 'v':
+                    self.val_data.append([Image.open(ln_split[0]), int(ln_split[1])])
+                if ln_split[2].replace('\n', '') == 't':
+                    self.train_data.append([Image.open(ln_split[0]), int(ln_split[1])])
+                if ln_split[1] not in temp_class:
+                    temp_class.append(ln_split[1])
+
+            # number of classes
+            self.num_classes = len(temp_class)
+        else:
+            # number of classes
+            self.num_classes = len(os.listdir(dataset_path)) - 1
+
+            # Load Data from folders
+            dataset = datasets.ImageFolder(dataset_path)
+            self.data = dataset
+
+            label_split = [[]] * (self.num_classes)
+            self.train_idx = []
+            self.val_idx = []
+            self.test_idx = []
+            labels_set = []
+
+            # create an array of label indexes with an array of indexes
+            j = 0
+            for input, label in self.data:
+                label_split[label] = label_split[label] + [j]
+                j+=1
+            # split the data into valid train and test
+            # iterate over the labels or the arrays of indexes of that specific label
+            for set in label_split:
+                if len(set) < 10:
+                    raise Exception("The number of images in one of the classes is less then 10!\nYou have to have at least 10 images per class!")
+                # iterate over the indexes in the label array
+                set_num = 0
+                for idx in set:
+                    # check if the index is in the test %
+                    if len(set) - set_num > int(float(len(set))/100)*(100-split_size["train"]):
+                        self.train_idx.append(idx)
+                    # check if the index is in the valid %
+                    elif len(set) - set_num > int(float(len(set))/100)*(100-split_size["val"]):
+                        self.val_idx.append(idx)
+                    # check if the index is in the test %
+                    else:
+                        self.test_idx.append(idx)
+                    set_num += 1
+
+            for i, (inputs, labels) in enumerate(self.data):
+                if i in self.train_idx:
+                    self.train_data.append([self.train_image_transforms(inputs), labels])
+                    if save_config:
+                        labels_set.append("r")
+                elif i in self.val_idx:
+                    self.val_data.append([self.valid_test_image_transforms(inputs), labels])
+                    if save_config:
+                        labels_set.append("v")
+                else:
+                    self.test_data.append([self.valid_test_image_transforms(inputs), labels])
+                    if save_config:
+                        labels_set.append("t")
+
+            # save into txt if needed
+            if save_config:
+                if os_exists:
+                    os.remove("data_dir_and_label_info.txt")
+                f = open("data_dir_and_label_info.txt", "w")
+                i = 0
+                for im in self.data.imgs:
+                    f.write(str(im).replace("'", "").replace("(", "").replace(")", "") + ',' + labels_set[i] + "\n")
+                    i+=1
 
         # Size of Data, to be used for calculating Average Loss and Accuracy
-        self.train_data_size = len(self.train_idx)
-        self.valid_data_size = len(self.val_idx)
-        self.test_data_size = len(self.test_idx)
+        self.train_data_size = len(self.train_data)
+        self.valid_data_size = len(self.val_data)
+        self.test_data_size = len(self.test_data)
 
         # Create iterators for the Data loaded using DataLoader module
         self.train_data_loader = DataLoader(self.train_data, batch_size=self.bs, shuffle=True)
@@ -223,7 +285,6 @@ class train:
             for inputs, labels in self.val_data:
                 valid_loss, valid_acc, loss, acc = self.training_loop(inputs, labels, model, loss_criterion, valid_loss, valid_acc)
 
-                    # print("Validation Batch number: {:03d}, Validation: Loss: {:.4f}, Accuracy: {:.4f}".format(j, loss.item(), acc.item()))
             if valid_loss < best_loss:
                 best_loss = valid_loss
                 best_epoch = epoch
