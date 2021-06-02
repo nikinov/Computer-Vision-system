@@ -14,7 +14,7 @@ namespace Detector
         static void Main(string[] args)
         {
             Console.WriteLine(Path.Combine(Directory.GetCurrentDirectory(),"..\\..\\"));
-            //Maker.MakeModel();
+            Maker.MakeModel(use_config: true, save_config: true);
             Console.ReadKey();
         }
     }

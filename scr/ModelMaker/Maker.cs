@@ -19,11 +19,15 @@ namespace ModelMaker
         /// <param name="dataPath">path to your data or assets</param>
         /// <param name="outPath">the path where the model.pt file will be outputed</param>
         /// <param name="epoch">how many times will the training script go throught the data</param>
+        /// <param name="save_config">if we want to save data config into a txt file</param>
+        /// <param name="use_config">if we want to use a txt file with a data config</param>
         public static void MakeModel(string pythonPath = "C:/Users/Ryzen7-EXT/anaconda3/envs/tensor/pythonw.exe",
             string scriptPath = "C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech/resources/python/cli_example.py",
             string dataPath = "C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech/resources/Assets",
             string outPath = "C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech",
-            int epoch = 0)
+            int epoch = 0,
+            bool save_config=false,
+            bool use_config=false)
         {
             if (dataPath == outPath)
             {
@@ -34,7 +38,7 @@ namespace ModelMaker
             psi.FileName = pythonPath;
 
             Console.WriteLine("arguments in");
-            psi.Arguments = scriptPath + " " + dataPath + " " + outPath + " " + epoch;
+            psi.Arguments = scriptPath + " " + dataPath + " " + outPath + " " + epoch + " " + save_config + " " + use_config;
 
             // process configuration
             psi.UseShellExecute = false;
@@ -60,6 +64,6 @@ namespace ModelMaker
     }
     public class Predictor
     {
-        [DllImport(Directory.GetCurrentDirectory(Path.Combine(Directory.GetCurrentDirectory(), "..\\..\\..\\")))]
+        //[DllImport(Directory.GetCurrentDirectory(Path.Combine(Directory.GetCurrentDirectory(), "..\\..\\..\\")))]
     }
 }

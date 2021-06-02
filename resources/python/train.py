@@ -19,7 +19,7 @@ import time
 from PIL import Image
 
 class train:
-    def __init__(self, dataset_path="../Assets", model_output_path="../models", save_config=False, use_config=False):
+    def __init__(self, dataset_path="../Assets", model_output_path="../..", save_config=False, use_config=False):
         # prepare the data and the transforms
         self.train_image_transforms = transforms.Compose([
                 transforms.RandomResizedCrop(size=256, scale=(0.8, 1.0)),
@@ -73,7 +73,7 @@ class train:
             self.num_classes = len(temp_class)
         else:
             # number of classes
-            self.num_classes = len(os.listdir(dataset_path)) - 1
+            self.num_classes = len(os.listdir(dataset_path))
 
             # Load Data from folders
             dataset = datasets.ImageFolder(dataset_path)
@@ -84,6 +84,7 @@ class train:
             self.val_idx = []
             self.test_idx = []
             labels_set = []
+            print(label_split)
 
             # create an array of label indexes with an array of indexes
             j = 0
@@ -151,10 +152,11 @@ class train:
             i += 1
         self.resnet = models.resnet152()
 
-    def model_prep(self, resnet_type=None):
+    def model_prep(self, resnet_type=None, learning_rate=0.0001):
         """
         Function to prepare the model
         :param resnet_type: type of resnet model
+        :param learning_rate: how much does the program learn in on go
         """
 
         if resnet_type == None:
@@ -183,7 +185,7 @@ class train:
 
         # Define Optimizer and Loss Function
         self.loss_func = nn.NLLLoss()
-        self.optimizer = optim.Adam(self.resnet.parameters())
+        self.optimizer = optim.Adam(self.resnet.parameters(), lr=learning_rate)
 
     def training_loop(self, inputs, labels, model, loss_criterion, u_loss, u_acc, train=False):
         """
@@ -237,7 +239,7 @@ class train:
 
             return u_loss, u_acc, loss, acc
 
-    def train_and_validate(self, model=None, loss_criterion=None, optimizer=None, epochs=25, show_results=False):
+    def train_and_validate(self, model=None, loss_criterion=None, optimizer=None, epochs=25):
         """
         Train and validate the model
         :param model: the model to train
@@ -312,23 +314,6 @@ class train:
 
         # tain the model for 50 epochs
         num_epochs = 50
-
-        if show_results:
-            plt.plot(history[:, 0:2])
-            plt.legend(['Tr Loss', 'Val Loss'])
-            plt.xlabel('Epoch Number')
-            plt.ylabel('Loss')
-            plt.ylim(0, 1)
-            plt.savefig(self.pt_path + '_loss_curve.png')
-            plt.show()
-
-            plt.plot(history[:, 2:4])
-            plt.legend(['Tr Accuracy', 'Val Accuracy'])
-            plt.xlabel('Epoch Number')
-            plt.ylabel('Accuracy')
-            plt.ylim(0, 1)
-            plt.savefig(self.pt_path + '_accuracy_curve.png')
-            plt.show()
 
         return best_model
 
