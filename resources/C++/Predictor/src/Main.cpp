@@ -12,12 +12,12 @@
 
 using namespace std::chrono;
 
-int main(int argc, const char* argv[]) {
-    if (argc != 3) {
-        std::cerr << "usage: resnet_libtorch <path-to-resnet-script-module> <path-to-input-image>\n";
-        return -1;
-    }
+int main() {
+    
+}
 
+float* GetPrediction(const char* modelPath, unsigned char* byteArray)
+{
     // Configuration
     int input_image_size = 224;
     int batch_size = 8;
@@ -26,19 +26,28 @@ int main(int argc, const char* argv[]) {
     torch::jit::script::Module module;
     try {
         // Deserialize the ScriptModule from a file using torch::jit::load().
-        module = torch::jit::load(argv[1]);
+        module = torch::jit::load(modelPath);
     }
     catch (const c10::Error& e) {
         std::cerr << "error loading the model\n";
-        return -1;
     }
 
+    int ptr = 0;
+
     // Read input image
-    cv::Mat origin_image = cv::imread(argv[2]);
+    cv::Mat img;
+    for (int i = 0; i < img.rows; i++) {
+        for (int j = 0; j < img.cols; j++) {
+
+            img.at<cv::Vec3b>(i, j) = cv::Vec3b(byteArray[ptr + 0], byteArray[ptr + 1], byteArray[ptr + 2]);
+            ptr = ptr + 3;
+        }
+    }
+
 
     // Preprocess image (resize, put on GPU)
     cv::Mat resized_image;
-    cv::cvtColor(origin_image, resized_image, cv::COLOR_RGB2BGR);
+    cv::cvtColor(img, resized_image, cv::COLOR_RGB2BGR);
     cv::resize(resized_image, resized_image, cv::Size(input_image_size, input_image_size));
 
     cv::Mat img_float;
@@ -66,8 +75,8 @@ int main(int argc, const char* argv[]) {
     }
 
     at::Tensor max_ind = at::argmax(output);
+
     std::cout << "class_id: " << max_ind.item<int>() << std::endl;
     std::cout << "Time take for forward pass: " << duration.count() << " ms" << std::endl;
-
-    std::cout << "Done\n";
+    return max_ind.data<float>();
 }
