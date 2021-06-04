@@ -10,7 +10,7 @@ find_package(OpenCV REQUIRED)
 include_directories(&{OpenCV_INCLUDE_DIRS})
 
 # Add source to this project's executable.
-add_executable (Predictor "src/Main.cpp" "headers/Predictor.h")
+add_executable (Predictor "src/Predictor.cpp" "headers/Predictor.h" )
 target_link_libraries(Predictor "${TORCH_LIBRARIES}")
 target_link_libraries(Predictor "${OpenCV_LIBS}")
 
