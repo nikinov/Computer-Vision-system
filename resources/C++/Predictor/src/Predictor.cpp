@@ -12,12 +12,10 @@
 
 using namespace std::chrono;
 
-int main() {
-    
-}
 
-float* GetPrediction(const char* modelPath, unsigned char* byteArray)
+at::Tensor GetPrediction(const char* modelPath, unsigned char* byteArray)
 {
+
     // Configuration
     int input_image_size = 224;
     int batch_size = 8;
@@ -78,5 +76,5 @@ float* GetPrediction(const char* modelPath, unsigned char* byteArray)
 
     std::cout << "class_id: " << max_ind.item<int>() << std::endl;
     std::cout << "Time take for forward pass: " << duration.count() << " ms" << std::endl;
-    return max_ind.data<float>();
+    return max_ind;
 }

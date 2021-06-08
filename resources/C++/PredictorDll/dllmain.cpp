@@ -1,5 +1,11 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
-#include "pch.h"
+#include "headers/Predictor.h"
+
+#include <cstring>
+#include <Windows.h>
+// defined in Windows.h
+#undef max
+#undef min
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -17,3 +23,17 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     return TRUE;
 }
 
+int DLL_GetPrediction(
+    const char* modelPath,
+    unsigned char* byteArray,
+    float* buffer,                      // output char array with version info message
+    int allocSizOfBuffer                        // size of externally allocated array
+)
+{
+    auto output = GetPrediction(modelPath, byteArray);
+
+    std::memcpy(buffer, output.data<float>(), output.size(0));
+
+
+    return 0;
+}

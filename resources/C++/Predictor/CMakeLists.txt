@@ -3,16 +3,25 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
-project ("Predictor")
+project (Predictor)
+
+
+set(CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/lib/libtorch/share/cmake/Torch")
 
 find_package(torch REQUIRED)
 find_package(OpenCV REQUIRED)
 include_directories(&{OpenCV_INCLUDE_DIRS})
 
 # Add source to this project's executable.
-add_executable (Predictor "src/Predictor.cpp" "headers/Predictor.h" )
-target_link_libraries(Predictor "${TORCH_LIBRARIES}")
-target_link_libraries(Predictor "${OpenCV_LIBS}")
+
+#add_executable (${PROJECT_NAME} "src/Predictor.cpp" "headers/Predictor.h" )
+
+add_library(${PROJECT_NAME}
+  STATIC
+  "src/Predictor.cpp" "headers/Predictor.h")
+
+target_link_libraries(${PROJECT_NAME} "${TORCH_LIBRARIES}")
+target_link_libraries(${PROJECT_NAME} "${OpenCV_LIBS}")
 
 if (MSVC)
   file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")

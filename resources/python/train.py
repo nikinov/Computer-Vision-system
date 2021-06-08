@@ -73,7 +73,7 @@ class train:
             self.num_classes = len(temp_class)
         else:
             # number of classes
-            self.num_classes = len(os.listdir(dataset_path)) - 1
+            self.num_classes = len(os.listdir(dataset_path))
 
             # Load Data from folders
             dataset = datasets.ImageFolder(dataset_path)

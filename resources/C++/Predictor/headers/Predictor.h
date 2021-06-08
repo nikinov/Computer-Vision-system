@@ -3,6 +3,10 @@
 
 #pragma once
 
+#include <torch/script.h>
+
+at::Tensor GetPrediction(const char* modelPath, unsigned char* byteArray);
+/*
 #include <iostream>
 #include <torch/torch.h>
 
@@ -24,3 +28,4 @@ struct NetImpl : torch::nn::Module {
 };
 
 TORCH_MODULE(Net);
+*/
