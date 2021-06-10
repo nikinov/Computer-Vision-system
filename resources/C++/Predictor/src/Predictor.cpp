@@ -12,10 +12,14 @@
 
 using namespace std::chrono;
 
-
-at::Tensor GetPrediction(const char* modelPath, unsigned char* byteArray)
+unsigned char* matToBytes(cv::Mat image)
 {
+    unsigned char* v_char = image.data;
+    return v_char;
+}
 
+at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[])
+{
     // Configuration
     int input_image_size = 224;
     int batch_size = 8;
@@ -32,16 +36,8 @@ at::Tensor GetPrediction(const char* modelPath, unsigned char* byteArray)
 
     int ptr = 0;
 
-    // Read input image
-    cv::Mat img;
-    for (int i = 0; i < img.rows; i++) {
-        for (int j = 0; j < img.cols; j++) {
-
-            img.at<cv::Vec3b>(i, j) = cv::Vec3b(byteArray[ptr + 0], byteArray[ptr + 1], byteArray[ptr + 2]);
-            ptr = ptr + 3;
-        }
-    }
-
+    unsigned char* imageDataPtr = (unsigned char*)&imageData;
+    cv::Mat img(2, 4, CV_8UC3, imageDataPtr);
 
     // Preprocess image (resize, put on GPU)
     cv::Mat resized_image;
