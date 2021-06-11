@@ -65,8 +65,15 @@ namespace ModelMaker
     }
     public class Predictor
     {
-
-        [DllImport(@"C:\Users\Ryzen7-EXT\Documents\Github\WickonHightech\resources\C++\build\PredictorDll\Debug\Predictor_dll.dll")]
+        [DllImport(@"C:\Users\Ryzen7-EXT\Documents\Github\WickonHightech\resources\C++\PredictorDll\dllmain.dll", CallingConvention = CallingConvention.Cdecl)]
+        static extern int test();
+        public static int testing()
+        {
+            return test();
+        }
+        /*
+        
+        [DllImport(@"C:\Users\Ryzen7-EXT\Documents\Github\WickonHightech\resources\C++\build\PredictorDll\Debug\Predictor_dll.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int DLL_GetPrediction(
             byte[] modelPath,
             IntPtr byteArray,
@@ -90,6 +97,6 @@ namespace ModelMaker
             }
             return output;
         }
-
+        */
     }
 }

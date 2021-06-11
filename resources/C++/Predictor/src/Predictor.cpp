@@ -11,14 +11,13 @@
 #include <memory>
 
 using namespace std::chrono;
-
+/*
 unsigned char* matToBytes(cv::Mat image)
 {
     unsigned char* v_char = image.data;
     return v_char;
 }
-
-at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[])
+int GetPrediction(const char* modelPath, unsigned char imageData[], int imHight, int imWidth)
 {
     // Configuration
     int input_image_size = 224;
@@ -37,7 +36,7 @@ at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[])
     int ptr = 0;
 
     unsigned char* imageDataPtr = (unsigned char*)&imageData;
-    cv::Mat img(2, 4, CV_8UC3, imageDataPtr);
+    cv::Mat img(imHight, imWidth, CV_8UC3, imageDataPtr);
 
     // Preprocess image (resize, put on GPU)
     cv::Mat resized_image;
@@ -72,5 +71,5 @@ at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[])
 
     std::cout << "class_id: " << max_ind.item<int>() << std::endl;
     std::cout << "Time take for forward pass: " << duration.count() << " ms" << std::endl;
-    return max_ind;
-}
+    return max_ind.item<int>();
+}*/

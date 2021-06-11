@@ -1,8 +1,13 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
-#include "headers/Predictor.h"
+//#include <cstring>
+//#include <Windows.h>
+#include "../Predictor/headers/Predictor.h"
+#include "dllmain.h"
 
-#include <cstring>
-#include <Windows.h>
+int GetPrediction(const char* modelPath, unsigned char imageData[], int imHight, int imWidth);
+int test();
+
+/*
 // defined in Windows.h
 #undef max
 #undef min
@@ -37,3 +42,4 @@ int DLL_GetPrediction(
 
     return 0;
 }
+*/
