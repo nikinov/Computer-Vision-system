@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.18)
+
 project(Predictor_dll)
 
 # add sources
@@ -5,7 +7,7 @@ file(GLOB DLL_CPP "*.cpp")
 file(GLOB DLL_H   "*.h")
 set(DLL_SOURCES ${DLL_CPP} ${DLL_H})
 
-find_package(torch REQUIRED)
+find_package(Torch REQUIRED)
 find_package(OpenCV REQUIRED)
 include_directories(&{OpenCV_INCLUDE_DIRS})
 
@@ -30,3 +32,15 @@ target_include_directories(${PROJECT_NAME}
 	${PATH_PREDICTOR}
 )
 
+add_custom_command(TARGET ${PROJECT_NAME}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy
+				"${PATH_PREDICTOR}/lib/libtorch/lib/torch_cuda_cu.dll">
+				"${CMAKE_CURRENT_BINARY_DIR}/$<$<CONFIG:debug>:Debug>$<$<CONFIG:release>:Release>")
+
+
+add_custom_command(TARGET ${PROJECT_NAME}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy
+				"${PATH_PREDICTOR}/lib/libtorch/lib/torch_cuda_cpp.dll">
+				"${CMAKE_CURRENT_BINARY_DIR}/$<$<CONFIG:debug>:Debug>$<$<CONFIG:release>:Release>")

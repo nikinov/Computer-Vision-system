@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include "C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech/resources/C++/Predictor/lib/libtorch/include/torch/script.h"
-//#include <torch/script.h>
+#include <torch/script.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 

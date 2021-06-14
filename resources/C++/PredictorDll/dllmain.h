@@ -1,4 +1,5 @@
-/*#pragma once
+#pragma once
+
 
 #if defined(_MSC_VER)
 //  Microsoft 
@@ -16,7 +17,7 @@
 #pragma warning Unknown dynamic link import/export semantics.
 #endif
 
-
+/*
 extern "C" {
 
     // return DLL version info
@@ -31,11 +32,6 @@ extern "C" {
 }
 */
 
-#ifndef SHARED_LIB_H
-#define SHARED_LIB_H
-
-#include <iostream>
-
 using namespace std;
 
 #ifdef __cplusplus
@@ -43,17 +39,9 @@ extern "C" {
 
 #endif
 
-#ifdef BUILD_MY_DLL
-    #define SHARED_LIB __declspec(dllexport)
-#else
-    #define SHARED_LIB __declspec(dllimport)
-#endif
-
-    int SHARED_LIB test();
-    int SHARED_LIB GetPrediction(const char* modelPath, unsigned char imageData[], int imHight, int imWidth);
+    EXPORT int DLL_test();
+    EXPORT int DLL_GetPrediction(const char* modelPath, unsigned char imageData[], int imHight, int imWidth);
 
 #ifdef __cplusplus
 }
 #endif 
-
-#endif
