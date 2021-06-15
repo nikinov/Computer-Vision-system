@@ -63,42 +63,4 @@ namespace ModelMaker
             Console.WriteLine(result);
         }
     }
-        /*
-    public class Predictor
-    {
-        [DllImport(@"C:\Users\Ryzen7-EXT\Documents\Github\WickonHightech\resources\C++\PredictorDll\dllmain.dll", CallingConvention = CallingConvention.Cdecl)]
-        static extern int test();
-        public static int testing()
-        {
-
-            Wrapper.Test();
-            return test();
-        }
-        
-        [DllImport(@"C:\Users\Ryzen7-EXT\Documents\Github\WickonHightech\resources\C++\build\PredictorDll\Debug\Predictor_dll.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int DLL_GetPrediction(
-            byte[] modelPath,
-            IntPtr byteArray,
-            IntPtr buffer,
-            int allocSizOfBuffer
-            );
-
-        public static float[] GetPrediction(
-            string modelPath,
-            byte[] byteArray,
-            int sizeOutput
-            )
-        {
-            var bufferFolder = Encoding.ASCII.GetBytes(modelPath);
-            var output = new float[sizeOutput];
-
-            using (var pinbyteArray = byteArray.Pin())
-            using (var pinOutput = output.Pin())
-            {
-                DLL_GetPrediction(bufferFolder, pinbyteArray, pinOutput, sizeOutput);
-            }
-            return output;
-        }
-        
-    }*/
 }

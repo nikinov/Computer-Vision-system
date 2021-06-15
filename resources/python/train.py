@@ -73,7 +73,7 @@ class train:
             self.num_classes = len(temp_class)
         else:
             # number of classes
-            self.num_classes = len(os.listdir(dataset_path)) - 1
+            self.num_classes = len(os.listdir(dataset_path))
 
             # Load Data from folders
             dataset = datasets.ImageFolder(dataset_path)
@@ -103,16 +103,20 @@ class train:
                 if len(set) < 10:
                     raise Exception("The number of images in one of the classes is less then 10!\nYou have to have at least 10 images per class!")
                 # iterate over the indexes in the label array
+                print(len(set))
                 for set_num, idx in enumerate(set):
                     # check if the index is in the test %
-                    if len(set) - set_num > int(float(len(set))/100)*(100-split_size["train"]):
+                    if len(set) - set_num > 5:#int(float(len(set))/100)*(100-split_size["train"]):
                         self.train_idx.append(idx)
                     # check if the index is in the valid %
-                    elif len(set) - set_num > int(float(len(set))/100)*(100-split_size["val"]):
+                    elif len(set) - set_num > 1:#int(float(len(set))/100)*(100-split_size["val"]):
                         self.val_idx.append(idx)
                     # check if the index is in the test %
                     else:
                         self.test_idx.append(idx)
+            print(len(self.train_idx))
+            print(len(self.val_idx))
+            print(len(self.test_idx))
             for i, (inputs, labels) in enumerate(self.data):
                 if i in self.train_idx:
                     self.train_data.append([self.train_image_transforms(inputs), labels])
