@@ -105,17 +105,14 @@ class train:
                 # iterate over the indexes in the label array
                 for set_num, idx in enumerate(set):
                     # check if the index is in the test %
-                    if lowest_class_num - set_num > int(float(lowest_class_num)/100)*(100-split_size["train"]):
+                    if len(set) - set_num > int(float(len(set))/100)*(100-split_size["train"]):
                         self.train_idx.append(idx)
                     # check if the index is in the valid %
-                    elif lowest_class_num - set_num > int(float(lowest_class_num)/100)*(100-split_size["val"]):
+                    elif len(set) - set_num > int(float(len(set))/100)*(100-split_size["val"]):
                         self.val_idx.append(idx)
                     # check if the index is in the test %
                     else:
                         self.test_idx.append(idx)
-            print(len(self.train_idx))
-            print(len(self.val_idx))
-            print(len(self.test_idx))
             for i, (inputs, labels) in enumerate(self.data):
                 if i in self.train_idx:
                     self.train_data.append([self.train_image_transforms(inputs), labels])
