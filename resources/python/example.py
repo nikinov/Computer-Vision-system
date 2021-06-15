@@ -3,10 +3,10 @@ import time
 
 t = time.time()
 # use_config=true is more performant
-tr = train(save_config=True, use_config=True)
+tr = train(use_config=False)
 print(time.time() - t)
-tr.model_prep()
+#tr.model_prep()
 
-tr.train_and_validate(epochs=15)
+#tr.train_and_Rvalidate(epochs=15)
 
 

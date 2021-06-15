@@ -73,7 +73,7 @@ class train:
             self.num_classes = len(temp_class)
         else:
             # number of classes
-            self.num_classes = len(os.listdir(dataset_path))
+            self.num_classes = len(os.listdir(dataset_path)) - 1
 
             # Load Data from folders
             dataset = datasets.ImageFolder(dataset_path)
@@ -89,6 +89,14 @@ class train:
             for j, (input, label) in enumerate(self.data):
                 label_split[label] = label_split[label] + [j]
 
+            lowest_class_num = len(label_split[0])
+
+            for set in label_split:
+                if len(set) < lowest_class_num:
+                    lowest_class_num = len(set)
+
+
+
             # split the data into valid train and test
             # iterate over index arrays of each label like this [label_0_array[index_0, index_1, ...], label_1_array[index_30, index_31, ...], ...]
             for set in label_split:
@@ -97,15 +105,17 @@ class train:
                 # iterate over the indexes in the label array
                 for set_num, idx in enumerate(set):
                     # check if the index is in the test %
-                    if len(set) - set_num > int(float(len(set))/100)*(100-split_size["train"]):
+                    if lowest_class_num - set_num > int(float(lowest_class_num)/100)*(100-split_size["train"]):
                         self.train_idx.append(idx)
                     # check if the index is in the valid %
-                    elif len(set) - set_num > int(float(len(set))/100)*(100-split_size["val"]):
+                    elif lowest_class_num - set_num > int(float(lowest_class_num)/100)*(100-split_size["val"]):
                         self.val_idx.append(idx)
                     # check if the index is in the test %
                     else:
                         self.test_idx.append(idx)
-
+            print(len(self.train_idx))
+            print(len(self.val_idx))
+            print(len(self.test_idx))
             for i, (inputs, labels) in enumerate(self.data):
                 if i in self.train_idx:
                     self.train_data.append([self.train_image_transforms(inputs), labels])
