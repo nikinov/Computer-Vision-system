@@ -13,5 +13,5 @@ set(PATH_PREDICTOR "${PROJECT_SOURCE_DIR}/Predictor")
 
 set(CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/Predictor/lib/libtorch/share/cmake/Torch")
 
-add_subdirectory(Predictor)
+#add_subdirectory(Predictor)
 add_subdirectory(PredictorDll)

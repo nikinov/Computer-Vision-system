@@ -39,8 +39,8 @@ add_custom_command(TARGET ${PROJECT_NAME}
 				"${CMAKE_CURRENT_BINARY_DIR}/$<$<CONFIG:debug>:Debug>$<$<CONFIG:release>:Release>")
 
 
-add_custom_command(TARGET ${PROJECT_NAME}
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy
-				"${PATH_PREDICTOR}/lib/libtorch/lib/torch_cuda_cpp.dll">
-				"${CMAKE_CURRENT_BINARY_DIR}/$<$<CONFIG:debug>:Debug>$<$<CONFIG:release>:Release>")
+#add_custom_command(TARGET ${PROJECT_NAME}
+#		POST_BUILD
+#		COMMAND ${CMAKE_COMMAND} -E copy
+#				"${PATH_PREDICTOR}/lib/libtorch/lib/torch_cuda_cpp.dll">
+#				"${CMAKE_CURRENT_BINARY_DIR}/$<$<CONFIG:debug>:Debug>$<$<CONFIG:release>:Release>")
