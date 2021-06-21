@@ -40,7 +40,7 @@ extern "C" {
 #endif
 
     EXPORT int DLL_test();
-    EXPORT int DLL_GetPrediction(const char* modelPath, unsigned char imageData[], int imHight, int imWidth);
+    EXPORT int DLL_GetPrediction(const char* modelPath, unsigned char* imageData, int imHight, int imWidth);
 
 #ifdef __cplusplus
 }

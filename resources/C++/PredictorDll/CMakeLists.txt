@@ -1,46 +1,36 @@
-cmake_minimum_required(VERSION 3.18)
+﻿# CMakeList.txt : CMake project for Predictor, include source and define
+# project specific logic here.
+#
+cmake_minimum_required (VERSION 3.18.1)
 
-project(Predictor_dll)
+project (Predictor_Dll)
 
-# add sources
-file(GLOB DLL_CPP "*.cpp")
-file(GLOB DLL_H   "*.h")
-set(DLL_SOURCES ${DLL_CPP} ${DLL_H})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+
+set(Torch_DIR "C:/Users/Ryzen7-EXT/Documents/libtorch/share/cmake/Torch")
 
 find_package(Torch REQUIRED)
 find_package(OpenCV REQUIRED)
 include_directories(&{OpenCV_INCLUDE_DIRS})
 
-# generate dll library from the sources
+# Add source to this project's executable.
+
+#add_executable (${PROJECT_NAME} "src/Predictor.cpp" "headers/Predictor.h" )
+
 add_library(${PROJECT_NAME}
-	SHARED
-	${DLL_SOURCES})
+  SHARED
+  "src/dllmain.cpp" "headers/dllmain.h")
 
-# add external libraries
-target_link_libraries(${PROJECT_NAME}
-	Predictor
-)
+target_link_libraries(${PROJECT_NAME} "${TORCH_LIBRARIES}")
+target_link_libraries(${PROJECT_NAME} "${OpenCV_LIBS}")
 
-# add link directories
-target_link_directories(${PROJECT_NAME}
-    PRIVATE
-)
+if (MSVC)
+  file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
+  add_custom_command(TARGET Predictor_Dll
+                     POST_BUILD
+                     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                     ${TORCH_DLLS}
+                     $<TARGET_FILE_DIR:Predictor_Dll>)
+endif (MSVC)
 
-# add include directories
-target_include_directories(${PROJECT_NAME}
-	PRIVATE
-	${PATH_PREDICTOR}
-)
-
-add_custom_command(TARGET ${PROJECT_NAME}
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy
-				"${PATH_PREDICTOR}/lib/libtorch/lib/torch_cuda_cu.dll">
-				"${CMAKE_CURRENT_BINARY_DIR}/$<$<CONFIG:debug>:Debug>$<$<CONFIG:release>:Release>")
-
-
-#add_custom_command(TARGET ${PROJECT_NAME}
-#		POST_BUILD
-#		COMMAND ${CMAKE_COMMAND} -E copy
-#				"${PATH_PREDICTOR}/lib/libtorch/lib/torch_cuda_cpp.dll">
-#				"${CMAKE_CURRENT_BINARY_DIR}/$<$<CONFIG:debug>:Debug>$<$<CONFIG:release>:Release>")
+# TODO: Add tests and install targets if needed.

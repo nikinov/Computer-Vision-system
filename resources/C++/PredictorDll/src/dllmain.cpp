@@ -1,23 +1,43 @@
-﻿// Predictor.cpp : Defines the entry point for the application.
-//
-//
-
+// dllmain.cpp : Defines the entry point for the DLL application.
+//#include <cstring>
+#include <Windows.h>
 #include <torch/script.h>
 #include <opencv2/opencv.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/imgproc.hpp>
 
 #include <chrono>
 #include <iostream>
 #include <memory>
 
 using namespace std::chrono;
-/*
-unsigned char* matToBytes(cv::Mat image)
+#undef min
+#undef max
+
+//#include "../Predictor/headers/Predictor.h"
+#include "../headers/dllmain.h"
+
+
+BOOL APIENTRY DllMain(HMODULE hModule,
+    DWORD  ul_reason_for_call,
+    LPVOID lpReserved
+)
 {
-    unsigned char* v_char = image.data;
-    return v_char;
+    switch (ul_reason_for_call)
+    {
+    case DLL_PROCESS_ATTACH:
+    case DLL_THREAD_ATTACH:
+    case DLL_THREAD_DETACH:
+    case DLL_PROCESS_DETACH:
+        break;
+    }
+    return TRUE;
 }
-int GetPrediction(const char* modelPath, unsigned char imageData[], int imHight, int imWidth)
+
+int DLL_test()
+{
+    return 0;
+}
+int DLL_GetPrediction(const char* modelPath, unsigned char* imageData, int imHight, int imWidth)
 {
     // Configuration
     int input_image_size = 224;
@@ -35,12 +55,19 @@ int GetPrediction(const char* modelPath, unsigned char imageData[], int imHight,
 
     int ptr = 0;
 
-    unsigned char* imageDataPtr = (unsigned char*)&imageData;
-    cv::Mat img(imHight, imWidth, CV_8UC3, imageDataPtr);
-
+    //unsigned char* imageDataPtr = (unsigned char*)&imageData;
+    cv::Mat img(imHight, imWidth, CV_8UC4, imageData);
+    cv::imshow("image",img);
+    cv::waitKey(0);
     // Preprocess image (resize, put on GPU)
     cv::Mat resized_image;
-    cv::cvtColor(img, resized_image, cv::COLOR_RGB2BGR);
+    try {
+        cv::cvtColor(img, resized_image, cv::COLOR_RGB2BGR);
+    }
+    catch (const c10::Error& e)
+    {
+        std::cerr << "your byte array is incorrect, try redoing your byte array. Hint: openCV doesn't like bmp files but it can work with png or jpg\n";
+    }
     cv::resize(resized_image, resized_image, cv::Size(input_image_size, input_image_size));
 
     cv::Mat img_float;
@@ -72,4 +99,22 @@ int GetPrediction(const char* modelPath, unsigned char imageData[], int imHight,
     std::cout << "class_id: " << max_ind.item<int>() << std::endl;
     std::cout << "Time take for forward pass: " << duration.count() << " ms" << std::endl;
     return max_ind.item<int>();
-}*/
+}
+
+
+/*
+int DLL_GetPrediction(
+    const char* modelPath,
+    unsigned char* byteArray,
+    float* buffer,                      // output char array with version info message
+    int allocSizOfBuffer                        // size of externally allocated array
+)
+{
+    auto output = GetPrediction(modelPath, byteArray);
+
+    std::memcpy(buffer, output.data<float>(), output.size(0));
+
+
+    return 0;
+}
+*/

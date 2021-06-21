@@ -11,6 +11,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchsummary import summary
+import numpy as np
 
 import matplotlib.pyplot as plt
 import os
@@ -61,7 +62,8 @@ class train:
             for line in f.readlines():
                 ln_split = line.split(",")
                 if ln_split[2].replace('\n', '') == 'r':
-                    self.train_data.append([self.train_image_transforms(Image.open(ln_split[0])), int(ln_split[1])])
+                    for i in range(5):
+                        self.train_data.append([self.train_image_transforms(Image.open(ln_split[0])), int(ln_split[1])])
                 if ln_split[2].replace('\n', '') == 'v':
                     self.val_data.append([self.valid_test_image_transforms(Image.open(ln_split[0])), int(ln_split[1])])
                 if ln_split[2].replace('\n', '') == 't':
@@ -119,9 +121,10 @@ class train:
             print(len(self.test_idx))
             for i, (inputs, labels) in enumerate(self.data):
                 if i in self.train_idx:
-                    self.train_data.append([self.train_image_transforms(inputs), labels])
-                    if save_config:
-                        labels_set.append("r")
+                    for j in range(5):
+                        self.train_data.append([self.train_image_transforms(inputs), labels])
+                        if save_config:
+                            labels_set.append("r")
                 elif i in self.val_idx:
                     self.val_data.append([self.valid_test_image_transforms(inputs), labels])
                     if save_config:
@@ -317,15 +320,16 @@ class train:
         num_epochs = 50
 
         if show_results:
-            plt.plot(history[:, 0:2])
+            h = np.array(history)
+            plt.plot(h[:,0:2])
             plt.legend(['Tr Loss', 'Val Loss'])
             plt.xlabel('Epoch Number')
             plt.ylabel('Loss')
-            plt.ylim(0, 1)
+            #plt.ylim(0, 1)
             plt.savefig(self.pt_path + '_loss_curve.png')
             plt.show()
 
-            plt.plot(history[:, 2:4])
+            plt.plot(h[:, 2:4])
             plt.legend(['Tr Accuracy', 'Val Accuracy'])
             plt.xlabel('Epoch Number')
             plt.ylabel('Accuracy')

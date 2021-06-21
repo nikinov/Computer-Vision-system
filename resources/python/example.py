@@ -7,6 +7,6 @@ tr = train(use_config=False)
 print(time.time() - t)
 tr.model_prep()
 
-tr.train_and_validate(epochs=300)
+tr.train_and_validate(epochs=100, show_results=True)
 
 
