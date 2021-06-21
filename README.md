@@ -107,3 +107,8 @@ class Program
     }
 }
 ```
+For getting a prediction out of a model you can call the following function
+```C#
+Predictor.GetPrediction();
+
+```
