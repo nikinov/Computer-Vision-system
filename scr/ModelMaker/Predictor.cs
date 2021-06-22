@@ -21,7 +21,7 @@ namespace ModelMaker
             }
         }
         //public const string Library = @"Predictor_dll.dll";
-        public const string Library = @"C:\Users\Ryzen7-EXT\Documents\Github\WickonHightech\resources\C++\PredictorDll\build\Debug\Predictor_dll.dll";
+        public const string Library = "C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech/resources/C++/PredictorDll/build/Debug/Predictor_dll.dll";
 
         [DllImport(Library, CallingConvention = CallingConvention.Cdecl)]
         private static extern int DLL_test();
@@ -34,13 +34,13 @@ namespace ModelMaker
         private static extern int DLL_GetPrediction(byte[] modelPath, IntPtr imageData, int imHight, int imWidth);
 
         /// <summary>
-        /// 
+        /// get a prediction in a form of an int
         /// </summary>
-        /// <param name="modelPath"></param>
-        /// <param name="imageData"></param>
-        /// <param name="imHight"></param>
-        /// <param name="imWidth"></param>
-        /// <returns></returns>
+        /// <param name="modelPath"></param> path to the model
+        /// <param name="imageData"></param> image data in the form of a byte array
+        /// <param name="imHight"></param> image hight
+        /// <param name="imWidth"></param> image width
+        /// <returns>int representing the label </returns>
         public static int GetPrediction(
             string modelPath,
             byte[] imageData,

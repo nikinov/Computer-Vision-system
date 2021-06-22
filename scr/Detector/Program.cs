@@ -10,10 +10,8 @@ namespace Detector
     {
         static void Main(string[] args)
         {
-            MyImage myImage = MyImage.FromFile(@"C:\Users\Ryzen7-EXT\Documents\Github\WickonHightech\resources\python\otherImages\_Bad_Brown\01074334210_testfield_7245_1_0_.bmp");
-
-            //ModelMaker.Predictor.Test();
-            Console.WriteLine(myImage.data[0]);
+            
+            Predictor.Test();
             //Console.WriteLine(Path.Combine(Directory.GetCurrentDirectory(),"..\\..\\"));
             //Maker.MakeModel(use_config: true, save_config: true, outPath: "C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech/scr/ModelMaker");
             //Image im = Image.FromFile(@"C:\Users\Ryzen7-EXT\Documents\C++Stuff\TorchTest\0.png");
