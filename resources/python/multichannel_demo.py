@@ -17,23 +17,12 @@ col2 = np.vstack([r2, g2, b2])
 
 full = np.hstack([col, col2])
 
-model_urls = {
-    # Inception v3 ported from TensorFlow
-    'inception_v3_google': 'https://download.pytorch.org/models/inception_v3_google-0cc3c7bd.pth',
-}
+im = cv.resize(full, (299, 299))
+
+cv.imshow("image", im)
+cv.waitKey()
 
 
-model = torch.hub.load('pytorch/vision:v0.9.0', 'inception_v3', pretrained=True)
-model.eval()
-
-train_transform = transforms.Compose([
-    transforms.Resize(299),
-    transforms.CenterCrop(299),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-])
-
-print(full)
 
 
 

@@ -3,7 +3,7 @@ import warnings
 import torch
 from torch import nn, Tensor
 import torch.nn.functional as F
-from .._internally_replaced_utils import load_state_dict_from_url
+from utils import load_state_dict_from_url
 from typing import Callable, Any, Optional, Tuple, List
 
 
@@ -196,7 +196,7 @@ class Inception3(nn.Module):
         if self.training and self.aux_logits:
             return InceptionOutputs(x, aux)
         else:
-            return x  # type: ignore[return-value]
+            return x  # type: ignore[value]
 
     def forward(self, x: Tensor) -> InceptionOutputs:
         x = self._transform_input(x)
@@ -475,4 +475,3 @@ class BasicConv2d(nn.Module):
         x = self.conv(x)
         x = self.bn(x)
         return F.relu(x, inplace=True)
-
