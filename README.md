@@ -20,6 +20,7 @@ Make sure you have installed all of the following prerequisites on your developm
 - uninstall all NVIDIA drivers and files and then get [Cuda toolkit](https://developer.nvidia.com/accelerated-computing-toolkit) and [CuDNN](https://developer.nvidia.com/cudnn), make sure it's the same as the one mentioned in pytorch, you can also follow [this tutorial](https://www.youtube.com/watch?v=raBkhUoeOHs) for pytorch and cuda installation
 - [Visual Studio 2019](https://visualstudio.microsoft.com/) with C++
 - [LibTorch](https://pytorch.org/), for this process you can follow [this tutorial](https://www.youtube.com/watch?v=6eTVqYGIWx0)
+- make sure to install [pillow](https://pypi.org/project/Pillow/) and [matplotlib](pip install matplotlib)
 
 ### How to Make
 
