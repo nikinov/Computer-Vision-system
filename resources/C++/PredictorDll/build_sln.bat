@@ -7,5 +7,5 @@ cmake -S ../ -B . -DCMAKE_PREFIX_PATH="C:/Users/Ryzen7-EXT/Documents/libtorch"
 
 :: cmake --build C:\Users\Ryzen7-EXT\Documents\Github\WickonHightech\resources\C++\PredictorDll\build --target clean
 :: CREATE PROJECT
-:: cmake -G "Visual Studio 16 2019" -A x64 -S . -B .\build
+cmake -G "Visual Studio 16 2019" -A x64 -S . -B .\build
 pause
