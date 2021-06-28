@@ -7,7 +7,7 @@ project (Predictor_Dll)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
-set(Torch_DIR "C:/Users/Ryzen7-EXT/Documents/libtorch/share/cmake/Torch")
+set(Torch_DIR "C:/libtorch/share/cmake/Torch")
 
 find_package(Torch REQUIRED)
 find_package(OpenCV REQUIRED)

@@ -21,7 +21,7 @@ namespace ModelMaker
             }
         }
         //public const string Library = @"Predictor_dll.dll";
-        public const string Library = "C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech/resources/C++/PredictorDll/build/Debug/Predictor_dll.dll";
+        public const string Library = @"..\..\..\..\resources\C++\PredictorDll\build\Debug\Predictor_Dll.dll";
 
         [DllImport(Library, CallingConvention = CallingConvention.Cdecl)]
         private static extern int DLL_test();

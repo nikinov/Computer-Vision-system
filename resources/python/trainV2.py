@@ -43,7 +43,7 @@ class train:
             # number of classes
             self.num_classes = len(os.listdir(dataset_path))
 
-            # 
+            #
             for j, path in enumerate(os.walk(dataset_path)):
                 print(path[0])
     #def (self, model_name, num_classes, feature_extract, use_pretrained=True):
