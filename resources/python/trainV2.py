@@ -74,9 +74,7 @@ class train:
             ],
             "mnasnet": [
                 models.mnasnet0_5(pretrained=self.pretrained),
-                models.mnasnet1_3(pretrained=self.pretrained),
-                models.mnasnet1_0(pretrained=self.pretrained),
-                models.mnasnet0_75(pretrained=self.pretrained)
+                models.mnasnet1_0(pretrained=self.pretrained)
             ],
             "mobilenet": [
                 models.mobilenet_v2(pretrained=self.pretrained)
