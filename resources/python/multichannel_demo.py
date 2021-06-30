@@ -23,7 +23,6 @@ im = cv.resize(full, (299, 299))
 cv.imshow("image", im)
 cv.waitKey()
 
-model = models.inception_v3()
 
 num_classes = 2
 
