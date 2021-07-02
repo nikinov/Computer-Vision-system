@@ -83,6 +83,12 @@ tr.predict('testimage.png')
 
 ### integration
 
+#### prep
+
+For prep run the build_sln.bat file in resources\C++\PredictorDll, then go to the build folder and open up the solution and build it. It will generate a debug folder with the dll file that you can use when integrating with C#.
+
+#### code
+
 For integrating learning in C# call the following function. You can find an example in [source](https://github.com/nikinov/WickonHightech/tree/Torch/scr/Detector)
 ```C#
 
