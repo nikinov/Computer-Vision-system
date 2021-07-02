@@ -10,16 +10,31 @@ namespace Detector
     {
         static void Main(string[] args)
         {
-            
-            Predictor.Test();
-            //Console.WriteLine(Path.Combine(Directory.GetCurrentDirectory(),"..\\..\\"));
-            //Maker.MakeModel(use_config: true, save_config: true, outPath: "C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech/scr/ModelMaker");
-            //Image im = Image.FromFile(@"C:\Users\Ryzen7-EXT\Documents\C++Stuff\TorchTest\0.png");
-            
-            //Console.WriteLine(ImageToByteArray(im)[0] + "\n" + ImageToByteArray(im)[1] + "\n" + ImageToByteArray(im)[2]);
-            //Console.WriteLine(ModelMaker.Predictor.GetPrediction("C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech/resources/models/model.pt", ImageToByteArray(im), 300, 300));
-            //Console.WriteLine(test());
-            Console.ReadKey();
+            			if (false) // for model maker use true, or use "example.py" to create the "model.pt" !
+			{
+				//Console.WriteLine(Path.Combine(Directory.GetCurrentDirectory(),"..\\..\\"));
+				//Maker.MakeModel(use_config: true, save_config: true, outPath: "C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech/scr/ModelMaker");
+				Maker.MakeModel(use_config: true, save_config: true, outPath: @"..\ModelMaker");
+			}
+			else
+			{
+				// DLL calling test
+				Predictor.Test();
+				// Predictor.GetPrediction(); ....
+
+				var currentDir = Directory.GetCurrentDirectory();
+				var modelFile = Path.Combine(currentDir, @"..\..\..\..\resources\models\model.pt");
+				if (!File.Exists(modelFile))
+				{
+					throw new FileNotFoundException(modelFile);
+				}
+				//Image im = Image.FromFile(@"C:/temp/0.png");
+				var byteArray = new byte[300 * 300 * 4];
+				//Console.WriteLine(byteArray[0] + "\n" + byteArray[1] + "\n" + byteArray[2]);
+				Console.WriteLine(ModelMaker.Predictor.GetPrediction(modelFile, byteArray, 300, 300));
+				//Console.WriteLine(test());
+			}
+
         }
     }
 }

@@ -16,14 +16,14 @@ at::Tensor GetPrediction(const char* modelPath, unsigned char byteArray[]);
 unsigned char* matToBytes(cv::Mat image);
 int main()
 {
-    cv::Mat image = cv::imread("C:/Users/Ryzen7-EXT/Documents/C++Stuff/TorchTest/0.png");
+    cv::Mat image = cv::imread("../0.png");
     if (image.empty())
     {
         std::cout << "this image is empty" << std::endl;
     }
     else
     {
-        std::cout << GetPrediction("C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech/resources/models/model.pt", matToBytes(image)) << std::endl;
+        std::cout << GetPrediction("../../../models/model.pt", matToBytes(image)) << std::endl;
         std::cout << "showing image" << std::endl;
     }
 }
