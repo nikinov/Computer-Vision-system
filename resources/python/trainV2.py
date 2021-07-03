@@ -101,7 +101,10 @@ class train:
 
             pass
         else:
-
+            if grayscale:
+                pass
+            else:
+                pass
             self.model_prep("googlenet", models["googlenet"][0], True)
             # number of classes
             self.num_classes = len(os.listdir(dataset_path))
@@ -134,9 +137,7 @@ class train:
 
     def transform_image(self, ims, gray):
         if gray:
-            col1 = np.vstack(ims[0], ims[1], ims[2])
-            col2 = np.vstack(ims[3], ims[4], ims[5])
-            im = np.hstack([col1, col2])
+            im = ims
         else:
             im = ims
         im = self.preprocessing(im)
