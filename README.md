@@ -23,6 +23,61 @@ Make sure you have installed all of the following prerequisites on your developm
 - make sure to install [pillow](https://pypi.org/project/Pillow/), [matplotlib](https://pypi.org/project/matplotlib/) and [torchsummary](https://pypi.org/project/torch-summary/)
 - !! there are 2 links on the torch website, make sure to choose the debug version unless you need relese !!
 
+### Setup
+-----
+### Installation & Compilation HOW-TO
+
+
+#### PYTORCH
+-------
+pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio===0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
+
+
+#### CUDA
+----
+install: cuda_11.3.1_465.89_win10.exe
+
+
+#### CudNN
+-----
+copy CudNN files: cudnn-11.2-windows-x64-v8.1.1.33.zip
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\vx.x\
+
+
+#### LIBTORCH
+--------
+https://pytorch.org/ 
+- Stable(1.9.0) + Windows + LibTorch + C++/Java + CUDA11.1 -> Download DEBUG(!) version
+- unpack to C:\libtorch (libtorch-win-shared-with-deps-debug-1.9.0+cu111.zip)
+
+
+#### Build MODEL
+-----------
+- run LibTorch\resources\python\example.py
+
+
+#### Compile PredictorDLL
+--------------------
+LibTorch\resources\C++\PredictorDll\
+- run build_sln.bat
+- rebuild build\Predictor_Dll.sln in VS2019
+
+
+#### Compile and test TorchTest (optional)
+-------------------------------------
+LibTorch\resources\C++\TorchTest\
+- run build_sln.bat
+- rebuild and run build\TorchTest.sln in VS2019
+
+
+#### Compile and test Detector C#
+----------------------------
+LibTorch\scr\Detector\
+- rebuild and run Detector.sln
+
+
+MW, 2.7.2021
+
 ### How to Make
 
 you can follow [this tutorial](https://learnopencv.com/image-classification-using-transfer-learning-in-pytorch/) for the python script
