@@ -21,6 +21,7 @@ Make sure you have installed all of the following prerequisites on your developm
 - [Visual Studio 2019](https://visualstudio.microsoft.com/) with C++
 - [LibTorch](https://pytorch.org/), for this process you can follow [this tutorial](https://www.youtube.com/watch?v=6eTVqYGIWx0)
 - make sure to install [pillow](https://pypi.org/project/Pillow/), [matplotlib](https://pypi.org/project/matplotlib/) and [torchsummary](https://pypi.org/project/torch-summary/)
+- !! there are 2 links on the torch website, make sure to choose the debug version unless you need relese !!
 
 ### How to Make
 
@@ -82,6 +83,12 @@ tr.predict('testimage.png')
 ```
 
 ### integration
+
+#### prep
+
+For prep run the build_sln.bat file in resources\C++\PredictorDll, then go to the build folder and open up the solution and build it. It will generate a debug folder with the dll file that you can use when integrating with C#.
+
+#### code
 
 For integrating learning in C# call the following function. You can find an example in [source](https://github.com/nikinov/WickonHightech/tree/Torch/scr/Detector)
 ```C#

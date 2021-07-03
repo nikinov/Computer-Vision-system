@@ -47,6 +47,7 @@ int DLL_GetPrediction(const char* modelPath, unsigned char* imageData, int imHig
     torch::jit::script::Module module;
     try {
         // Deserialize the ScriptModule from a file using torch::jit::load().
+        std::cout << "Loading model, path = " << modelPath << "\n";
         module = torch::jit::load(modelPath);
     }
     catch (const c10::Error& e) {
