@@ -24,7 +24,7 @@ from pathlib import Path
 
 
 class train:
-    def __init__(self, dataset_path="../AssetsGray", model_output_path="../models", config_file_name="data_dir_and_label_info.txt", save_config=False, use_config=False, channels=3, grayscale=False, go_nuts=False):
+    def __init__(self, dataset_path="../AssetsGray", model_output_path="../models", config_file_name="data_dir_and_label_info.txt", save_config=False, use_config=False, channels=3, grayscale=False):
 
         self.preprocessing = transforms.Compose([
             transforms.ToTensor(),
@@ -70,14 +70,20 @@ class train:
                 models.inception_v3(pretrained=self.pretrained)
             ],
             "googlenet": [
-                models.googlenet(pretrained=self.pretrained, )
+                models.googlenet(pretrained=self.pretrained)
+            ],
+            "mnasnet": [
+                models.mnasnet0_5(pretrained=self.pretrained),
+                models.mnasnet1_0(pretrained=self.pretrained)
+            ],
+            "mobilenet": [
+                models.mobilenet_v2(pretrained=self.pretrained)
             ]
         }
 
         splits = 80
+
         self.data = []
-        self.augmented_data = []
-        self.ready_mod = []
 
         self.val_data = []
         self.train_data = []
@@ -87,34 +93,27 @@ class train:
         self.bs = 32
         self.data_path = dataset_path
         self.grayscale = grayscale
-
-
         os_exists = os.path.exists(config_file_name)
 
-        self.input_size = (224, 224)
-
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.input_size = (299, 299)
 
         if use_config and os_exists:
 
             pass
         else:
+            if grayscale:
+                pass
+            else:
+                pass
+            self.model_prep("googlenet", models["googlenet"][0], True)
             # number of classes
             self.num_classes = len(os.listdir(dataset_path))
 
             # load data from folders
-            self.load_data(dataset_path, grayscale)
+            #self.load_data(dataset_path, grayscale)
 
-            #print(self.data[0])
-        if go_nuts:
-            self.augmented_data = [[], []]
-            for point in self.data:
-                self.augmented_data[0].append(self.transform_image(point[0], grayscale))
-                self.input_size = (299, 299)
-                self.augmented_data[1].append(self.transform_image(point[0], grayscale))
-            for model in self.models:
-                for mod in self.models[model]:
-                    self.ready_mod.append(self.model_prep(model, mod.to(self.device), True))
+            print(self.data[0])
+
 
     def load_data(self, dirs, gray):
         i = 0
@@ -127,23 +126,20 @@ class train:
                         holder.append(Image.open(os.path.join(dirs, dr)))
                         if i == 6:
                             i = 0
-                            arr = [holder, Path(dirs).parent.absolute().name]
+                            arr = [self.transform_image(holder, gray), Path(dirs).parent.absolute().name]
                             holder = []
                             self.data.append(arr)
                     else:
-                        arr = [Image.open(os.path.join(dirs, dr)), Path(dirs).name]
+                        arr = [self.transform_image(Image.open(os.path.join(dirs, dr)), gray), Path(dirs).name]
                         self.data.append(arr)
                 else:
                     self.load_data(os.path.join(dirs, dr), gray)
 
     def transform_image(self, ims, gray):
         if gray:
-            col1 = np.vstack(ims[0], ims[1], ims[2])
-            col2 = np.vstack(ims[3], ims[4], ims[5])
-            im = np.hstack([col1, col2])
+            im = ims
         else:
             im = ims
-        im = cv.resize(im, self.input_size)
         im = self.preprocessing(im)
         return im
 
@@ -208,73 +204,20 @@ class train:
         elif model_name == "googlenet":
             self.set_parameter_requires_grad(model_ft, feature_extract)
 
-            num_ftrs = model_ft.fc.in_features
-            model_ft.fc = nn.Linear(num_ftrs, self.num_classes)
+            num_ftrs = model_ft.AuxLogits.fc.in_features
+            model_ft.AuxLogits.fc = nn.Linear(num_ftrs, self.num_classes)
 
             num_ftrs = model_ft.fc.in_features
             model_ft.fc = nn.Linear(num_ftrs, self.num_classes)
-            self.input_size = 224
+
         else:
             model_ft = None
-        optimizer = optim.Adam(model_ft.parameters())
-        loss_func = nn.NLLLoss()
-        model_ft.to(self.device)
-        return model_ft, optimizer, loss_func
+        return model_ft
+"""
+    def training_loop(self):
 
-    def training_loop(self, inputs, labels, model, loss_criterion, u_loss, u_acc, optimizer, train=False):
-        grad_mode = torch.enable_grad()
+    def train_and_validate(self):
 
-        if not train:
-            # Set to training mode
-            model.train()
-            # Set to evaluation mode
-            model.eval()
-            grad_mode = torch.no_grad()
-        with grad_mode:
-            inputs = inputs.to(self.device)
-            labels = labels.to(self.device)
-
-            if train:
-                # Clean existing gradients
-                optimizer.zero_grad()
-            # Forward pass - compute outputs on input data using the model
-            outputs = model(inputs)
-
-            # Compute loss
-            loss = loss_criterion(outputs, labels)
-            if train:
-                # Backpropagate the gradients
-                loss.backward()
-
-                # Update the parameters
-                optimizer.step()
-
-            # Compute the total loss for the batch and add it to train_loss
-            u_loss += loss.item() * inputs.size(0)
-
-            # Compute the accuracy
-            ret, predictions = torch.max(outputs.data, 1)
-            correct_counts = predictions.eq(labels.data.view_as(predictions))
-
-            # Convert correct_counts to float and then compute the mean
-            acc = torch.mean(correct_counts.type(torch.FloatTensor))
-
-            # Compute total accuracy in the whole batch and add to train_acc
-            u_acc += acc.item() * inputs.size(0)
-
-            return u_loss, u_acc, loss, acc
-
-
-    def train_and_validate(self, loss_criterion=None, optimizer=None, epochs=25, show_results=False):
-        history = []
-        best_epoch = None
-
-        # iterate over the data multiple times
-        for epoch in range(epochs):
-            pass
-
-
-    """     
     def compute_test_set_accuracy(self):
 
     def predict(self):

@@ -16,14 +16,14 @@ at::Tensor GetPrediction(const char* modelPath, unsigned char byteArray[]);
 unsigned char* matToBytes(cv::Mat image);
 int main()
 {
-    cv::Mat image = cv::imread("C:/Users/Ryzen7-EXT/Documents/C++Stuff/TorchTest/0.png");
+    cv::Mat image = cv::imread("C:/Temp/0.png");
     if (image.empty())
     {
         std::cout << "this image is empty" << std::endl;
     }
     else
     {
-        std::cout << GetPrediction("C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech/resources/models/model.pt", matToBytes(image)) << std::endl;
+        std::cout << GetPrediction("C:/Temp/models/model.pt", matToBytes(image)) << std::endl;
         std::cout << "showing image" << std::endl;
     }
 }
@@ -48,6 +48,8 @@ at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[])
     }
     catch (const c10::Error& e) {
         std::cerr << "error loading the model\n";
+        at::Tensor out;
+        return out;
     }
 
     int ptr = 0;
@@ -75,12 +77,10 @@ at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[])
     // Execute the model and turn its output into a tensor.
     at::Tensor output;
     auto duration = duration_cast<milliseconds>(std::chrono::high_resolution_clock::now() - std::chrono::high_resolution_clock::now());
-    for (int i = 0; i < 10; i++) {
-        auto start = std::chrono::high_resolution_clock::now();
-        output = module.forward(inputs).toTensor().to(at::kCPU);
-        auto end = std::chrono::high_resolution_clock::now();
-        duration = duration_cast<milliseconds>(end - start);
-    }
+    auto start = std::chrono::high_resolution_clock::now();
+    output = module.forward(inputs).toTensor().to(at::kCUDA);
+    auto end = std::chrono::high_resolution_clock::now();
+    duration = duration_cast<milliseconds>(end - start);
 
     at::Tensor max_ind = at::argmax(output);
 
