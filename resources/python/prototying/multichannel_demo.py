@@ -5,7 +5,7 @@ import numpy as np
 from torchvision import datasets, models, transforms
 from torch import nn
 import torch
-path = "otherImages/_Bad_Void"
+path = "../otherImages/_Bad_Void"
 
 image = cv.imread(os.path.join(path, "01055538070_testfield_1028_2.bmp"))
 image2 = cv.imread(os.path.join(path, "01055542031_testfield_1028_6.bmp"))

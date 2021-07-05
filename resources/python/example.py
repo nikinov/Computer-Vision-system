@@ -1,4 +1,4 @@
-from train import train
+from resources.python.train.train import train
 import time
 
 t = time.time()
