@@ -156,7 +156,7 @@ class train:
         self.idx_to_class = {}
         for i, dir in enumerate(os.listdir(dataset_path)):
             self.idx_to_class[i] = dir
-        self.resnet = models.resnet152()
+        self.resnet = models.resnet18(pretrained=True)
 
     def model_prep(self, resnet_type=None):
         """
