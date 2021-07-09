@@ -16,16 +16,16 @@ at::Tensor GetPrediction(const char* modelPath, unsigned char byteArray[]);
 unsigned char* matToBytes(cv::Mat image);
 int main()
 {
-    cv::Mat image = cv::imread("C:/Temp/0.png");
+    cv::Mat image = cv::imread("C:/Temp/5.jpg");
     if (image.empty())
     {
         std::cout << "this image is empty" << std::endl;
     }
     else
     {
-        std::cout << GetPrediction("C:/Temp/models/model.pt", matToBytes(image)) << std::endl;
+        std::cout << GetPrediction("C:/Temp/models/num_model.pt", matToBytes(image)) << std::endl;
         std::cout << "showing image" << std::endl;
-    }
+    }    
 }
 
 unsigned char* matToBytes(cv::Mat image)
@@ -38,45 +38,45 @@ at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[])
 {
 
     // Configuration
-    int input_image_size = 224;
+    int input_image_size = 28;
 
     // Deserialize the ScriptModule from a file using torch::jit::load().
     torch::jit::script::Module module;
     try {
         // Deserialize the ScriptModule from a file using torch::jit::load().
+        std::cout << "Loading model, path = " << modelPath << "\n";
         module = torch::jit::load(modelPath);
     }
     catch (const c10::Error& e) {
         std::cerr << "error loading the model\n";
-        at::Tensor out;
-        return out;
     }
 
     int ptr = 0;
 
-    cv::Mat img(300, 300, CV_8UC3, imageData);
-
+    //unsigned char* imageDataPtr = (unsigned char*)&imageData;
+    cv::Mat img(28, 28, CV_8UC1, imageData);
     // Preprocess image (resize, put on GPU)
     cv::Mat resized_image;
-    cv::resize(img, resized_image, cv::Size(input_image_size, input_image_size));
+    cv::resize(resized_image, resized_image, cv::Size(input_image_size, input_image_size));
 
     cv::Mat img_float;
     resized_image.convertTo(img_float, CV_32F, 1.0 / 255);
 
-    auto img_tensor = torch::from_blob(img_float.data, { 1, input_image_size, input_image_size, 3 });
-    img_tensor = img_tensor.permute({ 0, 3, 1, 2 });
-    img_tensor[0][0] = img_tensor[0][0].sub(0.485).div(0.229);
-    img_tensor[0][1] = img_tensor[0][1].sub(0.456).div(0.224);
-    img_tensor[0][2] = img_tensor[0][2].sub(0.406).div(0.225);
+    auto img_tensor = torch::from_blob(img_float.data, { 1, input_image_size, input_image_size });
+    img_tensor = img_tensor.permute({ 0, 1, 2 });
+    img_tensor[0][0] = img_tensor[0][0].sub(0.5).div(0.5);
+    img_tensor[0][1] = img_tensor[0][1].sub(0.5).div(0.5);
+    img_tensor[0][2] = img_tensor[0][2].sub(0.5).div(0.5);
     auto img_var = torch::autograd::make_variable(img_tensor, false);
 
     // Create a vector of inputs.
     std::vector<torch::jit::IValue> inputs;
     inputs.push_back(img_var.to(at::kCUDA));
-
+    std::cout << inputs << std::endl;
     // Execute the model and turn its output into a tensor.
     at::Tensor output;
     auto duration = duration_cast<milliseconds>(std::chrono::high_resolution_clock::now() - std::chrono::high_resolution_clock::now());
+
     auto start = std::chrono::high_resolution_clock::now();
     output = module.forward(inputs).toTensor().to(at::kCUDA);
     auto end = std::chrono::high_resolution_clock::now();
