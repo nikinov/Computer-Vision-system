@@ -63,7 +63,6 @@ for e in range(epochs):
         print("Epoch {} - Training loss: {}".format(e, running_loss / len(trainloader)))
 print("\nTraining Time (in minutes) =", (time() - time0) / 60)
 
-
 m = torch.jit.script(model)
 
 torch.jit.save(m, "model.pt")

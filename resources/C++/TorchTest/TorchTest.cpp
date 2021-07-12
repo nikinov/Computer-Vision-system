@@ -12,18 +12,18 @@
 
 using namespace std::chrono;
 
-at::Tensor GetPrediction(const char* modelPath, unsigned char byteArray[]);
+at::Tensor GetPrediction(const char* modelPath, unsigned char byteArray[], int imwidth, int imhight);
 unsigned char* matToBytes(cv::Mat image);
 int main()
 {
-    cv::Mat image = cv::imread("C:/Temp/5.jpg");
+    cv::Mat image = cv::imread("C:/!SAMPLES!/1716-5082/digit2/20210709-142856_X0Y0_R-scan0.bmp", 0);
     if (image.empty())
     {
         std::cout << "this image is empty" << std::endl;
     }
     else
     {
-        std::cout << GetPrediction("C:/Temp/models/num_model.pt", matToBytes(image)) << std::endl;
+        std::cout << GetPrediction("C:/Temp/models/num_model.pt", matToBytes(image), image.size().width, image.size().height) << std::endl;
         std::cout << "showing image" << std::endl;
     }    
 }
@@ -34,7 +34,7 @@ unsigned char* matToBytes(cv::Mat image)
     return v_char;
 }
 
-at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[])
+at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[], int imwidth, int imheight)
 {
 
     // Configuration
@@ -54,10 +54,12 @@ at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[])
     int ptr = 0;
 
     //unsigned char* imageDataPtr = (unsigned char*)&imageData;
-    cv::Mat img(28, 28, CV_8UC1, imageData);
+    cv::Mat img(imheight, imwidth, CV_8UC1, imageData);
     // Preprocess image (resize, put on GPU)
     cv::Mat resized_image;
-    cv::resize(resized_image, resized_image, cv::Size(input_image_size, input_image_size));
+    cv::resize(img, resized_image, cv::Size(input_image_size, input_image_size));
+    cv::imshow("test", resized_image);
+    cv::waitKey();
 
     cv::Mat img_float;
     resized_image.convertTo(img_float, CV_32F, 1.0 / 255);
@@ -71,14 +73,14 @@ at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[])
 
     // Create a vector of inputs.
     std::vector<torch::jit::IValue> inputs;
-    inputs.push_back(img_var.to(at::kCUDA));
+    inputs.push_back(img_var.to(at::kCPU));
     std::cout << inputs << std::endl;
     // Execute the model and turn its output into a tensor.
     at::Tensor output;
     auto duration = duration_cast<milliseconds>(std::chrono::high_resolution_clock::now() - std::chrono::high_resolution_clock::now());
 
     auto start = std::chrono::high_resolution_clock::now();
-    output = module.forward(inputs).toTensor().to(at::kCUDA);
+    output = module.forward(inputs).toTensor().to(at::kCPU);
     auto end = std::chrono::high_resolution_clock::now();
     duration = duration_cast<milliseconds>(end - start);
 
