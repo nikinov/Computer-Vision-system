@@ -1,0 +1,33 @@
+﻿# CMakeList.txt : CMake project for TorchTest, include source and define
+# project specific logic here.
+#
+cmake_minimum_required (VERSION 3.8)
+
+project ("CppTrainDemo")
+
+find_package(Torch REQUIRED)
+find_package(OpenCV REQUIRED)
+
+find_package(OpenMP)
+
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+
+include_directories( ${OpenCV_INCLUDE_DIRS})
+
+# Add source to this project's executable.
+add_executable (CppTrainDemo "src/TrainDemo.cpp" "headers/TrainDemo.h")
+target_link_libraries(CppTrainDemo "${TORCH_LIBRARIES}")
+target_link_libraries(CppTrainDemo ${OpenCV_LIBS})
+
+if (MSVC)
+  file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
+  add_custom_command(TARGET CppTrainDemo
+                     POST_BUILD
+                     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                     ${TORCH_DLLS}
+                     $<TARGET_FILE_DIR:CppTrainDemo>)
+endif (MSVC)
+
+# TODO: Add tests and install targets if needed.

@@ -61,8 +61,27 @@ for e in range(epochs):
         running_loss += loss.item()
     else:
         print("Epoch {} - Training loss: {}".format(e, running_loss / len(trainloader)))
+
+    correct_count, all_count = 0, 0
+    for images, labels in valloader:
+        for i in range(len(labels)):
+            img = images[i].view(1, 784)
+            with torch.no_grad():
+                logps = model(img.to("cuda"))
+
+            ps = torch.exp(logps).to("cpu")
+            probab = list(ps.numpy()[0])
+            pred_label = probab.index(max(probab))
+            true_label = labels.numpy()[i]
+            if (true_label == pred_label):
+                correct_count += 1
+            all_count += 1
+    print("Number Of Images Tested =", all_count)
+    print("\nModel Accuracy =", (correct_count / all_count))
 print("\nTraining Time (in minutes) =", (time() - time0) / 60)
 
-m = torch.jit.script(model)
 
-torch.jit.save(m, "model.pt")
+
+#m = torch.jit.script(model)
+
+#torch.jit.save(m, "model.pt")
