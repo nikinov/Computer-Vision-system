@@ -1,25 +1,18 @@
 
+from torch import nn
+import torch
 
-import numpy as np
-import cv2
+input_size = 784
+hidden_sizes = [128, 64]
+output_size = 10
 
-img = cv2.imread("assets/test_brown.bmp")
-or_shape = img.shape
+model = nn.Sequential(nn.Linear(input_size, hidden_sizes[0]),
+                      nn.ReLU(),
+                      nn.Linear(hidden_sizes[0], hidden_sizes[1]),
+                      nn.ReLU(),
+                      nn.Linear(hidden_sizes[1], output_size),
+                      nn.LogSoftmax(dim=1))
 
-img = np.float32(img.reshape((-1, 3)))
+m = torch.jit.script(model)
 
-criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-
-k=3
-
-attemts=10
-
-ret, label, center = cv2.kmeans(img, k, None, criteria, attemts, cv2.KMEANS_PP_CENTERS)
-
-center = np.uint8(center)
-
-res = center[label.flatten()]
-res = res.reshape((or_shape))
-cv2.imwrite("temp/sample1.png", res)
-
-cv2.waitKey(0)
+torch.jit.save(m, "model.pt")
