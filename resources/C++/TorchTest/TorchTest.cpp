@@ -2,7 +2,7 @@
 //
 
 
-#include <torch/script.h> 
+#include <torch/script.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -24,12 +24,8 @@ int main()
     else
     {
         //std::cout << GetPrediction("C:/Temp/models/num_model.pt", matToBytes(image), image.size().width, image.size().height) << std::endl;
-        std::vector<int> temp[2];
-        temp->push_back(2);
-        temp->push_back(3);
-        temp->push_back(4);
-        temp->at(2) = 10;
-        std::cout << "showing image " << temp->at(2) << "||" << temp->at(1) << std::endl;
+
+        std::cout << "showing image " << std::endl;
     }    
 }
 
@@ -49,8 +45,8 @@ at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[], int i
     torch::jit::script::Module module;
     try {
         // Deserialize the ScriptModule from a file using torch::jit::load().
-        std::cout << "Loading model, path = " << "C:/Temp/models/num_model.pt" << "\n";
-        module = torch::jit::load("C:/Temp/models/num_model.pt");
+        std::cout << "Loading model, path = " << "C:/Temp/models/model_num_naked.pt" << "\n";
+        module = torch::jit::load("C:/Temp/models/model_num_naked.pt");
     }
     catch (const c10::Error& e) {
         std::cerr << "error loading the model\n";
@@ -60,7 +56,6 @@ at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[], int i
 
     //unsigned char* imageDataPtr = (unsigned char*)&imageData;
     cv::Mat img(imheight, imwidth, CV_8UC1, imageData);
-
 
     // Resize
     cv::Mat resized_image;
@@ -82,7 +77,6 @@ at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[], int i
     }
 
     //resized_image = reshaped_image.reshape(1, resized_image.rows);
-
     cv::Mat img_float;
     reshaped_image = reshaped_image + cv::Scalar(-127.5);
     reshaped_image.convertTo(img_float, CV_32F, 2.0 / 255);
@@ -108,7 +102,7 @@ at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[], int i
     //at::Tensor max_ind = at::argmax(output);
 
     float out[10];
-    for (unsigned int i = 0; i < 9; i++) {
+    for (unsigned int i = 0; i < 10; i++) {
         std::stringstream tmp;
         tmp << output[0][i].data();
         std::string tmp_str = tmp.str();
