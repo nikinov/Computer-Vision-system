@@ -75,9 +75,9 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
             running_corrects = 0
 
             # Iterate over data.
-            for inputs, labels in dataloaders[phase]:
-                inputs = inputs.to(device)
-                labels = labels.to(device)
+            for inputs, labels in dataloaders[phase].dataset:
+                inputs = inputs.to(device).reshape(1, 3, 224, 224)
+                labels = torch.tensor([labels]).to(device)
 
                 # zero the parameter gradients
                 optimizer.zero_grad()
