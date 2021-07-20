@@ -9,7 +9,7 @@ transform = transforms.Compose([transforms.ToTensor(),
                               transforms.Normalize((0.5,), (0.5,)),
                               ])
 
-directory = "C:/!SAMPLES!/1716-5082/Assets5082-samples-for-training/Assets5082"
+directory = "/Applications/stuff/Documents/NewOtherGithub/WickonHightech/WickonHightech/resources/Assets5082"
 class_num = 0
 classes = {}
 k=2
@@ -30,7 +30,7 @@ model = nn.Sequential(nn.Linear(input_size, hidden_sizes[0]),
                       nn.LogSoftmax(dim=1))
 
 for i, entry in enumerate(glob.iglob(directory + '**/**')):
-    classes[entry.split(r"\ ".replace(" ", ""))[-1]] = i
+    classes[entry.split("/")[-1]] = i
 
 class_check = ""
 for i, entry in enumerate(glob.iglob(directory + '**/**', recursive=True)):
@@ -41,21 +41,21 @@ for i, entry in enumerate(glob.iglob(directory + '**/**', recursive=True)):
         ret, label, center = cv2.kmeans(img, k, None, criteria, attemts, cv2.KMEANS_PP_CENTERS)
         label = label*(255/(k-1))
         label = transform(label)
-        splitter = r"\ ".replace(" ","")
+        splitter = r"/"
         if entry.split(splitter)[-2] != class_check:
             class_check = entry.split(splitter)[-2]
             val_data.append([label, entry.split(splitter)[-2]])
         else:
-            train_data.append([label, classes[entry.split(splitter)[-2]]])
+            train_data.append([label, entry.split(splitter)[-2]])
 
 
-print(len(val_data))
-print(len(train_data))
-model.to("cuda")
+
+print(classes)
+model.to("cpu")
 
 criterion = nn.NLLLoss()
 
-optimizer = optim.SGD(model.parameters(), lr=0.003, momentum=0.9)
+optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9)
 epochs = 15
 for e in range(epochs):
     running_loss = 0
@@ -64,14 +64,14 @@ for e in range(epochs):
         # Flatten MNIST images into a 784 long vector
         images = images.view(images.shape[0], -1)
         images = images.type(torch.FloatTensor)
-        images = images.to("cuda")
-        labels = torch.tensor(labels)
+        images = images.to("cpu")
+        label = torch.tensor([classes[labels]])
 
         # Training pass
         optimizer.zero_grad()
 
         output = model(images)
-        loss = criterion(output, labels.to("cuda"))
+        loss = criterion(output, label)
 
         # This is where the model learns by backpropagating
         loss.backward()
@@ -80,22 +80,25 @@ for e in range(epochs):
         optimizer.step()
 
         running_loss += loss.item()
-    else:
-        print("Epoch {} - Training loss: {}".format(e, running_loss / len(val_data)))
+        print("Epoch " + str(e) + " - Training loss: " + str(running_loss / len(train_data)))
 
     correct_count, all_count = 0, 0
     for images, labels in val_data:
         with torch.no_grad():
-            logps = model(images.to("cuda"))
+            # Flatten MNIST images into a 784 long vector
+            images = images.view(images.shape[0], -1)
+            images = images.type(torch.FloatTensor)
+            images = images.to("cpu")
+            logps = model(images)
 
-        ps = torch.exp(logps).to("cuda")
+        ps = torch.exp(logps).to("cpu")
         probab = list(ps.numpy()[0])
         pred_label = probab.index(max(probab))
-        true_label = labels.numpy()
+        true_label = torch.tensor([classes[labels]]).numpy()
         if (true_label == pred_label):
             correct_count += 1
         all_count += 1
     print("Number Of Images Tested =", all_count)
-    print("\nModel Accuracy =", (correct_count / all_count))
+    print("Model Accuracy =", (correct_count / all_count) + "\n")
 
 
