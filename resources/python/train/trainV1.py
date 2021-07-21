@@ -1,3 +1,9 @@
+#
+#   https://github.com/leimao/LibTorch-ResNet-CIFAR/blob/main/src/resnet-cifar-demo.cpp
+#
+
+
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -12,7 +18,7 @@ import copy
 
 plt.ion()   # interactive mode
 
-dataset_path = "/Users/nicholasnovelle/Downloads/hymenoptera_data"
+dataset_path = "../../hymenoptera_data"
 
 # Data augmentation and normalization for training
 # Just normalization for validation
