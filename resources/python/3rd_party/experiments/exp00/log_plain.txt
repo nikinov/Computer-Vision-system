@@ -1,4 +1,4 @@
-[32m[2021-07-21 14:59:00] __main__ INFO: [0mdevice: cpu
+[2021-07-21 16:00:01] __main__ INFO: device: cpu
 cudnn:
   benchmark: True
   deterministic: False
@@ -184,7 +184,10 @@ test:
   dataloader:
     num_workers: 2
     pin_memory: False
-[32m[2021-07-21 14:59:00] __main__ INFO: [0menv_info:
+[2021-07-21 16:00:01] __main__ INFO: env_info:
   pytorch_version: 1.7.1
   cuda_version: ''
   cudnn_version: ''
+[2021-07-21 16:01:28] __main__ INFO: MACs   : 255.25M
+[2021-07-21 16:01:28] __main__ INFO: #params: 1.73M
+[2021-07-21 16:01:33] __main__ INFO: Val 0

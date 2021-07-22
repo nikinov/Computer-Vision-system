@@ -80,7 +80,7 @@ for e in range(epochs):
         optimizer.step()
 
         running_loss += loss.item()
-        print("Epoch " + str(e) + " - Training loss: " + str(running_loss / len(train_data)))
+    print("Epoch " + str(e) + " - Training loss: " + str(running_loss / len(train_data)))
 
     correct_count, all_count = 0, 0
     for images, labels in val_data:
