@@ -24,12 +24,8 @@ from pathlib import Path
 
 
 class train:
-    def __init__(self, dataset_path="../AssetsGray", model_output_path="../models", config_file_name="data_dir_and_label_info.txt", save_config=False, use_config=False, channels=3, grayscale=False):
-
-        self.preprocessing = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ])
+    def __init__(self, num_classes):
+        self.num_classes = num_classes
         self.pretrained = True
         self.models = {
             "resnet": [
@@ -80,68 +76,6 @@ class train:
                 models.mobilenet_v2(pretrained=self.pretrained)
             ]
         }
-
-        splits = 80
-
-        self.data = []
-
-        self.val_data = []
-        self.train_data = []
-        self.test_data = []
-
-        # batch size
-        self.bs = 32
-        self.data_path = dataset_path
-        self.grayscale = grayscale
-        os_exists = os.path.exists(config_file_name)
-
-        self.input_size = (299, 299)
-
-        if use_config and os_exists:
-
-            pass
-        else:
-            if grayscale:
-                pass
-            else:
-                pass
-            self.model_prep("googlenet", models["googlenet"][0], True)
-            # number of classes
-            self.num_classes = len(os.listdir(dataset_path))
-
-            # load data from folders
-            #self.load_data(dataset_path, grayscale)
-
-            print(self.data[0])
-
-
-    def load_data(self, dirs, gray):
-        i = 0
-        holder = []
-        for dr in os.listdir(dirs):
-            if not dr.endswith(".DS_Store"):
-                if dr.endswith(".bmp") or dr.endswith(".png"):
-                    if gray:
-                        i += 1
-                        holder.append(Image.open(os.path.join(dirs, dr)))
-                        if i == 6:
-                            i = 0
-                            arr = [self.transform_image(holder, gray), Path(dirs).parent.absolute().name]
-                            holder = []
-                            self.data.append(arr)
-                    else:
-                        arr = [self.transform_image(Image.open(os.path.join(dirs, dr)), gray), Path(dirs).name]
-                        self.data.append(arr)
-                else:
-                    self.load_data(os.path.join(dirs, dr), gray)
-
-    def transform_image(self, ims, gray):
-        if gray:
-            im = ims
-        else:
-            im = ims
-        im = self.preprocessing(im)
-        return im
 
     def set_parameter_requires_grad(self, model, feature_extracting):
         if feature_extracting:
@@ -213,18 +147,6 @@ class train:
         else:
             model_ft = None
         return model_ft
-"""
-    def training_loop(self):
-
-    def train_and_validate(self):
-
-    def compute_test_set_accuracy(self):
-
-    def predict(self):
-
-
-    """
-    #def (self, model_name, self.num_classes, feature_extract, use_pretrained=True):
 
 
 

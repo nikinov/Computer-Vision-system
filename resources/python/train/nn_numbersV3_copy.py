@@ -14,8 +14,8 @@ import torchvision
 # Hyper parameters
 input_size = 784
 num_classes = 11
-learning_rate = 0.001
-batch_size = 2
+learning_rate = 0.01
+batch_size = 1
 num_epochs = 100000
 
 # Make Network
@@ -33,15 +33,15 @@ class NN(nn.Module):
 # Init transformations
 transform = transforms.Compose([
     transforms.ToTensor(),
-    transforms.Resize((224, 224))
+    transforms.Resize((28, 28))
 ])
 
 # Load Data
 
 data = "../../Assets5082"
 
-train_dataset = CustomDataset(data, transforms=transform, train=True)
-val_dataset = CustomDataset(data, transforms=transform, train=False)
+train_dataset = CustomDataset(data, transforms=transform, train=True, gray=True)
+val_dataset = CustomDataset(data, transforms=transform, train=False, gray=True)
 
 # Set device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -52,12 +52,11 @@ def set_parameter_requires_grad(model, feature_extracting):
         for param in model.parameters():
             param.requires_grad = False
 
-model = torchvision.models.resnet18(pretrained=True)#NN(input_size=input_size, num_classes=num_classes).to(device)
+model = NN(input_size, num_classes)#torchvision.models.resnet18(pretrained=True)#NN(input_size=input_size, num_classes=num_classes).to(device)
 #set_parameter_requires_grad(model, feature_extract)
-num_ftrs = model.fc.in_features
-model.fc = nn.Linear(num_ftrs, num_classes)
+#num_ftrs = model.fc.in_features
+#model.fc = nn.Linear(num_ftrs, num_classes)
 model = model.to(device)
-input_size = 224*224
 
 # Loss and optimizer
 criterion = nn.CrossEntropyLoss()
@@ -71,12 +70,13 @@ def check_accuracy(loader, model):
 
     with torch.no_grad():
         for x, y in loader:
-            #x = x.reshape(x.shape[0], -1).to(device)
-            x = x.reshape(1, 3, 224, 224).to(device)
+            x = x.reshape(x.shape[0], -1).to(device)
+            #x = x.reshape(1, 3, 224, 224).to(device)
             y = y.to(device)
 
             output = model(x).to(device)
             _, predictions = output.max(1)
+            yy = y
             num_correct += (predictions == y).sum()
             num_samples += predictions.size(0)
 
@@ -84,17 +84,18 @@ def check_accuracy(loader, model):
 
 # Train Network
 for epoch in range(num_epochs):
+    num_right = 0
     for data, label_y in train_dataset:
         # Get to correct shape and device
-        #data = data.reshape(data.shape[0], -1).to(device)
-        data = data.reshape(1, 3, 224, 224).to(device)
+        data = data.reshape(data.shape[0], -1).to(device)
+        #data = data.reshape(1, 3, 224, 224).to(device)
         label = label_y.to(device)
 
         # forward
         model.train()
         output = model(data).to(device)
         loss = criterion(output, label)
-
+        ll = output.max(0)
         # backward
         optimizer.zero_grad()
         loss.backward()
