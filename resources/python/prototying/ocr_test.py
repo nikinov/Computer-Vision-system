@@ -3,8 +3,8 @@ from skimage import io
 import glob
 
 
-reader = easyocr.Reader(['en'], gpu=False)
-data_dir = "../../Assets5082"
+reader = easyocr.Reader(['en'], gpu=True)
+data_dir = "C:/Wision/CSharpSource/MachineLearning/LibTorch/resources/Assets5082"
 
 def reading():
     num_correct = 0
@@ -15,8 +15,7 @@ def reading():
             prediction = list(prediction[0])[1]
         except:
             prediction = 'E'
-
-        if str(prediction) == entry.split("/")[-2]:
+        if str(prediction) == entry.split("\\")[-2]:
             num_correct += 1
         else:
             num_incorrect += 1

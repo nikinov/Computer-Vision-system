@@ -14,36 +14,35 @@ from torch.utils.data import DataLoader
 from torchsummary import summary
 import numpy as np
 from DataLoaders import FolderDataset
-from torch.utils.tensorboard import SummaryWriter
 
 import matplotlib.pyplot as plt
 import os
 import time
-import sys
+import pickle
 
 from PIL import Image
 
 class train:
-    def __init__(self, dataset_path="../Assets", model_output_path="../models"):
-        # tensor board
-        self.writer = SummaryWriter("runs/numbers")
-
-        # prepare the data and the transforms
-        self.train_image_transforms = transforms.Compose([
-                transforms.ToTensor(),
-                transforms.RandomRotation(degrees=10),
-                transforms.ColorJitter(brightness=.1, contrast=.1, hue=.1),
-                transforms.Resize((224, 224)),
-                transforms.Normalize((0.5),(0.2))])
+    def __init__(self, dataset_path="../Assets"):
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.valid_test_image_transforms =  transforms.Compose([
             transforms.ToTensor(),
             transforms.Resize(size=256),
             transforms.CenterCrop(size=224),
             transforms.Normalize((0.5),(0.2))])
+        self.idx_to_class = {}
+        for i, dir in enumerate(os.listdir(dataset_path)):
+            self.idx_to_class[i] = dir
 
+    def data_prep(self, dataset_path="../Assets", model_output_path="../models"):
+        # prepare the data and the transforms
+        self.train_image_transforms = transforms.Compose([
+                transforms.ToTensor(),
+                transforms.RandomRotation(degrees=10),
+                transforms.Resize((224, 224)),
+                transforms.Normalize((0.5),(0.2))])
         self.pt_path = model_output_path
-        self.bs = 5
-
+        self.bs = 3
         self.train_data = FolderDataset(dataset_path, transforms=self.train_image_transforms, train=True, generate_number_of_images=50)
         self.val_data = FolderDataset(dataset_path, transforms=self.valid_test_image_transforms, train=False)
 
@@ -51,19 +50,9 @@ class train:
         self.train_data_size = len(self.train_data)
         self.valid_data_size = len(self.val_data)
         # Create iterators for the Data loaded using DataLoader module
-        self.train_data_loader = DataLoader(self.train_data, batch_size=self.bs, shuffle=True)
+        self.train_data_loader = DataLoader(self.train_data, batch_size=150, shuffle=True)
         self.valid_data_loader = DataLoader(self.val_data, batch_size=self.bs, shuffle=False)
 
-        #experimantal
-        examples = iter(self.train_data_loader)
-        self.example_data, example_label = examples.next()
-        img_grid = torchvision.utils.make_grid(self.example_data)
-        self.writer.add_image('number_imnages', img_grid)
-
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.idx_to_class = {}
-        for i, dir in enumerate(os.listdir(dataset_path)):
-            self.idx_to_class[i] = dir
         self.resnet = models.resnet18(pretrained=True)
 
     def model_prep(self, resnet_type=None):
@@ -100,11 +89,6 @@ class train:
         # Define Optimizer and Loss Function
         self.loss_func = nn.NLLLoss()
         self.optimizer = optim.Adam(self.resnet.parameters(), lr=0.0001)
-
-        # tensor board visualization
-        self.writer.add_graph(self.resnet, self.example_data)
-        self.writer.close()
-        #sys.exit()
 
     def training_loop(self, inputs, labels, model, loss_criterion, u_loss, u_acc, train=False):
         """
@@ -160,7 +144,7 @@ class train:
 
             return u_loss, u_acc, loss, acc
 
-    def train_and_validate(self, model=None, loss_criterion=None, optimizer=None, epochs=25, show_results=False):
+    def train_and_validate(self, model=None, loss_criterion=None, optimizer=None, epochs=25, show_results=False, save="pickle"):
         """
         Train and validate the model
         :param model: the model to train
@@ -230,14 +214,18 @@ class train:
                                            epoch_end - epoch_start))
 
         # save the model with the best accuracy
-        best_model = torch.jit.script(best_model)
-        torch.jit.save(best_model, self.pt_path + '/model' + '.pt')
+        if save == "jit":
+            best_model = torch.jit.script(best_model)
+            torch.jit.save(best_model, self.pt_path + '/model' + '.pt')
+            pass
+        elif save == "pickle":
+            # Store data (serialize)
+            with open(self.pt_path + '/model.pickle', 'wb') as handle:
+                pickle.dump(best_model, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        else:
+            pass
+
         self.best_model = best_model
-        summary(self.resnet, input_size=(3, 224, 224), batch_size=self.bs, device='cuda')
-
-        # tain the model for 50 epochs
-        num_epochs = 50
-
         if show_results:
             h = np.array(history)
             plt.plot(h[:,0:2])
@@ -275,17 +263,13 @@ class train:
         plt.imshow(test_image)
 
         test_image_tensor = transform(test_image)
-        if torch.cuda.is_available():
-            test_image_tensor = test_image_tensor.view(1, 3, 224, 224).cuda()
-        else:
-            test_image_tensor = test_image_tensor.view(1, 3, 224, 224)
+        test_image_tensor = test_image_tensor.view(1, 3, 224, 224).to(self.device)
 
         with torch.no_grad():
             model.eval()
             # Model outputs log probabilities
-            out = model(test_image_tensor)
+            out = model(test_image_tensor).to(self.device)
             ps = torch.exp(out)
-
             topk, topclass = ps.topk(3, dim=1)
             cls = self.idx_to_class[topclass.cpu().numpy()[0][0]]
             score = topk.cpu().numpy()[0][0]
