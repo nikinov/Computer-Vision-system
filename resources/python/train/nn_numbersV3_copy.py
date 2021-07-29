@@ -8,7 +8,7 @@ import torchvision.transforms as transforms
 import cv2
 import glob
 import numpy as np
-from data_loader_test import CustomDataset
+from DataLoaders import CustomDataset
 import torchvision
 
 # Hyper parameters

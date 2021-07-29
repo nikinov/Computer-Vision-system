@@ -1,12 +1,22 @@
+#
+#
+#
+#
+# Nicholas Novelle July 2021
+#
+
+
 import torch
 from skimage import io
 from torch.utils.data import Dataset
 import os
 import glob
 import cv2
+import pandas as pd
 
 
-class CustomDataset(Dataset):
+# loads data from folders and automatically allocates classes
+class FolderDataset(Dataset):
     def __init__(self, data_dir, transforms=None, train=True, gray=False, train_split=0.8):
         self.gray = gray
         self.annotations = []
@@ -51,5 +61,28 @@ class CustomDataset(Dataset):
         return len(list(self.class_track.keys()))
 
 
+# this loads data from the csv file
+class CSVDataset(Dataset):
+    def __init__(self, csv_file, root_dir, transform=None, gray=False, mode='trn'):
+        self.annotations = pd.read_csv(csv_file)
+        self.root_dir = root_dir
+        self.transform = transform
+        self.gray = gray
+        self.mode = mode
 
+    def __len__(self):
+        return len(self.annotations)
+
+    def __getitem__(self, item):
+        img_path = os.path.join(self.root_dir, self.annotations.iloc[item, 2])
+        if self.gray:
+            image = cv2.imread(img_path, 0)
+        else:
+            image = io.imread(img_path)
+        y_label = torch.tensor(int(self.annotations.iloc[item, 1]))
+
+        if self.transform:
+            image = self.transform(image)
+
+        return (image, y_label)
 
