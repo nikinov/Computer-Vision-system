@@ -17,13 +17,15 @@ import pandas as pd
 
 # loads data from folders and automatically allocates classes
 class FolderDataset(Dataset):
-    def __init__(self, data_dir, transforms=None, train=True, gray=False, train_split=0.8):
+    def __init__(self, data_dir, transforms=None, train=True, gray=False, train_split=0.8, generate_number_of_images=1):
         self.gray = gray
+        # !!!!!!!!!!!!! if you get an error at split change the separator from "/" to "\\"
+        self.separator = "/"
         self.annotations = []
         # class split looks like this {name_of_cass:list_of_paths}
         self.class_track = {}
         for entry in glob.iglob(data_dir + '/**/*.bmp', recursive=True):
-            temp = entry.split("\\")[-2]
+            temp = entry.split(self.separator)[-2]
             if temp in self.class_track.keys():
                 self.class_track[temp].append(entry)
             else:
@@ -37,7 +39,8 @@ class FolderDataset(Dataset):
                 ls.pop()
             for i, el in enumerate(ls):
                 if train and i < self.smallest_class_num*train_split:
-                    self.annotations.append(el)
+                    for i in range(generate_number_of_images):
+                        self.annotations.append(el)
                 elif i > self.smallest_class_num*train_split and not train:
                     self.annotations.append(el)
         self.data_dir = data_dir
@@ -52,11 +55,12 @@ class FolderDataset(Dataset):
             image = cv2.imread(img_path, 0)
         else:
             image = io.imread(img_path)
-        y_label = torch.tensor([int(list(self.class_track.keys()).index(self.annotations[item].split("\\")[-2]))]) # problem make forloop
+        y_label = torch.tensor(int(list(self.class_track.keys()).index(self.annotations[item].split(self.separator)[-2]))) # problem make forloop
 
         if self.transforms:
             image = self.transforms(image)
         return (image, y_label)
+
     def get_class_num(self):
         return len(list(self.class_track.keys()))
 

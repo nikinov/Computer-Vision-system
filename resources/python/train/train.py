@@ -12,6 +12,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchsummary import summary
 import numpy as np
+from DataLoaders import FolderDataset
 
 import matplotlib.pyplot as plt
 import os
@@ -20,137 +21,34 @@ import time
 from PIL import Image
 
 class train:
-    def __init__(self, dataset_path="../Assets", model_output_path="../models", config_file_name="data_dir_and_label_info.txt", save_config=False, use_config=False):
+    def __init__(self, dataset_path="../Assets", model_output_path="../models"):
         # prepare the data and the transforms
         self.train_image_transforms = transforms.Compose([
-                transforms.RandomResizedCrop(size=256, scale=(0.8, 1.0)),
-                transforms.RandomRotation(degrees=15),
-                transforms.RandomHorizontalFlip(),
-                transforms.CenterCrop(size=224),
                 transforms.ToTensor(),
+                transforms.RandomResizedCrop(size=256, scale=(0.8, 1.0)),
+                transforms.RandomRotation(degrees=5),
+                transforms.CenterCrop(size=224),
                 transforms.Normalize([0.485, 0.456, 0.406],
                                      [0.229, 0.224, 0.225])])
         self.valid_test_image_transforms =  transforms.Compose([
+            transforms.ToTensor(),
             transforms.Resize(size=256),
             transforms.CenterCrop(size=224),
-            transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406],
                                  [0.229, 0.224, 0.225])])
 
-        os_exists = os.path.exists(config_file_name)
-
-        split_size = {
-            "train": 70,  # will split the first 70%
-            "val": 90,  # will use 90% - what's already used up or 70%
-            "test": 100  # will use 100% - what's used up or 90%
-        }
-
-        self.val_data = []
-        self.train_data = []
-        self.test_data = []
-
-        # batch size
-        self.bs = 32
-        self.dataset_path = dataset_path
         self.pt_path = model_output_path
-        self.data = []
-        if use_config and os_exists:
-            # get the data about the images from txt file
-            f = open("../data_dir_and_label_info.txt", "r")
-            dataset = []
-            temp_class = []
-            for line in f.readlines():
-                ln_split = line.split(",")
-                if ln_split[2].replace('\n', '') == 'r':
-                    for i in range(5):
-                        self.train_data.append([self.train_image_transforms(Image.open(ln_split[0])), int(ln_split[1])])
-                if ln_split[2].replace('\n', '') == 'v':
-                    self.val_data.append([self.valid_test_image_transforms(Image.open(ln_split[0])), int(ln_split[1])])
-                if ln_split[2].replace('\n', '') == 't':
-                    self.train_data.append([self.valid_test_image_transforms(Image.open(ln_split[0])), int(ln_split[1])])
-                if ln_split[1] not in temp_class:
-                    temp_class.append(ln_split[1])
+        self.bs = 1
 
-            # number of classes
-            self.num_classes = len(temp_class)
-        else:
-            # number of classes
-            self.num_classes = len(os.listdir(dataset_path))
+        self.train_data = FolderDataset(dataset_path, transforms=self.train_image_transforms, train=True)
+        self.val_data = FolderDataset(dataset_path, transforms=self.valid_test_image_transforms, train=False)
 
-            # Load Data from folders
-            dataset = datasets.ImageFolder(dataset_path)
-            self.data = dataset
-
-            label_split = [[]] * self.num_classes
-            self.train_idx = []
-            self.val_idx = []
-            self.test_idx = []
-            labels_set = []
-
-            # create an array of label indexes with an array of indexes
-            for j, (input, label) in enumerate(self.data):
-                label_split[label] = label_split[label] + [j]
-
-            lowest_class_num = len(label_split[0])
-
-            for set in label_split:
-                if len(set) < lowest_class_num:
-                    lowest_class_num = len(set)
-
-
-
-            # split the data into valid train and test
-            # iterate over index arrays of each label like this [label_0_array[index_0, index_1, ...], label_1_array[index_30, index_31, ...], ...]
-            for set in label_split:
-                if len(set) < 10:
-                    raise Exception("The number of images in one of the classes is less then 10!\nYou have to have at least 10 images per class!")
-                # iterate over the indexes in the label array
-                print(len(set))
-                for set_num, idx in enumerate(set):
-                    # check if the index is in the test %
-                    if len(set) - set_num > 5:#int(float(len(set))/100)*(100-split_size["train"]):
-                        self.train_idx.append(idx)
-                    # check if the index is in the valid %
-                    elif len(set) - set_num > 1:#int(float(len(set))/100)*(100-split_size["val"]):
-                        self.val_idx.append(idx)
-                    # check if the index is in the test %
-                    else:
-                        self.test_idx.append(idx)
-            print(len(self.train_idx))
-            print(len(self.val_idx))
-            print(len(self.test_idx))
-            for i, (inputs, labels) in enumerate(self.data):
-                if i in self.train_idx:
-                    for j in range(5):
-                        self.train_data.append([self.train_image_transforms(inputs), labels])
-                        if save_config:
-                            labels_set.append("r")
-                elif i in self.val_idx:
-                    self.val_data.append([self.valid_test_image_transforms(inputs), labels])
-                    if save_config:
-                        labels_set.append("v")
-                else:
-                    self.test_data.append([self.valid_test_image_transforms(inputs), labels])
-                    if save_config:
-                        labels_set.append("t")
-
-            # save into txt if needed
-            if save_config:
-                if os_exists:
-                    os.remove("../data_dir_and_label_info.txt")
-                f = open("../data_dir_and_label_info.txt", "w")
-                for i, im in enumerate(self.data.imgs):
-                    f.write(str(im).replace("'", "").replace("(", "").replace(")", "") + ',' + labels_set[i] + "\n")
-
-        # Size of Data, to be used for calculating Average Loss and Accuracy
+        self.class_num = self.train_data.get_class_num()
         self.train_data_size = len(self.train_data)
         self.valid_data_size = len(self.val_data)
-        self.test_data_size = len(self.test_data)
-
         # Create iterators for the Data loaded using DataLoader module
         self.train_data_loader = DataLoader(self.train_data, batch_size=self.bs, shuffle=True)
         self.valid_data_loader = DataLoader(self.val_data, batch_size=self.bs, shuffle=False)
-        self.test_data_loader = DataLoader(self.test_data, batch_size=self.bs, shuffle=False)
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.idx_to_class = {}
@@ -174,6 +72,7 @@ class train:
         for param in self.resnet.parameters():
             param.requires_grad = False
 
+
         # Change the final layer of ResNet Model for Transfer Learning
         self.fc_inputs = self.resnet.fc.in_features
 
@@ -181,7 +80,7 @@ class train:
             nn.Linear(self.fc_inputs, 256),
             nn.ReLU(),
             nn.Dropout(0.4),
-            nn.Linear(256, self.num_classes),  # Since 2 possible outputs
+            nn.Linear(256, self.class_num),  # Since 2 possible outputs
             nn.LogSoftmax(dim=1)  # For using NLLLoss()
         )
 
@@ -190,7 +89,7 @@ class train:
 
         # Define Optimizer and Loss Function
         self.loss_func = nn.NLLLoss()
-        self.optimizer = optim.Adam(self.resnet.parameters())
+        self.optimizer = optim.Adam(self.resnet.parameters(), lr=0.0001)
 
     def training_loop(self, inputs, labels, model, loss_criterion, u_loss, u_acc, train=False):
         """
@@ -220,7 +119,7 @@ class train:
                 # Clean existing gradients
                 self.optimizer.zero_grad()
             # Forward pass - compute outputs on input data using the model
-            outputs = model(inputs)
+            outputs = model(inputs).to(self.device)
 
             # Compute loss
             loss = loss_criterion(outputs, labels)
@@ -288,6 +187,11 @@ class train:
             for inputs, labels in self.valid_data_loader:
                 valid_loss, valid_acc, loss, acc = self.training_loop(inputs, labels, model, loss_criterion, valid_loss, valid_acc)
 
+            # I grabbed it from here https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.StepLR.html#torch.optim.lr_scheduler.StepLR
+            #scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=30, gamma=0.1, last_epoch=epoch-1)
+            #scheduler.step()
+
+            # Check for best model
             if valid_loss < best_loss:
                 best_loss = valid_loss
                 best_epoch = epoch
@@ -313,7 +217,7 @@ class train:
         # save the model with the best accuracy
         best_model = torch.jit.script(best_model)
         torch.jit.save(best_model, self.pt_path + '/model' + '.pt')
-
+        self.best_model = best_model
         summary(self.resnet, input_size=(3, 224, 224), batch_size=self.bs, device='cuda')
 
         # tain the model for 50 epochs
@@ -339,31 +243,6 @@ class train:
 
         return best_model
 
-    def compute_test_set_accuracy(self, model, loss_criterion):
-        '''
-        Function to compute the accuracy on the test set
-        Parameters
-            :param model: Model to test
-            :param loss_criterion: Loss Criterion to minimize
-        '''
-
-        test_acc = 0.0
-        test_loss = 0.0
-
-        # Validation loop
-        j = 0
-        for inputs, labels in self.test_data_loader:
-            j+=1
-            test_loss, test_acc, loss, acc = self.training_loop(inputs, labels, model, loss_criterion, test_loss, test_acc)
-            print("Test Batch number: {:03d}, Test: Loss: {:.4f}, Accuracy: {:.4f}".format(j, loss.item(),
-                                                                                           acc.item()))
-
-        # Find average test loss and test accuracy
-        avg_test_loss = test_loss / self.test_data_size
-        avg_test_acc = test_acc / self.test_data_size
-
-        print("Test accuracy : " + str(avg_test_acc))
-
     def predict(self, test_image_path, model=None):
         '''
         Predict the class of a single test image
@@ -373,7 +252,7 @@ class train:
         '''
 
         if model == None:
-            model = self.resnet
+            model = self.best_model
 
         transform = self.valid_test_image_transforms
 
@@ -399,3 +278,4 @@ class train:
             for i in range(3):
                 print("Predcition", i + 1, ":", self.idx_to_class[topclass.cpu().numpy()[0][i]], ", Score: ",
                       topk.cpu().numpy()[0][i])
+            return self.idx_to_class[topclass.cpu().numpy()[0][0]]
