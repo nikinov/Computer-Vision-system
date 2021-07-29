@@ -12,7 +12,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchsummary import summary
 import numpy as np
-from DataLoaders import CustomDataset
+from DataLoaders import FolderDataset
 
 import matplotlib.pyplot as plt
 import os
