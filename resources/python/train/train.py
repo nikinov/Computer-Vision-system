@@ -7,40 +7,44 @@
 
 import torch
 from torchvision import datasets, models, transforms
+import torchvision
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchsummary import summary
 import numpy as np
 from DataLoaders import FolderDataset
+from torch.utils.tensorboard import SummaryWriter
 
 import matplotlib.pyplot as plt
 import os
 import time
+import sys
 
 from PIL import Image
 
 class train:
     def __init__(self, dataset_path="../Assets", model_output_path="../models"):
+        # tensor board
+        self.writer = SummaryWriter("runs/numbers")
+
         # prepare the data and the transforms
         self.train_image_transforms = transforms.Compose([
                 transforms.ToTensor(),
-                transforms.RandomResizedCrop(size=256, scale=(0.8, 1.0)),
-                transforms.RandomRotation(degrees=5),
-                transforms.CenterCrop(size=224),
-                transforms.Normalize([0.485, 0.456, 0.406],
-                                     [0.229, 0.224, 0.225])])
+                transforms.RandomRotation(degrees=10),
+                transforms.ColorJitter(brightness=.1, contrast=.1, hue=.1),
+                transforms.Resize((224, 224)),
+                transforms.Normalize((0.5),(0.2))])
         self.valid_test_image_transforms =  transforms.Compose([
             transforms.ToTensor(),
             transforms.Resize(size=256),
             transforms.CenterCrop(size=224),
-            transforms.Normalize([0.485, 0.456, 0.406],
-                                 [0.229, 0.224, 0.225])])
+            transforms.Normalize((0.5),(0.2))])
 
         self.pt_path = model_output_path
-        self.bs = 1
+        self.bs = 5
 
-        self.train_data = FolderDataset(dataset_path, transforms=self.train_image_transforms, train=True)
+        self.train_data = FolderDataset(dataset_path, transforms=self.train_image_transforms, train=True, generate_number_of_images=50)
         self.val_data = FolderDataset(dataset_path, transforms=self.valid_test_image_transforms, train=False)
 
         self.class_num = self.train_data.get_class_num()
@@ -49,6 +53,12 @@ class train:
         # Create iterators for the Data loaded using DataLoader module
         self.train_data_loader = DataLoader(self.train_data, batch_size=self.bs, shuffle=True)
         self.valid_data_loader = DataLoader(self.val_data, batch_size=self.bs, shuffle=False)
+
+        #experimantal
+        examples = iter(self.train_data_loader)
+        self.example_data, example_label = examples.next()
+        img_grid = torchvision.utils.make_grid(self.example_data)
+        self.writer.add_image('number_imnages', img_grid)
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.idx_to_class = {}
@@ -90,6 +100,11 @@ class train:
         # Define Optimizer and Loss Function
         self.loss_func = nn.NLLLoss()
         self.optimizer = optim.Adam(self.resnet.parameters(), lr=0.0001)
+
+        # tensor board visualization
+        self.writer.add_graph(self.resnet, self.example_data)
+        self.writer.close()
+        #sys.exit()
 
     def training_loop(self, inputs, labels, model, loss_criterion, u_loss, u_acc, train=False):
         """
