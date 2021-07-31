@@ -24,7 +24,7 @@ from PIL import Image
 
 class train:
     def __init__(self, dataset_path="../Assets"):
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.valid_test_image_transforms =  transforms.Compose([
             transforms.ToTensor(),
             transforms.Resize(size=256),
@@ -38,7 +38,8 @@ class train:
         # prepare the data and the transforms
         self.train_image_transforms = transforms.Compose([
                 transforms.ToTensor(),
-                transforms.RandomRotation(degrees=10),
+                transforms.ColorJitter(brightness=.1, contrast=.1, hue=.1),
+                transforms.RandomResizedCrop(size=(195,100), scale=(0.9,1.1), ratio=(0.4,0.6)),
                 transforms.Resize((224, 224)),
                 transforms.Normalize((0.5),(0.2))])
         self.pt_path = model_output_path
@@ -88,7 +89,7 @@ class train:
 
         # Define Optimizer and Loss Function
         self.loss_func = nn.NLLLoss()
-        self.optimizer = optim.Adam(self.resnet.parameters(), lr=0.0001)
+        self.optimizer = optim.Adam(self.resnet.parameters(), lr=0.001)
 
     def training_loop(self, inputs, labels, model, loss_criterion, u_loss, u_acc, train=False):
         """

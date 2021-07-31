@@ -46,6 +46,14 @@ class Classifier(nn.Module):
         x = self.linear3(x)
         return x
 
+    def predict(self, inputs):
+        outputs = self(inputs)
+        _, preds = torch.max(outputs, 1)
+        return preds
+
+    @staticmethod
+    def loss_fnc():
+        return nn.CrossEntropyLoss()
 
 def model_save(model, path):
 
@@ -67,7 +75,7 @@ def model_train(device, training_loader, validation_loader):
     model = Classifier(28*28, 125, 65, 11)
     model.to(device)
 
-    criterion = nn.CrossEntropyLoss()
+    criterion = model.loss_fnc()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
     print('Training ... ')
@@ -109,7 +117,8 @@ def model_train(device, training_loader, validation_loader):
                     val_outputs = model(val_inputs)
                     val_loss = criterion(val_outputs, val_labels)
 
-                    _, val_preds = torch.max(val_outputs, 1)
+                    val_preds = model.predict(val_inputs)
+
                     val_running_loss += val_loss.item()
                     val_running_corrects += torch.sum(val_preds == val_labels.data)
                     num_val += len(val_labels)
@@ -167,7 +176,7 @@ def main():
 
     # load trn/val data splits from file
     dataloader = DataSampler(
-        path=r'..\..\Assets5082',
+        path='../../Assets5082',
         labels={'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 'E': 10},
         filename='list.csv')
 
@@ -185,8 +194,6 @@ def main():
     training_loader = torch.utils.data.DataLoader(training_dataset, batch_size=64, shuffle=True, num_workers=6, pin_memory=True)
     validation_loader = torch.utils.data.DataLoader(validation_dataset, batch_size=16, shuffle=False, pin_memory=True)
 
-
-
     dataiter = iter(training_loader)
     images, labels = dataiter.next()
     fig = plt.figure(figsize=(15, 4))
@@ -196,7 +203,6 @@ def main():
         ax.set_title([labels[idx].item()])
     plt.savefig('image.png', dpi=90, bbox_inches='tight')
     plt.show()
-
 
     model = model_train(device, training_loader, validation_loader)
     model_save(model, "model.bin")

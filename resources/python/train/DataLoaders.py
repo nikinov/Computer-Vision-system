@@ -19,7 +19,7 @@ import pandas as pd
 class FolderDataset(Dataset):
     def __init__(self, data_dir, transforms=None, train=True, gray=False, train_split=0.8, generate_number_of_images=1):
         self.gray = gray
-        # !!!!!!!!!!!!! if you get an error at split change the separator from "/" to "\\"
+        # important double check the directory separator
         self.separator = "\\"
         self.annotations = []
         # class split looks like this {name_of_cass:list_of_paths}
