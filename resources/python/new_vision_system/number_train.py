@@ -43,8 +43,8 @@ class train():
     def data_prep(self, dataset_path="../Assets", model_output_path="../models"):
         # prepare the data and the transforms
         self.pt_path = model_output_path
-        self.bs = 150
-        self.train_data = FolderDataset(dataset_path, transforms=self.train_image_transform, train=True, generate_number_of_images=50)
+        self.bs = 50
+        self.train_data = FolderDataset(dataset_path, transforms=self.train_image_transform, train=True, generate_number_of_images=100)
         self.val_data = FolderDataset(dataset_path, transforms=self.val_image_transform, train=False)
 
         self.class_num = self.train_data.get_class_num()
@@ -52,7 +52,7 @@ class train():
         self.valid_data_size = len(self.val_data)
         # Create iterators for the Data loaded using DataLoader module
         self.train_data_loader = DataLoader(self.train_data, batch_size=self.bs, shuffle=True)
-        self.valid_data_loader = DataLoader(self.val_data, batch_size=self.bs, shuffle=False)
+        self.valid_data_loader = DataLoader(self.val_data, 1, shuffle=False)
 
         dataset = iter(self.train_data_loader)
         images, labels = next(dataset)
@@ -73,6 +73,7 @@ class train():
         # Parameters
         size_0 = 125
         size_1 = 65
+        learnin_rate = 0.001
         self.epoch = 10
 
         # Define Model
@@ -80,7 +81,7 @@ class train():
         self.model.to(self.device)
 
         self.criterion = nn.CrossEntropyLoss()
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=learnin_rate)
 
     def training(self, save_type="None"):
         self.running_loss_history = []
@@ -104,7 +105,7 @@ class train():
                 running_loss_val += loss
                 running_corrects_val += corrects
             epoch_loss = running_loss/len(self.train_data_loader)
-            epoch_acc = running_corrects.item()/len(self.train_data_loader)
+            epoch_acc = running_corrects.item()/len(self.train_data_loader)/self.bs
             self.running_loss_history.append(epoch_loss)
             self.running_corrects_history.append(epoch_acc)
 

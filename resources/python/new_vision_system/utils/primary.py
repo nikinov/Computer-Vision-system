@@ -46,7 +46,7 @@ def save_model(model, type="pickle"):
         m = torch.jit.script(model)
         torch.jit.save("models/jit_model.pt",m)
     elif type == "pickle":
-        filehandler = open("models/pickle_model.pt", 'w')
-        pickle.dump(model, filehandler)
+        filehandler = open("models/pickle_model.pt", 'wb')
+        pickle.dump(model, filehandler, pickle.HIGHEST_PROTOCOL)
     else:
         torch.save("models/model.pt",model)
