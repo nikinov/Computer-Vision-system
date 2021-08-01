@@ -59,17 +59,14 @@ int DLL_GetPrediction(const char* modelPath, unsigned char* imageData, int imHig
     cv::Mat img(imHight, imWidth, CV_8UC4, imageData);
     // Preprocess image (resize, put on GPU)
     cv::Mat resized_image;
-    cv::cvtColor(img, resized_image, cv::COLOR_RGB2BGR);
+    cv::cvtColor(img, resized_image, cv::COLOR_RGB2GRAY);
     cv::resize(resized_image, resized_image, cv::Size(input_image_size, input_image_size));
 
     cv::Mat img_float;
     resized_image.convertTo(img_float, CV_32F, 1.0 / 255);
 
     auto img_tensor = torch::from_blob(img_float.data, { 1, input_image_size, input_image_size });
-    img_tensor = img_tensor.permute({ 0, 3, 1, 2 });
-    img_tensor[0][0] = img_tensor[0][0].sub(0.5).div(0.5);
-    img_tensor[0][1] = img_tensor[0][1].sub(0.5).div(0.5);
-    img_tensor[0][2] = img_tensor[0][2].sub(0.5).div(0.5);
+    img_tensor[0] = img_tensor[0].sub(0.5).div(0.5);
     auto img_var = torch::autograd::make_variable(img_tensor, false);
 
     // Create a vector of inputs.
