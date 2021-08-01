@@ -1,4 +1,4 @@
-from nn_numbersV4 import train
+from number_train import train
 
 import time
 import torch
@@ -10,11 +10,11 @@ data_dir = "../../Assets5082"
 
 t = time.time()
 # use_config=true is more performant
-tr = train()
+tr = train(tensorboard=False)
 print(time.time() - t)
 tr.data_prep(data_dir, "../../models")
-#tr.model_prep()
-#tr.train_and_validate(epochs=50, show_results=True, save="pickle")
+tr.model_prep()
+tr.training(save_type="pickle")
 
 num_incorrect = 0
 num_correct = 0

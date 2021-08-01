@@ -6,6 +6,7 @@ import torchvision
 
 import sys
 from PIL import Image
+import matplotlib.pyplot as plt
 
 from DataLoaders import FolderDataset
 from networks import LinearNN
@@ -48,14 +49,13 @@ class train():
         self.valid_data_loader = DataLoader(self.val_data, batch_size=self.bs, shuffle=False)
 
         if self.writer:
-            examples = iter(self.train_data_loader)
-            example_data, example_labels = Image.fromarray(examples).next()
-
-            img_grid = torchvision.utils.make_grid(example_data)
-
-            self.writer.add_image('numbers', img_grid)
-            self.writer.close()
-            sys.exit()
+            fig = plt.figure(figsize=(15, 4))
+            for idx in np.arange(16):
+                ax = fig.add_subplot(2, 8, idx + 1, xticks=[], yticks=[])
+                plt.imshow(im_convert(images[idx]))
+                ax.set_title([labels[idx].item()])
+            plt.savefig('image.png', dpi=90, bbox_inches='tight')
+            plt.show()
 
     def model_prep(self, resnet_type=None):
         """
