@@ -12,10 +12,11 @@
 
 using namespace std::chrono;
 
-at::Tensor GetPrediction(const char* modelPath, unsigned char byteArray[], int imwidth, int imhight);
+at::Tensor GetPrediction2(const char* modelPath, unsigned char byteArray[], int imwidth, int imhight);
 unsigned char* matToBytes(cv::Mat image);
 int main()
 {
+    std::cout << "yes" << std::endl;
     cv::Mat image = cv::imread("C:/!SAMPLES!/1716-5082/Sorted!/5/20210709-142903_X0Y0_R-scan1_b.bmp", 0);
     if (image.empty())
     {
@@ -23,7 +24,7 @@ int main()
     }
     else
     {
-        //std::cout << GetPrediction("C:/Temp/models/num_model.pt", matToBytes(image), image.size().width, image.size().height) << std::endl;
+        std::cout << GetPrediction2("C:/Temp/models/jit_model.pt", matToBytes(image), image.size().width, image.size().height) << std::endl;
 
         std::cout << "showing image " << std::endl;
     }    
@@ -33,6 +34,60 @@ unsigned char* matToBytes(cv::Mat image)
 {
     unsigned char* v_char = image.data;
     return v_char;
+}
+
+at::Tensor GetPrediction2(const char* modelPath, unsigned char imageData[], int imWidth, int imHeight)
+{
+    // Configuration
+    int input_image_size = 28;
+
+    // Deserialize the ScriptModule from a file using torch::jit::load().
+    torch::jit::script::Module module;
+    try {
+        // Deserialize the ScriptModule from a file using torch::jit::load().
+        std::cout << "Loading model, path = " << modelPath << "\n";
+        module = torch::jit::load(modelPath);
+    }
+    catch (const c10::Error& e) {
+        std::cerr << "error loading the model\n";
+    }
+
+    int ptr = 0;
+
+    //unsigned char* imageDataPtr = (unsigned char*)&imageData;
+    cv::Mat img(imHeight, imWidth, CV_8UC1, imageData);
+    // Preprocess image (resize, put on GPU)
+    cv::Mat resized_image;
+    //cv::cvtColor(img, resized_image, cv::COLOR_RGB2GRAY);
+    cv::resize(img, resized_image, cv::Size(input_image_size, input_image_size));
+    cv::imwrite("C:/Temp/testing_img.png", resized_image);
+    cv::Mat img_float;
+    resized_image.convertTo(img_float, CV_32F, 1.0 / 255);
+
+    auto img_tensor = torch::from_blob(img_float.data, { 1, input_image_size * input_image_size });
+    img_tensor[0] = img_tensor[0].sub(0.5).div(0.5);
+    auto img_var = torch::autograd::make_variable(img_tensor, false);
+
+
+
+    // Create a vector of inputs.
+    std::vector<torch::jit::IValue> inputs;
+    inputs.push_back(img_var.to(at::kCUDA));
+
+    // Execute the model and turn its output into a tensor.
+    at::Tensor output;
+    auto duration = duration_cast<milliseconds>(std::chrono::high_resolution_clock::now() - std::chrono::high_resolution_clock::now());
+
+    auto start = std::chrono::high_resolution_clock::now();
+    output = module.forward(inputs).toTensor().to(at::kCUDA);
+    auto end = std::chrono::high_resolution_clock::now();
+    duration = duration_cast<milliseconds>(end - start);
+
+    at::Tensor max_ind = at::argmax(output);
+
+    std::cout << "class_id: " << max_ind.item<int>() << std::endl;
+    std::cout << "Time take for forward pass: " << duration.count() << " ms" << std::endl;
+    return output;
 }
 
 at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[], int imwidth, int imheight)
@@ -93,9 +148,8 @@ at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[], int i
     auto duration = duration_cast<milliseconds>(std::chrono::high_resolution_clock::now() - std::chrono::high_resolution_clock::now());
     
     auto start = std::chrono::high_resolution_clock::now();
-    std::cout << img_tensor  << std::endl;
     output = module.forward(inputs).toTensor().to(at::kCUDA);
-    
+    std::cout << output << std::endl;
     auto end = std::chrono::high_resolution_clock::now();
     duration = duration_cast<milliseconds>(end - start);
 

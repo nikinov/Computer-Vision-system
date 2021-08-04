@@ -10,14 +10,19 @@ data_dir = "../../Assets5082"
 
 t = time.time()
 # use_config=true is more performant
-tr = train(tensorboard=False)
+#tr = train(tensorboard=False)
 print(time.time() - t)
-tr.data_prep(data_dir, "../../models")
-tr.model_prep()
-tr.training(save_type="pickle")
+#tr.data_prep(data_dir, "../../models")
+#tr.model_prep()
+#tr.training(save_type="pickle")
 
-num_incorrect = 0
-num_correct = 0
+#num_incorrect = 0
+#num_correct = 0
+
+with open('models/pickle_model.pt', 'rb') as inp:
+    model = pickle.load(inp)
+m = torch.jit.script(model)
+torch.jit.save(m,"models/jit_model.pt")
 """
 model = None
 # Load data (deserialize)
