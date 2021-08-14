@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.IO;
-using Wision.CppRoutinesWrapper;
+using RoutinesWrapper;
 
 namespace ModelMaker
 {

@@ -33,17 +33,15 @@ BOOL APIENTRY DllMain(HMODULE hModule,
     return TRUE;
 }
 
+torch::jit::script::Module module;
+
 int DLL_test()
 {
     return 0;
 }
-int DLL_GetPrediction(const char* modelPath, unsigned char* imageData, int imHight, int imWidth)
-{
-    // Configuration
-    int input_image_size = 28;
 
+void DLL_InitModel(const char* modelPath) {
     // Deserialize the ScriptModule from a file using torch::jit::load().
-    torch::jit::script::Module module;
     try {
         // Deserialize the ScriptModule from a file using torch::jit::load().
         std::cout << "Loading model, path = " << modelPath << "\n";
@@ -52,22 +50,28 @@ int DLL_GetPrediction(const char* modelPath, unsigned char* imageData, int imHig
     catch (const c10::Error& e) {
         std::cerr << "error loading the model\n";
     }
+}
 
+float *DLL_GetPrediction(unsigned char* imageData, int imHeight, int imWidth){
+    // Configuration
+    int input_image_size = 28;
     int ptr = 0;
 
     //unsigned char* imageDataPtr = (unsigned char*)&imageData;
-    cv::Mat img(imHight, imWidth, CV_8UC4, imageData);
+    cv::Mat img(imHeight, imWidth, CV_8UC1, imageData);
     // Preprocess image (resize, put on GPU)
     cv::Mat resized_image;
-    cv::cvtColor(img, resized_image, cv::COLOR_RGB2GRAY);
-    cv::resize(resized_image, resized_image, cv::Size(input_image_size, input_image_size));
-
+    //cv::cvtColor(img, resized_image, cv::COLOR_RGB2GRAY);
+    cv::resize(img, resized_image, cv::Size(input_image_size, input_image_size));
+    cv::imwrite("C:/Temp/testing_img.png", resized_image);
     cv::Mat img_float;
     resized_image.convertTo(img_float, CV_32F, 1.0 / 255);
 
-    auto img_tensor = torch::from_blob(img_float.data, { 1, input_image_size, input_image_size });
+    auto img_tensor = torch::from_blob(img_float.data, { 1, input_image_size * input_image_size });
     img_tensor[0] = img_tensor[0].sub(0.5).div(0.5);
     auto img_var = torch::autograd::make_variable(img_tensor, false);
+
+
 
     // Create a vector of inputs.
     std::vector<torch::jit::IValue> inputs;
@@ -78,15 +82,24 @@ int DLL_GetPrediction(const char* modelPath, unsigned char* imageData, int imHig
     auto duration = duration_cast<milliseconds>(std::chrono::high_resolution_clock::now() - std::chrono::high_resolution_clock::now());
 
     auto start = std::chrono::high_resolution_clock::now();
-    output = module.forward(inputs).toTensor().to(at::kCPU);
+    output = module.forward(inputs).toTensor().to(at::kCUDA);
     auto end = std::chrono::high_resolution_clock::now();
     duration = duration_cast<milliseconds>(end - start);
 
-    at::Tensor max_ind = at::argmax(output);
+    // get values from tensor
+    float out[11];
+    for (unsigned int i = 0; i < 11; i++) {
+        std::stringstream tmp;
+        tmp << output[0][i].data();
+        std::string tmp_str = tmp.str();
+        out[i] = std::stof(tmp.str());
+    }
 
-    std::cout << "class_id: " << max_ind.item<int>() << std::endl;
     std::cout << "Time take for forward pass: " << duration.count() << " ms" << std::endl;
-    return max_ind.item<int>();
+    for (unsigned int i = 0; i < 11; i++) {
+        std::cout << out[i] << std::endl;
+    }
+    return out;
 }
 
 

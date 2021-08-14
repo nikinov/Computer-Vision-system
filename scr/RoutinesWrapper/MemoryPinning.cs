@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Wision.CppRoutinesWrapper
+namespace RoutinesWrapper
 {
 	public struct MemoryPinning : IDisposable
 	{
@@ -31,7 +31,7 @@ namespace Wision.CppRoutinesWrapper
 		{
 			foreach (var handle in _handles)
 				if (handle.Target != null)
-				    handle.Free();
+					handle.Free();
 		}
 
 		#endregion
@@ -56,7 +56,7 @@ namespace Wision.CppRoutinesWrapper
 		public void Dispose()
 		{
 			if (_handle.Target != null)
-			    _handle.Free();
+				_handle.Free();
 		}
 
 		#endregion
@@ -88,7 +88,7 @@ namespace Wision.CppRoutinesWrapper
 		{
 			foreach (var handle in _handles)
 				if (handle.Target != null)
-                    handle.Free();
+					handle.Free();
 		}
 		#endregion
 

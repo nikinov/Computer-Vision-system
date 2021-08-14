@@ -12,8 +12,13 @@
 
 using namespace std::chrono;
 
-at::Tensor GetPrediction2(const char* modelPath, unsigned char byteArray[], int imwidth, int imhight);
+float *GetPrediction2(unsigned char byteArray[], int imwidth, int imhight);
 unsigned char* matToBytes(cv::Mat image);
+void DLL_InitModel(const char* modelPath);
+
+// model
+torch::jit::script::Module module;
+
 int main()
 {
     std::cout << "yes" << std::endl;
@@ -24,7 +29,8 @@ int main()
     }
     else
     {
-        std::cout << GetPrediction2("C:/Temp/models/jit_model.pt", matToBytes(image), image.size().width, image.size().height) << std::endl;
+        DLL_InitModel("C:/Temp/models/jit_model.pt");
+        std::cout << GetPrediction2(matToBytes(image), image.size().width, image.size().height) << std::endl;
 
         std::cout << "showing image " << std::endl;
     }    
@@ -36,13 +42,7 @@ unsigned char* matToBytes(cv::Mat image)
     return v_char;
 }
 
-at::Tensor GetPrediction2(const char* modelPath, unsigned char imageData[], int imWidth, int imHeight)
-{
-    // Configuration
-    int input_image_size = 28;
-
-    // Deserialize the ScriptModule from a file using torch::jit::load().
-    torch::jit::script::Module module;
+void DLL_InitModel(const char* modelPath) {
     try {
         // Deserialize the ScriptModule from a file using torch::jit::load().
         std::cout << "Loading model, path = " << modelPath << "\n";
@@ -51,6 +51,14 @@ at::Tensor GetPrediction2(const char* modelPath, unsigned char imageData[], int 
     catch (const c10::Error& e) {
         std::cerr << "error loading the model\n";
     }
+
+}
+
+float *GetPrediction2(unsigned char imageData[], int imWidth, int imHeight)
+{
+    // Configuration
+    int input_image_size = 28;
+
 
     int ptr = 0;
 
@@ -83,11 +91,20 @@ at::Tensor GetPrediction2(const char* modelPath, unsigned char imageData[], int 
     auto end = std::chrono::high_resolution_clock::now();
     duration = duration_cast<milliseconds>(end - start);
 
-    at::Tensor max_ind = at::argmax(output);
 
-    std::cout << "class_id: " << max_ind.item<int>() << std::endl;
+    float out[11];
+    for (unsigned int i = 0; i < 11; i++) {
+        std::stringstream tmp;
+        tmp << output[0][i].data();
+        std::string tmp_str = tmp.str();
+        out[i] = std::stof(tmp.str());
+    }
+
     std::cout << "Time take for forward pass: " << duration.count() << " ms" << std::endl;
-    return output;
+    for (unsigned int i = 0; i < 11; i++) {
+        std::cout << out[i] << std::endl;
+    }
+    return out;
 }
 
 at::Tensor GetPrediction(const char* modelPath, unsigned char imageData[], int imwidth, int imheight)

@@ -58,6 +58,10 @@
       <Project>{9f86ad11-5bd7-41a5-8831-670d5e61c518}</Project>
       <Name>ModelMaker</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Predictor\Predictor.csproj">
+      <Project>{50b25464-5c7b-4321-98bb-b13622eb7d8f}</Project>
+      <Name>Predictor</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
