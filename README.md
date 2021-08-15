@@ -172,15 +172,10 @@ class Program
 ```
 For getting a prediction out of a model you can call the following function
 ```C#
-/// <summary>
-/// get a prediction in a form of an int
-/// </summary>
-/// <param name="modelPath"></param> path to the model
-/// <param name="imageData"></param> image data in the form of a byte array
-/// <param name="imHight"></param> image hight
-/// <param name="imWidth"></param> image width
-/// <returns>int representing the label</returns>
+// first initialize the model with model path input
+Predictor.Predictor.InitModel(string modelPath);
 
-Predictor.GetPrediction();
+// then get the prediction with GetPrediction
+Predictor.Predictor.GetPrediction(byte[] ImageBytes, int imHight, int imWidth);
 
 ```
