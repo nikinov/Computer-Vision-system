@@ -147,7 +147,9 @@ For prep run the build_sln.bat file in resources\C++\PredictorDll, then go to th
 
 For integrating learning in C# call the following function. You can find an example in [source](https://github.com/nikinov/WickonHightech/tree/Torch/scr/Detector)
 ```C#
-
+/// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/// !! this code is deprecated use python code instead !!
+/// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 /// <summary>
 /// Function interacts with a python training script and makes a model.pt file, all params are optional
 /// </summary>
