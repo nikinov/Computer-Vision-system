@@ -16,6 +16,7 @@ from data_loading.data_loaders import FolderDataset
 from utils.primary import im_convert, run_data_to_model, save_model
 from utils.visualisation import print_metrix, plot_metrix
 from networks.custom_networks import LinearNN
+from data_preprocessing.transforms import LinearTransform
 
 
 class train():
@@ -32,8 +33,10 @@ class train():
 
         self.model = pt_linear.PtLinearNN(LinearNN, self.device, model_name="my_model", input_size=28)
 
-        self.train_data = FolderDataset(dataset_path, transforms=self.model.get_train_transforms(), train=True, generate_number_of_images=100)
-        self.val_data = FolderDataset(dataset_path, transforms=self.model.get_valid_transforms(), train=False)
+        tr = LinearTransform()
+
+        self.train_data = FolderDataset(dataset_path, transforms=tr.get_train_transforms(), train=True, generate_number_of_images=100)
+        self.val_data = FolderDataset(dataset_path, transforms=tr.get_valid_transforms(), train=False)
 
         self.class_num = self.train_data.get_class_num()
 
