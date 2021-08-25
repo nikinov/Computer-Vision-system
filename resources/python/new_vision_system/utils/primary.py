@@ -41,12 +41,12 @@ def run_data_to_model(data, device, model, criterion, optimizer, train=True):
         _, preds = torch.max(outputs, 1)
     return (loss.item(), torch.sum(preds == labels.data))
 
-def save_model(model, type="pickle"):
+def save_model(model, type="pickle", model_name="model"):
     if type == "jit":
         m = torch.jit.script(model)
-        torch.jit.save("models/jit_model.pt",m)
+        torch.jit.save("models/"+model_name+".pt",m)
     elif type == "pickle":
-        filehandler = open("models/pickle_model.pt", 'wb')
+        filehandler = open("models/"+model_name+".pt", 'wb')
         pickle.dump(model, filehandler)
     else:
-        torch.save("models/model.pt",model)
+        torch.save("models/"+model_name+".pt",model)

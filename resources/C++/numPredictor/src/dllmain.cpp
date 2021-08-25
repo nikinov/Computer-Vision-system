@@ -35,6 +35,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 
 torch::jit::script::Module module;
 
+
 int DLL_test()
 {
     return 0;
@@ -52,7 +53,7 @@ void DLL_InitModel(const char* modelPath) {
     }
 }
 
-float *DLL_GetPrediction(unsigned char* imageData, int imHeight, int imWidth){
+void DLL_GetPrediction(unsigned char* imageData, int imHeight, int imWidth, float* out, int sizOut){
     // Configuration
     int input_image_size = 28;
     int ptr = 0;
@@ -87,8 +88,7 @@ float *DLL_GetPrediction(unsigned char* imageData, int imHeight, int imWidth){
     duration = duration_cast<milliseconds>(end - start);
 
     // get values from tensor
-    float out[11];
-    for (unsigned int i = 0; i < 11; i++) {
+    for (unsigned int i = 0; i < sizOut; i++) {
         std::stringstream tmp;
         tmp << output[0][i].data();
         std::string tmp_str = tmp.str();
@@ -96,10 +96,9 @@ float *DLL_GetPrediction(unsigned char* imageData, int imHeight, int imWidth){
     }
 
     std::cout << "Time take for forward pass: " << duration.count() << " ms" << std::endl;
-    for (unsigned int i = 0; i < 11; i++) {
+    for (unsigned int i = 0; i < sizOut; i++) {
         std::cout << out[i] << std::endl;
     }
-    return out;
 }
 
 

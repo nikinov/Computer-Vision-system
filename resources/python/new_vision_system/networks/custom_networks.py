@@ -20,3 +20,7 @@ class LinearNN(nn.Module):
         x = F.relu(self.linear2(x))
         x = self.linear3(x)
         return x
+
+
+
+

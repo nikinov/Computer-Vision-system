@@ -13,6 +13,7 @@ import os
 import glob
 import cv2
 import pandas as pd
+import csv
 
 
 # loads data from folders and automatically allocates classes
@@ -73,6 +74,9 @@ class CSVDataset(Dataset):
         self.transform = transform
         self.gray = gray
         self.mode = mode
+        for index in range(self.annotations.shape[0]):
+            if self.annotations.iloc[index, 2] != self.mode:
+                self.annotations.drop(index)
 
     def __len__(self):
         return len(self.annotations)
@@ -89,4 +93,5 @@ class CSVDataset(Dataset):
             image = self.transform(image)
 
         return (image, y_label)
+
 

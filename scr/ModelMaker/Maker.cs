@@ -12,23 +12,13 @@ namespace ModelMaker
 {
     public class Maker
     {
-        /// <summary>
-        /// Function interacts with a python training script and makes a model.pt file
-        /// </summary>
-        /// <param name="pythonPath">python path</param>
-        /// <param name="scriptPath">the pathe to the cli python intervafe script</param>
-        /// <param name="dataPath">path to your data or assets</param>
-        /// <param name="outPath">the path where the model.pt file will be outputed</param>
-        /// <param name="epoch">how many times will the training script go throught the data</param>
-        /// <param name="save_config">if we want to save data config into a txt file</param>
-        /// <param name="use_config">if we want to use a txt file with a data config</param>
         public static void MakeModel(string pythonPath = "C:/Users/Ryzen7-EXT/anaconda3/envs/tensor/pythonw.exe",
-            string scriptPath = "C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech/resources/python/cli_example.py",
+            string scriptPath = "C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech/resources/python/new_vision_system/cli_base.py",
             string dataPath = "C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech/resources/Assets",
             string outPath = "C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech",
-            int epoch = 0,
-            bool save_config=false,
-            bool use_config=false)
+            string modelName = "model",
+            bool create_csv_file = false,
+            bool enabled_training = true)
         {
             if (dataPath == outPath)
             {
@@ -39,7 +29,7 @@ namespace ModelMaker
             psi.FileName = pythonPath;
 
             Console.WriteLine("arguments in");
-            psi.Arguments = scriptPath + " " + dataPath + " " + outPath + " " + epoch + " " + save_config + " " + use_config;
+            psi.Arguments = scriptPath + " " + dataPath + " " + outPath + " " + modelName + " " + create_csv_file + " " + enabled_training;
 
             // process configuration
             psi.UseShellExecute = false;
