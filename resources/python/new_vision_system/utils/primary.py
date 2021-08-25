@@ -20,7 +20,7 @@ def im_convert(tensor):
     return image
 
 # prepare data for forward pass
-def run_data_to_model(data, device, model, criterion, optimizer, train=True):
+def run_data_to_model(data, device, model, criterion, optimizer, train=True, flat_input=False):
     grad = torch.no_grad()
     model.eval()
     if train:
@@ -29,7 +29,9 @@ def run_data_to_model(data, device, model, criterion, optimizer, train=True):
 
     with grad:
         inputs, labels = data
-        inputs = inputs.view(inputs.shape[0], -1).to(device)
+        inputs = inputs.to(device)
+        if flat_input:
+            inputs = inputs.view(inputs.shape[0], -1)
         labels = labels.to(device)
         outputs = model(inputs)
         loss = criterion(outputs, labels)
@@ -46,7 +48,7 @@ def save_model(model, type="pickle", model_name="model"):
         m = torch.jit.script(model)
         torch.jit.save("models/"+model_name+".pt",m)
     elif type == "pickle":
-        filehandler = open("models/"+model_name+".pt", 'wb')
-        pickle.dump(model, filehandler)
+        file_handler = open("models/"+model_name+".pt", 'wb')
+        pickle.dump(model, file_handler)
     else:
         torch.save("models/"+model_name+".pt",model)

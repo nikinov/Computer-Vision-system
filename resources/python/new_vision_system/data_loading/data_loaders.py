@@ -18,8 +18,8 @@ import csv
 
 # loads data from folders and automatically allocates classes
 class FolderDataset(Dataset):
-    def __init__(self, data_dir, transforms=None, train=True, gray=False, train_split=0.8, generate_number_of_images=1):
-        self.gray = gray
+    def __init__(self, data_dir, transforms=None, train=True, color=False, train_split=0.8, generate_number_of_images=1):
+        self.color = color
         # important double check the directory separator
         self.separator = "\\"
         self.annotations = []
@@ -52,10 +52,10 @@ class FolderDataset(Dataset):
 
     def __getitem__(self, item):
         img_path = os.path.join(self.annotations[item])
-        if self.gray:
-            image = cv2.imread(img_path, 0)
-        else:
+        if self.color:
             image = io.imread(img_path)
+        else:
+            image = cv2.imread(img_path, 0)
         y_label = torch.tensor(int(list(self.class_track.keys()).index(self.annotations[item].split(self.separator)[-2]))) # problem make forloop
 
         if self.transforms:

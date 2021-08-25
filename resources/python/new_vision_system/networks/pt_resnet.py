@@ -10,6 +10,7 @@ class PtResnet(ModelBase):
         num_ftrs = self.model.fc.in_features
         self.model.fc = nn.Linear(num_ftrs, self.output_size)
         self.input_size = 224
+        self.model.to(self.device)
     def get_train_transforms(self):
         return transforms.Compose(
             [

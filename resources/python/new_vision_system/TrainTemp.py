@@ -1,4 +1,4 @@
-from number_train import train
+from number_train_resnet import train
 
 import time
 import torch

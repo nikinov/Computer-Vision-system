@@ -1,11 +1,11 @@
-from torchvision import transforms
+from torchvision import transforms, models
 import torch
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 import torchvision
 from torch import nn
 import torch.nn.functional as F
-from networks import pt_linear
+from networks import pt_resnet
 
 import sys
 from PIL import Image
@@ -16,7 +16,7 @@ from data_loading.data_loaders import FolderDataset
 from utils.primary import im_convert, run_data_to_model, save_model
 from utils.visualisation import print_metrix, plot_metrix
 from networks.custom_networks import LinearNN
-from data_preprocessing.transforms import LinearTransform
+from data_preprocessing.transforms import ResnetTransforms
 
 
 class train():
@@ -31,12 +31,12 @@ class train():
         self.pt_path = model_output_path
         self.bs = 50
 
-        self.model = pt_linear.PtLinearNN(LinearNN, self.device, model_name="my_model", input_size=28)
+        self.model = pt_resnet.PtResnet(models.resnet18(pretrained=True), self.device, model_name="my_model", input_size=28)
 
-        tr = LinearTransform()
+        tr = ResnetTransforms()
 
-        self.train_data = FolderDataset(dataset_path, transforms=tr.get_train_transforms(), train=True, generate_number_of_images=100)
-        self.val_data = FolderDataset(dataset_path, transforms=tr.get_valid_transforms(), train=False)
+        self.train_data = FolderDataset(dataset_path, transforms=tr.get_train_transforms(), train=True, generate_number_of_images=100, color=True)
+        self.val_data = FolderDataset(dataset_path, transforms=tr.get_valid_transforms(), train=False, color=True)
 
         self.class_num = self.train_data.get_class_num()
 
@@ -76,11 +76,11 @@ class train():
 
             # loops
             for i, data in enumerate(self.train_data_loader):
-                loss, corrects = run_data_to_model(data, self.device, self.model.model, self.model.get_criterion(), self.model.get_optimizer(), train=enabled_training, flat_input=True)
+                loss, corrects = run_data_to_model(data, self.device, self.model.model, self.model.get_criterion(), self.model.get_optimizer(), train=enabled_training)
                 running_loss += loss
                 running_corrects += corrects
             for i, data in enumerate(self.valid_data_loader):
-                loss, corrects = run_data_to_model(data, self.device, self.model.model, self.model.get_criterion(), self.model.get_optimizer(), train=False, flat_input=True)
+                loss, corrects = run_data_to_model(data, self.device, self.model.model, self.model.get_criterion(), self.model.get_optimizer(), train=False)
                 running_loss_val += loss
                 running_corrects_val += corrects
             epoch_loss = running_loss/len(self.train_data_loader)
