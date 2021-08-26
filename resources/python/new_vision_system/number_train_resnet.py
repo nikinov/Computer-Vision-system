@@ -17,26 +17,25 @@ from utils.primary import im_convert, run_data_to_model, save_model
 from utils.visualisation import print_metrix, plot_metrix
 from networks.custom_networks import LinearNN
 from data_preprocessing.transforms import ResnetTransforms
+from skimage import io
 
 
 class train():
-    def __init__(self, tensorboard=False):
+    def __init__(self, tensorboard=False, model_name="my_model"):
         self.tensorboard = tensorboard
         if tensorboard:
             self.writer = SummaryWriter("runs/nums")
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model = pt_resnet.PtResnet(models.resnet18(pretrained=True), self.device, model_name=model_name, input_size=28)
+        self.tr = ResnetTransforms()
 
     def prep(self, dataset_path="../Assets", model_output_path="../models"):
         # prepare the data and the transforms
         self.pt_path = model_output_path
         self.bs = 50
 
-        self.model = pt_resnet.PtResnet(models.resnet18(pretrained=True), self.device, model_name="my_model", input_size=28)
-
-        tr = ResnetTransforms()
-
-        self.train_data = FolderDataset(dataset_path, transforms=tr.get_train_transforms(), train=True, generate_number_of_images=100, color=True)
-        self.val_data = FolderDataset(dataset_path, transforms=tr.get_valid_transforms(), train=False, color=True)
+        self.train_data = FolderDataset(dataset_path, transforms=self.tr.get_train_transforms(), train=True, generate_number_of_images=40, color=True)
+        self.val_data = FolderDataset(dataset_path, transforms=self.tr.get_valid_transforms(), train=False, color=True)
 
         self.class_num = self.train_data.get_class_num()
 
@@ -60,7 +59,7 @@ class train():
             plt.savefig('image.png', dpi=90, bbox_inches='tight')
             plt.show()
 
-    def train(self, save_type="None", enabled_training=True):
+    def train(self, save_type="None"):
         self.running_loss_history = []
         self.running_corrects_history = []
         self.val_running_loss_history = []
@@ -74,9 +73,8 @@ class train():
             running_loss_val = 0.0
             running_corrects_val = 0.0
 
-            # loops
             for i, data in enumerate(self.train_data_loader):
-                loss, corrects = run_data_to_model(data, self.device, self.model.model, self.model.get_criterion(), self.model.get_optimizer(), train=enabled_training)
+                loss, corrects = run_data_to_model(data, self.device, self.model.model, self.model.get_criterion(), self.model.get_optimizer(), train=True)
                 running_loss += loss
                 running_corrects += corrects
             for i, data in enumerate(self.valid_data_loader):
@@ -101,5 +99,12 @@ class train():
         if save_type == "None":
             pass
         else:
-            save_model(model=best_model, type=save_type, model_name=self.model.get_model_name())
+            save_model(model=self.model.model, type=save_type, model_name=self.model.get_model_name())
+
+    def predict(self, image_path, model=None):
+        img = io.imread(image_path)
+        if model == None:
+            model = self.model.model
+        transform = self.tr.get_valid_transforms()
+        return run_data_to_model((transform(img).reshape(1, 3, 224, 224), torch.tensor([0])), self.device, model, self.model.get_criterion(), self.model.get_optimizer(), train=False, get_prediction=True)
 
