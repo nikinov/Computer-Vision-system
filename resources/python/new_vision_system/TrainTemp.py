@@ -9,21 +9,21 @@ import numpy
 
 
 data_dir = "..\\..\\Assets5082"
-tr = train(tensorboard=False, model_name='my_other_number_model')
-"""
+tr = train(tensorboard=False, model_name='my_resnet152_model')
+
 t = time.time()
 # use_config=true is more performant
 print(time.time() - t)
 tr.prep(data_dir, "../../models")
 tr.train(save_type="jit")
-"""
+
 num_incorrect = 0
 num_correct = 0
 
 lists = ['_bad_brown', '_bad_void']
 lists2 = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'E']
 
-model_path = "models/my_other_number_model.pt"
+model_path = "models/my_resnet152_model.pt"
 # Load data (deserialize)
 model = jit.load(model_path)
 for entry in glob.iglob(data_dir + '/**/*.bmp', recursive=True):

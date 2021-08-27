@@ -1,5 +1,5 @@
 import argparse as ap
-from ..number_train import train
+from ..number_train_resnet import train
 from ..data_loading.data_save import csv_save
 
 def main():
@@ -12,14 +12,12 @@ def main():
     parser.add_argument("mp", help="model path", type=str)
     parser.add_argument("mn", help="model name", type=str)
     parser.add_argument("sc", help="create csv file", type=bool)
-    parser.add_argument("et", help="enables training", type=bool)
 
     args = parser.parse_args()
 
-    tr = train()
-    tr.data_prep(dataset_path=args.ds, model_output_path=args.mp)
-    tr.model_prep(model_name=args.mn)
-    tr.train(save_type="jit", enabled_training=args.et)
+    tr = train(model_name=args.mn)
+    tr.prep(dataset_path=args.ds, model_output_path=args.mp)
+    tr.train(save_type="jit")
     if args.sc:
         csv_save(file_save_name="config", data_dir=args.ds)
 

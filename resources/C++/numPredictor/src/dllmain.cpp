@@ -58,7 +58,6 @@ void DLL_GetPrediction(unsigned char* imageData, int imWidth, int imHeight, floa
     int input_image_size = 28;
     if (resnet)
         input_image_size = 224;
-    int ptr = 0;
 
     //unsigned char* imageDataPtr = (unsigned char*)&imageData;
     cv::Mat img;

@@ -17,8 +17,7 @@ namespace ModelMaker
             string dataPath = "C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech/resources/Assets",
             string outPath = "C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech",
             string modelName = "model",
-            bool create_csv_file = false,
-            bool enabled_training = true)
+            bool create_csv_file = false)
         {
             if (dataPath == outPath)
             {
@@ -29,7 +28,7 @@ namespace ModelMaker
             psi.FileName = pythonPath;
 
             Console.WriteLine("arguments in");
-            psi.Arguments = scriptPath + " " + dataPath + " " + outPath + " " + modelName + " " + create_csv_file + " " + enabled_training;
+            psi.Arguments = scriptPath + " " + dataPath + " " + outPath + " " + modelName + " " + create_csv_file;
 
             // process configuration
             psi.UseShellExecute = false;

@@ -26,7 +26,7 @@ class train():
         if tensorboard:
             self.writer = SummaryWriter("runs/nums")
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = pt_resnet.PtResnet(models.resnet18(pretrained=True), self.device, model_name=model_name, input_size=28)
+        self.model = pt_resnet.PtResnet(models.resnet50(pretrained=True), self.device, model_name=model_name, input_size=28)
         self.tr = ResnetTransforms()
 
     def prep(self, dataset_path="../Assets", model_output_path="../models"):
@@ -96,6 +96,7 @@ class train():
                 best_loss = val_epoch_loss
 
         plot_metrix(self.running_loss_history, self.val_running_loss_history, self.running_corrects_history, self.val_running_corrects_history)
+        torch.cuda.empty_cache()
         if save_type == "None":
             pass
         else:
