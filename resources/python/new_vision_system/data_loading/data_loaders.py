@@ -5,15 +5,16 @@
 # Nicholas Novelle July 2021
 #
 
-
+from torchvision import transforms
 import torch
-from skimage import io
 from torch.utils.data import Dataset
+
+from skimage import io
 import os
 import glob
 import cv2
 import pandas as pd
-import csv
+from functools import reduce
 
 
 # loads data from folders and automatically allocates classes
@@ -23,6 +24,7 @@ class FolderDataset(Dataset):
         # important double check the directory separator
         self.separator = "\\"
         self.annotations = []
+        self.input_sizes = []
         # class split looks like this {name_of_cass:list_of_paths}
         self.class_track = {}
         for entry in glob.iglob(data_dir + '/**/*.bmp', recursive=True):
@@ -44,6 +46,10 @@ class FolderDataset(Dataset):
                         self.annotations.append(el)
                 elif i > self.smallest_class_num*train_split and not train:
                     self.annotations.append(el)
+                # add width and height to the input_sizes used for finding the right model
+                width, height, _ = io.imread(el).shape
+                self.input_sizes.append(width)
+                self.input_sizes.append(height)
         self.data_dir = data_dir
         self.transforms = transforms
 
@@ -65,6 +71,11 @@ class FolderDataset(Dataset):
     def get_class_num(self):
         return len(list(self.class_track.keys()))
 
+    def get_optimal_input_size(self):
+        return reduce(lambda a, b: a + b, self.input_sizes) / len(self.input_sizes)
+
+    def set_transforms(self, trans):
+        self.transforms = trans
 
 # this loads data from the csv file
 class CSVDataset(Dataset):

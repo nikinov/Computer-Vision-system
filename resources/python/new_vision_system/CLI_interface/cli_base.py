@@ -1,5 +1,5 @@
 import argparse as ap
-from ..number_train_resnet import train
+from ..train import train
 from ..data_loading.data_save import csv_save
 
 def main():

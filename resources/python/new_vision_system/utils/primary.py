@@ -47,11 +47,15 @@ def run_data_to_model(data, device, model, criterion, optimizer, train=True, fla
         return (loss.item(), torch.sum(preds == labels.data))
 
 def save_model(model, type="pickle", model_name="model"):
-    if type == "jit":
-        m = torch.jit.script(model)
+    model.save_prep()
+    if type == "jit_trace":
+        m = torch.jit.trace(model.model, torch.rand(1, 3, model.get_input_size(), model.get_input_size()).to(model.device))
+        m.save("models/"+model_name+".pt")
+    elif type == "jit_script":
+        m = torch.jit.script(model.model)
         torch.jit.save(m, "models/"+model_name+".pt")
     elif type == "pickle":
         file_handler = open("models/"+model_name+".pickle", 'wb')
-        pickle.dump(model, file_handler)
+        pickle.dump(model.model, file_handler)
     else:
-        torch.save("models/"+model_name+".pt",model)
+        torch.save("models/"+model_name+".pt",model.model)
