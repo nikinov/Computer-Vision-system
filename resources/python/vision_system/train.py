@@ -21,19 +21,20 @@ from skimage import io
 import glob
 
 
-class train():
-    def __init__(self, vizualization=False, model=None, model_name="my_model"):
-        self.vizualization = vizualization
-        if vizualization:
-            self.writer = SummaryWriter("runs/nums")
+class AI():
+    def __init__(self, model=None):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         if model is None:
-            self.model = pt_efficient_net.PtEfficientNet(None, model_name=model_name)
+            self.model = pt_efficient_net.PtEfficientNet(None, model_name="my_model")
         else:
             self.model = model
         self.tr = MyTransforms()
 
-    def prep(self, dataset_path="../Assets", model_output_path="../models", learning_rate=0.001, batch_size=5, generate_images_per_image=40, train_trans=None):
+    def prep(self, dataset_path="../Assets", model_output_path="../models", learning_rate=0.001, batch_size=5, generate_images_per_image=40, train_trans=None, visualisation=False):
+        self.vizualization = visualisation
+        if visualisation:
+            self.writer = SummaryWriter("runs/nums")
+
         # prepare the data and the transforms
         self.pt_path = model_output_path
         self.bs = batch_size
@@ -70,13 +71,13 @@ class train():
             plt.savefig('image.png', dpi=90, bbox_inches='tight')
             plt.show()
 
-    def train(self, save_type="None", epoch=5, flat=False):
+    def train(self, save_type="None", epochs=5, flat=False):
         self.running_loss_history = []
         self.running_corrects_history = []
         self.val_running_loss_history = []
         self.val_running_corrects_history = []
 
-        for e in range(epoch):
+        for e in range(epochs):
             # parameters
             running_loss = 0.0
             running_corrects = 0.0
@@ -107,12 +108,15 @@ class train():
         if save_type == "None":
             pass
         else:
-            save_model(model=self.model, type=save_type, model_name=self.model.get_model_name())
+            save_model(model=self.model, my_type=save_type, model_name=self.model.get_model_name())
+        return self.model
 
-    def predict_folder(self, folder_path, model, flat=False, reshape=True):
+    def predict_folder(self, folder_path, model=None, flat=False, reshape=True):
         num_incorrect = 0
         num_correct = 0
         listt = []
+        if model is None:
+            model = self.model
         for entry in glob.iglob(f'{folder_path}/*'):
             listt.append(entry.split("\\")[-1])
         for entry in glob.iglob(folder_path + '/**/*.bmp', recursive=True):
@@ -130,7 +134,7 @@ class train():
     def predict(self, image_path, model=None, flat=False, reshape=True):
         img = io.imread(image_path)
         if model == None:
-            model = self.model.model
+            model = self.model
         transform = model.get_val_transforms()
         if reshape:
             img = transform(img).reshape(1, list(transform(img).shape)[0], list(transform(img).shape)[1], list(transform(img).shape)[2])

@@ -1,7 +1,8 @@
-from train import train
+from train import AI
 from networks import pt_linear, pt_resnet, pt_inception, custom_networks, pt_efficient_net
 from torchvision import models
 from data_preprocessing import transforms
+from utils import primary
 
 import time
 import torch
@@ -13,7 +14,7 @@ from data_preprocessing.transforms import MyTransforms
 
 
 data_dir = "..\\..\\Assets"
-tr = train(vizualization=False, model_name="the_new_guy")
+tr = AI()
 
 t = time.time()
 # use_config=true is more performant

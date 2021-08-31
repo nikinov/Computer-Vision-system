@@ -5,7 +5,7 @@ from torchvision.models.resnet import ResNet, BasicBlock
 
 
 class ModelBase():
-    def __init__(self, model, model_name="my_model"):
+    def __init__(self, model=None, model_name="my_model"):
         self.input_size = self.make_input_size()
         self.model_name = model_name
         self.model = model
