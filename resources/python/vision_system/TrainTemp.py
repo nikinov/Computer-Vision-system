@@ -21,7 +21,7 @@ t = time.time()
 print(time.time() - t)
 my_t = MyTransforms()
 tr.prep(data_dir, "../../models", train_trans=my_t.get_train_transforms(tr.model.input_size), batch_size=50, generate_images_per_image=50)
-tr.train(save_type="jit_trace", epoch=7)
+tr.train(save_type="jit_trace", epochs=7)
 
 model_path = "models/the_new_guy.pt"
 # Load data (deserialize)

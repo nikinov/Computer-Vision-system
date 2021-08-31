@@ -123,7 +123,7 @@ def train(epoch, config, model, optimizer, scheduler, loss_func, train_loader,
         global_step += 1
 
         if get_rank() == 0 and step == 1:
-            if config.vizualization.train_images:
+            if config.visualisation.train_images:
                 image = torchvision.utils.make_grid(data,
                                                     normalize=True,
                                                     scale_each=True)
@@ -257,7 +257,7 @@ def validate(epoch, config, model, loss_func, val_loader, logger,
     with torch.no_grad():
         for step, (data, targets) in enumerate(val_loader):
             if get_rank() == 0:
-                if config.vizualization.val_images:
+                if config.visualisation.val_images:
                     if epoch == 0 and step == 0:
                         image = torchvision.utils.make_grid(data,
                                                             normalize=True,
@@ -319,7 +319,7 @@ def validate(epoch, config, model, loss_func, val_loader, logger,
         tensorboard_writer.add_scalar('Val/Acc1', acc1_meter.avg, epoch)
         tensorboard_writer.add_scalar('Val/Acc5', acc5_meter.avg, epoch)
         tensorboard_writer.add_scalar('Val/Time', elapsed, epoch)
-        if config.vizualization.model_params:
+        if config.visualisation.model_params:
             for name, param in model.named_parameters():
                 tensorboard_writer.add_histogram(name, param, epoch)
 

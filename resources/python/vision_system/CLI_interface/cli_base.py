@@ -1,6 +1,7 @@
 import argparse as ap
-from ..train import train
+from ..train import AI
 from ..data_loading.data_save import csv_save
+
 
 def main():
     """
@@ -15,13 +16,11 @@ def main():
 
     args = parser.parse_args()
 
-    tr = train(model_name=args.mn)
+    tr = AI()
     tr.prep(dataset_path=args.ds, model_output_path=args.mp)
     tr.train(save_type="jit")
     if args.sc:
         csv_save(file_save_name="config", data_dir=args.ds)
-
-
 
 
 """

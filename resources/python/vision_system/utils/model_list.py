@@ -1,5 +1,7 @@
 from torchvision import models
 
+
+# just an overview if you wanna use existing models
 class PtModels:
     def __init__(self, pretrained=True):
         self.pretrained = pretrained

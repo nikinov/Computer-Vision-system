@@ -1,21 +1,13 @@
-from torchvision import transforms, models
 import torch
 from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
-import torchvision
-from torch import nn
-import torch.nn.functional as F
 from networks import pt_efficient_net
 
-import sys
-from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
 
 from data_loading.data_loaders import FolderDataset
 from utils.primary import im_convert, run_data_to_model, save_model
 from utils.visualisation import print_metrix, plot_metrix
-from networks.custom_networks import LinearNN
 from data_preprocessing.transforms import MyTransforms
 from skimage import io
 import glob
@@ -31,18 +23,16 @@ class AI():
         self.tr = MyTransforms()
 
     def prep(self, dataset_path="../Assets", model_output_path="../models", learning_rate=0.001, batch_size=5, generate_images_per_image=40, train_trans=None, visualisation=False):
-        self.vizualization = visualisation
-        if visualisation:
-            self.writer = SummaryWriter("runs/nums")
-
-        # prepare the data and the transforms
+        # params
         self.pt_path = model_output_path
         self.bs = batch_size
         self.model.learning_rate = learning_rate
 
+        # default transforms
         if train_trans is None:
             train_trans = self.tr.get_train_transforms(self.model.input_size)
 
+        # data and model prep
         self.val_data = FolderDataset(dataset_path, transforms=None, train=False, color=True)
         self.model.make_input_size(self.val_data.get_optimal_input_size())
         self.val_data.set_transforms(self.model.get_val_transforms())
@@ -53,14 +43,14 @@ class AI():
         self.model.set_output_size(self.class_num)
         self.model.model_prep()
 
-
         self.train_data_size = len(self.train_data)
         self.valid_data_size = len(self.val_data)
         # Create iterators for the Data loaded using DataLoader module
         self.train_data_loader = DataLoader(self.train_data, batch_size=self.bs, shuffle=True)
         self.valid_data_loader = DataLoader(self.val_data, 1, shuffle=False)
 
-        if self.vizualization:
+        # looks
+        if visualisation:
             dataset = iter(self.train_data_loader)
             images, labels = next(dataset)
             fig = plt.figure(figsize=(15, 4))

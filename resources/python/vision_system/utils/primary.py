@@ -46,6 +46,7 @@ def run_data_to_model(data, device, model, criterion, optimizer, train=True, fla
     else:
         return (loss.item(), torch.sum(preds == labels.data))
 
+# save model
 def save_model(model, my_type="pickle", model_name="model", output_path="models/"):
     model.save_prep()
     if my_type == "jit_trace":
@@ -60,6 +61,7 @@ def save_model(model, my_type="pickle", model_name="model", output_path="models/
     else:
         torch.save(output_path+model_name+".pt",model.model)
 
+# load model
 def load_model(model_path, my_type):
     if my_type == "jit":
         return torch.jit.load(model_path)
