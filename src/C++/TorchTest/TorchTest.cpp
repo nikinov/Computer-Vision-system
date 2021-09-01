@@ -40,7 +40,7 @@ int main()
     }
     else
     {
-        DLL_InitModel("C:/Users/Ryzen7-EXT/Documents/Github/WickonHightech/resources/python/new_vision_system/models/my_other_number_model.pt");
+        DLL_InitModel("C:/Github/WickonHightech/src/python/new_vision_system/models/my_other_number_model.pt");
         float ouuut[11];
         DLL_GetPrediction(my_test_image.data, my_test_image.size().width, my_test_image.size().height, ouuut, 11, true);
         std::cout << ouuut << std::endl;
