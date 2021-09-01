@@ -4,16 +4,6 @@
 ---
 📚 This is a quick guide on how to gert started with the VisionAISystem
 
-## Before you start
-
----
-To get started make sure you have cuda 11. Then install all the requirements with pip:
-
-```shell
-cd python/vision_system
-pip install requirements.txt
-```
-
 ## Prepare Data
 ___
 To prepare the data create a folder with sub folders of classes with images in them that you want to train.
