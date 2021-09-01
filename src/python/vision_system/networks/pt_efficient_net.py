@@ -1,7 +1,7 @@
 from torchvision import transforms
 from .model_base import ModelBase
 from efficientnet_pytorch import EfficientNet
-from ..utils import math
+from src.python.vision_system.utils import math
 
 
 class PtEfficientNet(ModelBase):

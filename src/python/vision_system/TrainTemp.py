@@ -1,36 +1,39 @@
 from train import AI
-from networks import pt_linear, pt_resnet, pt_inception, custom_networks, pt_efficient_net
-from torchvision import models
-from data_preprocessing import transforms
 from utils import primary
-
-import time
-import torch
-import glob
-import pickle
-from torch import jit
-import numpy
-from data_preprocessing.transforms import MyTransforms
+from networks.pt_efficient_net import PtEfficientNet
 
 
-data_dir = "..\\..\\Assets"
-tr = AI()
+# define my parameters
+data_dir = "../../../resources/Datasets/NumberData"
+model_output_path = "../../../resources/models/"
+model_name = "my_favourite_model"
+save_type = "jit_trace"
 
-t = time.time()
-# use_config=true is more performant
-print(time.time() - t)
-my_t = MyTransforms()
-tr.prep(data_dir, "../../models", train_trans=my_t.get_train_transforms(tr.model.input_size), batch_size=50, generate_images_per_image=50)
-tr.train(save_type="jit_trace", epochs=7)
+# define train object
+tr = AI(model=PtEfficientNet())
 
-model_path = "models/the_new_guy.pt"
-# Load data (deserialize)
-model = jit.load(model_path)
+# prepare for the training
+tr.prep(dataset_path=data_dir, model_output_path=model_output_path)
 
-num_correct, num_incorrect = tr.predict_folder(data_dir, pt_efficient_net.PtEfficientNet(model, model_name="some_random_name"))
+# train our model
+model = tr.train()
 
-print(" number of correct: " + str(num_correct) + " number of incorrect: " + str(num_incorrect))
+# save the model
+primary.save_model(model, my_type="jit_trace", output_path=model_output_path, model_name=model_name)
 
-""""""
-#m = torch.jit.load("model/model.pt")
-#print(m):
+
+# define my parameters
+data_dir = "../../TestAssets"
+model_path = "models/my_favourite_model.pt"
+model_type = "jit"
+
+# load my model
+model = primary.load_model(model_path, my_type=model_type)
+
+# define my AI object with a model the type of efficient_net
+ai = AI(model=PtEfficientNet(model=model))
+
+# test our model a folder adn get the number of correct and incorrect images
+num_correct, num_incorrect = ai.predict_folder(folder_path=data_dir)
+print("number of correctly predicted images: " + num_correct)
+print("number of incorrectly predicted images: " + num_incorrect)
