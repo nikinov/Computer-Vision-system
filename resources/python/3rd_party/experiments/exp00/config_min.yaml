@@ -1,3 +1,0 @@
-device: cpu
-dataset:
-  dataset_dir: ~/.torch/datasets/CIFAR10
