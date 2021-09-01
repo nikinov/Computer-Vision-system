@@ -85,4 +85,6 @@ as well as [this tutorial](https://www.youtube.com/watch?v=Dk88zv1KYMI) for depl
 
 ### pytorch training
 
-follow [this](https://github.com/nikinov/WickonHightech/tree/CleanTorch/resources/python/vision_system) tutorial for more
+follow [this](https://github.com/nikinov/WickonHightech/tree/CleanTorch/resources/python/vision_system) tutorial for AI vision system
+
+or go [here](https://github.com/nikinov/WickonHightech/tree/CleanTorch/resources/python/yolo) for yolo
