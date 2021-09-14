@@ -340,32 +340,32 @@ namespace StraightSkeletonNet.Tests
             return gamma;
         }
 
-        public static Vector2 GetClosestPointOnLineSegment(Vector2 A, Vector2 B, Vector2 P)
+        public static Vector2 GetClosestPointOnLineSegment(Vector2 a, Vector2 b, Vector2 p)
         {
-            Vector2 AP = P - A;       //Vector from A to P   
-            Vector2 AB = B - A;       //Vector from A to B  
+            Vector2 ap = p - a;       //Vector from A to P   
+            Vector2 ab = b - a;       //Vector from A to B  
 
-            float magnitudeAB = AB.LengthSquared();     //Magnitude of AB vector (it's length squared)     
-            float ABAPproduct = Vector2.Dot(AP, AB);    //The DOT product of a_to_p and a_to_b     
-            float distance = ABAPproduct / magnitudeAB; //The normalized "distance" from a to your closest point  
+            float magnitudeAb = ab.LengthSquared();     //Magnitude of AB vector (it's length squared)     
+            float abaPproduct = Vector2.Dot(ap, ab);    //The DOT product of a_to_p and a_to_b     
+            float distance = abaPproduct / magnitudeAb; //The normalized "distance" from a to your closest point  
 
             if (distance < 0)     //Check if P projection is over vectorAB     
             {
-                return A;
+                return a;
             }
             else if (distance > 1)
             {
-                return B;
+                return b;
             }
             else
             {
-                return A + AB * distance;
+                return a + ab * distance;
             }
         }
 
-        public static bool SanityyCheck(Vector2d A, Vector2d B, Vector2d point)
+        public static bool SanityyCheck(Vector2d a, Vector2d b, Vector2d point)
         {
-            if (GetAngle(A, B, point) < 135)
+            if (GetAngle(a, b, point) < 135)
             {
                 return false;
             }
@@ -400,25 +400,23 @@ namespace StraightSkeletonNet.Tests
         public static List<Vector2d> FindEdges(List<Vector2d> mesh, int segment=15, float bigLineSize=100)
         {
             List<Vector2d> edges = new List<Vector2d>();
-            var inconsistancy = CheckForInconsistency(GetSegments(ConvertIntoDirections(mesh), segment), tolerance: 2);
-            foreach (var it in inconsistancy)
+            var inconsistency = CheckForInconsistency(GetSegments(ConvertIntoDirections(mesh), segment), tolerance: 2);
+            foreach (var it in inconsistency)
             {
                 foreach (var seg in Select<Vector2d>(mesh, it*segment, segment))
                     edges.Add(seg);
             }
             var edg = FindBigLines(edges, bigLineSize:bigLineSize);
 
-            var incon = CheckForInconsistency(ConvertIntoDirections(edg), tolerance: 2);
+            var icon = CheckForInconsistency(ConvertIntoDirections(edg), tolerance: 2);
             List<Vector2d> edges2 = new List<Vector2d>();
-            foreach (var it in incon)
+            foreach (var it in icon)
             {
                 edges2.Add(edg[it]);
             }
 
             for (int i = 0; i >= edges2.Count; i++)
             {
-                
-
                 bool lines_intersect;
                 bool segments_intersect;
                 Vector2d intersection;
@@ -429,7 +427,7 @@ namespace StraightSkeletonNet.Tests
 
             }
             
-            File.WriteAllText("C:/generatedTest.txt", SaveGeometry(edges2));
+            File.WriteAllText("../../../../../../resources/CoordinateData/generatedTest.txt", SaveGeometry(edges2));
 
             return edges2;
         }
@@ -448,7 +446,7 @@ namespace StraightSkeletonNet.Tests
             }
 
             var initText = SaveGeometry(newMesh);
-            File.WriteAllText("C:/initOptimizedMesh.txt", initText);
+            File.WriteAllText("../../../../../../resources/CoordinateData/initOptimizedMesh.txt", initText);
 
             var text = "";
             int iterr = 0;
@@ -486,7 +484,7 @@ namespace StraightSkeletonNet.Tests
                 text = text + SaveGeometry(newMesh) + "\n";
             }
 
-            File.WriteAllText("C:/optimizedMesh.txt", text);
+            File.WriteAllText("../../../../../../resources/CoordinateData/optimizedMesh.txt", text);
 
             return newMesh;
         }

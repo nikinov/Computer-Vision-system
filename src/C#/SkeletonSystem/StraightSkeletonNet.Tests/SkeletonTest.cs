@@ -242,7 +242,7 @@ namespace StraightSkeletonNet.Tests
                 text = text + "\n";
             }
 
-            File.WriteAllText("C:/pythonCoordinates.txt", text);
+            File.WriteAllText("../../../../resources/CoordinateData/pythonCoordinates.txt", text);
 
             SkeletonTestUtil.AssertExpectedPoints(expected, SkeletonTestUtil.GetFacePoints(sk));
         }
@@ -250,7 +250,7 @@ namespace StraightSkeletonNet.Tests
         [Test]
         public void SkeletonTest_hole_4()
         {
-            List<List<Vector2d>> polygons = SkeletonTestUtil.GetVerts("C:/pythonCoordinates.txt");
+            List<List<Vector2d>> polygons = SkeletonTestUtil.GetVerts("../../../../../../resources/CoordinateData/pythonCoordinates.txt");
             List<List<Vector2d>> optimizedPolygons = new List<List<Vector2d>>();
 
             int iter = 0;
