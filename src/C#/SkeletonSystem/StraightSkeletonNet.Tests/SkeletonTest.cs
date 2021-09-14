@@ -266,9 +266,7 @@ namespace StraightSkeletonNet.Tests
                         optimizedPolygons.Add(pol);
                 }
                 iter += 1;
-                    
             }
-
 
             List<Vector2d> full = new List<Vector2d>();
 
@@ -280,14 +278,12 @@ namespace StraightSkeletonNet.Tests
                 }
             }
 
-            File.WriteAllText("C:/maNiceOne.txt", SkeletonTestUtil.SaveGeometry(full));
+            File.WriteAllText("../../../../../../resources/CoordinateData/maNiceOne.txt", SkeletonTestUtil.SaveGeometry(full));
 
             var outer = optimizedPolygons[0];
             optimizedPolygons.RemoveAt(0);
-
-
-            var sk = SkeletonBuilder.Build(outer, optimizedPolygons);
-
+            
+            //var sk = SkeletonBuilder.Build(outer, optimizedPolygons);
         }
 
         [Test]

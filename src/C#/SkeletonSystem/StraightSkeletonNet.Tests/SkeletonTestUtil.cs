@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
+using NUnit.Framework.Constraints;
 using StraightSkeletonNet.Primitives;
 
 namespace StraightSkeletonNet.Tests
@@ -108,6 +110,11 @@ namespace StraightSkeletonNet.Tests
                 .Select(x => x.Select(v => v.Value).ToList())
                 .ToList();
         }
+
+        public static int Mod(int num, int mod)
+        {
+            return num % mod;
+        }
         public static bool IsClose(List<float> angles, float tolerance=0.1f)
         {
             foreach (var ang in angles)
@@ -140,6 +147,29 @@ namespace StraightSkeletonNet.Tests
                 }
             }
             return edges;
+        }
+
+        public static bool CheckForSymetry(float angle, float tolerance)
+        {
+            List<float> syms = new List<float>()
+            {
+                -180,
+                -135,
+                -90,
+                -45,
+                0,
+                45,
+                90,
+                135,
+                180
+            };
+
+            foreach (var sym in syms)
+            {
+                if (angle < sym + tolerance && angle > sym - tolerance)
+                    return true;
+            }
+            return false;
         }
 
         public static Vector2d GetMeshCenter(List<Vector2d> mesh)
@@ -414,17 +444,33 @@ namespace StraightSkeletonNet.Tests
             {
                 edges2.Add(edg[it]);
             }
-
-            for (int i = 0; i >= edges2.Count; i++)
+            
+            List<int> correctionIndexes =new List<int>();
+            var angles = ConvertIntoDirections(edges2);
+            for (int i = 0; i < angles.Count; i++)
             {
-                bool lines_intersect;
-                bool segments_intersect;
-                Vector2d intersection;
-                Vector2d close_p1;
-                Vector2d close_p2;
-                FindIntersection(edges[i], edges[i+1], edges[i+3], edges[i+2], out lines_intersect, out segments_intersect, out intersection, out close_p1, out close_p2);
+                if (!CheckForSymetry(angles[i], 1))
+                {
+                    correctionIndexes.Add(i);
+                }
+            }
 
-
+            var newEd = edges2;
+            var offset = -1;
+            for (int i = edges2.Count-1; i >= 0; i--)
+            {
+                if (correctionIndexes.Contains(i))
+                {
+                    bool lines_intersect;
+                    bool segments_intersect;
+                    Vector2d intersection;
+                    Vector2d close_p1;
+                    Vector2d close_p2;
+                    FindIntersection(edges2[i + offset], edges2[Mod(i+1 + offset, edges2.Count-1)], edges2[Mod(i+3 + offset, edges2.Count-1)], edges2[Mod(i+2 + offset, edges2.Count-1)], out lines_intersect, out segments_intersect, out intersection, out close_p1, out close_p2);
+                    if (lines_intersect)
+                        newEd[newEd.IndexOf(edges2[Mod(i + 1 + offset, edges2.Count - 1)])] = intersection;
+                    newEd.Remove(edges2[Mod(i + 2 + offset, edges2.Count - 1)]);
+                }
             }
             
             File.WriteAllText("../../../../../../resources/CoordinateData/generatedTest.txt", SaveGeometry(edges2));
