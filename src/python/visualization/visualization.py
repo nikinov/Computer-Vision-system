@@ -3,7 +3,7 @@ from shapely.geometry.polygon import LinearRing, Polygon
 from shapely.ops import cascaded_union
 
 
-path = "../../../resources/CoordinateData/generatedTest.txt"
+path = "../../../resources/CoordinateData/maNiceOne.txt"
 f = open(path)
 
 def plot_lines():

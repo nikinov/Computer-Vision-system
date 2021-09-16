@@ -95,6 +95,16 @@ namespace StraightSkeletonNet.Tests
 
             return text;
         }
+
+        public static Vector2 VdToV(Vector2d vec)
+        {
+            return new Vector2((float)vec.X, (float)vec.Y);
+        } 
+        public static Vector2d VToVd(Vector2 vec)
+        {
+            return new Vector2d((double)vec.X, (double)vec.Y);
+        } 
+        
         // returns square of distance b/w two points
         static double lengthSquare(Vector2d p1, Vector2d p2)
         {
@@ -130,7 +140,7 @@ namespace StraightSkeletonNet.Tests
             return fullList.Skip(start).Take(take).ToList();
         }
 
-        public static List<Vector2d> FindBigLines(List<Vector2d> allPoints, float bigLineSize=10)
+        public static List<Vector2d> GetBigLines(List<Vector2d> allPoints, float bigLineSize=10)
         {
             List<Vector2d> edges = new List<Vector2d>();
 
@@ -149,7 +159,7 @@ namespace StraightSkeletonNet.Tests
             return edges;
         }
 
-        public static bool CheckForSymetry(float angle, float tolerance)
+        public static bool GetSymetryCheck(float angle, float tolerance)
         {
             List<float> syms = new List<float>()
             {
@@ -175,25 +185,31 @@ namespace StraightSkeletonNet.Tests
         public static Vector2d GetMeshCenter(List<Vector2d> mesh)
         {
             Vector2d center = new Vector2d();
-            double[] posittions = new double[4];
+            double[] posittions = new double[]
+            {
+                mesh[0].X,
+                mesh[0].X,
+                mesh[0].Y,
+                mesh[0].Y
+            };
             
             foreach (var pos in mesh)
             {
                 if (pos.X < posittions[0])
                     posittions[0] = pos.X;
-                else if (pos.X > posittions[1])
+                if (pos.X > posittions[1])
                     posittions[1] = pos.X;
-                else if (pos.Y < posittions[2])
+                if (pos.Y < posittions[2])
                     posittions[2] = pos.Y;
-                else if (pos.Y > posittions[3])
+                if (pos.Y > posittions[3])
                     posittions[3] = pos.Y;
             }
 
-            var yVal = posittions[1] + (posittions[0] - posittions[1]) / 2;
-            var xVal = posittions[3] + (posittions[2] - posittions[3]) / 2;
+            var yVal = posittions[0] + (posittions[1] - posittions[0]) / 2;
+            var xVal = posittions[2] + (posittions[3] - posittions[2]) / 2;
 
-            center.X = xVal;
-            center.Y = yVal;
+            center.X = yVal;
+            center.Y = xVal;
 
             return center;
         }
@@ -277,7 +293,7 @@ namespace StraightSkeletonNet.Tests
             return allDistances.Average();
         }
         
-        public static void FindIntersection(
+        public static void GetIntersection(
             Vector2d p1, Vector2d p2, Vector2d p3, Vector2d p4,
             out bool lines_intersect, out bool segments_intersect,
             out Vector2d intersection,
@@ -393,7 +409,7 @@ namespace StraightSkeletonNet.Tests
             }
         }
 
-        public static bool SanityyCheck(Vector2d a, Vector2d b, Vector2d point)
+        public static bool GetSanityCheck(Vector2d a, Vector2d b, Vector2d point)
         {
             if (GetAngle(a, b, point) < 135)
             {
@@ -402,7 +418,25 @@ namespace StraightSkeletonNet.Tests
             return true;
         }
 
-        public static int GetFurthestPointIndex(List<Vector2d> line, List<Vector2d> points)
+        public static int GetFurthestPointIndex(Vector2d main, List<Vector2d> points)
+        {
+            int mainIndex = -1;
+            Vector2 mainV = VdToV(main);
+            float prevDistance = 0;
+            for (int i = 0; i < points.Count; i++)
+            {
+                Vector2 pt = VdToV(points[i]);
+                var distance = Vector2.Distance(mainV, pt);
+                if (distance > prevDistance)
+                {
+                    prevDistance = distance;
+                    mainIndex = i;
+                }
+            }
+            return mainIndex;
+        }
+
+        public static int GetFurthestPointFromLineIndex(List<Vector2d> line, List<Vector2d> points)
         {
             int pointCount = points.Count;
             float[] distances = new float[pointCount];
@@ -421,13 +455,51 @@ namespace StraightSkeletonNet.Tests
             }
             float largestDistance = distances.Max();
 
-            if (SanityyCheck(line[0], line[1], points[Array.IndexOf(distances, largestDistance)]))
+            if (GetSanityCheck(line[0], line[1], points[Array.IndexOf(distances, largestDistance)]))
                 return -1;
             else
                 return Array.IndexOf(distances, largestDistance);
         }
 
-        public static List<Vector2d> FindEdges(List<Vector2d> mesh, int segment=15, float bigLineSize=100)
+        public static List<Vector2d> GetQuadrantEdges(List<Vector2d> mesh)
+        {
+            List<Vector2d> edges = new List<Vector2d>();
+            var center = GetMeshCenter(mesh);
+            List<List<Vector2d>> quadrants = new List<List<Vector2d>>();
+            for (int i = 0; i < 4; i++)
+            {
+                quadrants.Add(new List<Vector2d>());
+            }
+            foreach (var point in mesh)
+            {
+                if (point.X > center.X)
+                {
+                    if (point.Y > center.Y)
+                        quadrants[0].Add(point);
+                    else
+                        quadrants[1].Add(point);
+                }
+                else
+                {
+                    if (point.Y > center.Y)
+                        quadrants[2].Add(point);
+                    else
+                        quadrants[3].Add(point);
+                }
+            }
+
+            foreach (var quadrant in quadrants)
+            {
+                edges.Add(quadrant[GetFurthestPointIndex(center, quadrant)]);
+            }
+
+            var temp = edges[2];
+            edges[2] = edges[3];
+            edges[3] = temp;
+            return edges;
+        }
+
+        public static List<Vector2d> GetEdges(List<Vector2d> mesh, int segment=15, float bigLineSize=100)
         {
             List<Vector2d> edges = new List<Vector2d>();
             var inconsistency = CheckForInconsistency(GetSegments(ConvertIntoDirections(mesh), segment), tolerance: 2);
@@ -436,7 +508,7 @@ namespace StraightSkeletonNet.Tests
                 foreach (var seg in Select<Vector2d>(mesh, it*segment, segment))
                     edges.Add(seg);
             }
-            var edg = FindBigLines(edges, bigLineSize:bigLineSize);
+            var edg = GetBigLines(edges, bigLineSize:bigLineSize);
 
             var icon = CheckForInconsistency(ConvertIntoDirections(edg), tolerance: 2);
             List<Vector2d> edges2 = new List<Vector2d>();
@@ -449,7 +521,7 @@ namespace StraightSkeletonNet.Tests
             var angles = ConvertIntoDirections(edges2);
             for (int i = 0; i < angles.Count; i++)
             {
-                if (!CheckForSymetry(angles[i], 1))
+                if (!GetSymetryCheck(angles[i], 1))
                 {
                     correctionIndexes.Add(i);
                 }
@@ -466,7 +538,7 @@ namespace StraightSkeletonNet.Tests
                     Vector2d intersection;
                     Vector2d close_p1;
                     Vector2d close_p2;
-                    FindIntersection(edges2[i + offset], edges2[Mod(i+1 + offset, edges2.Count-1)], edges2[Mod(i+3 + offset, edges2.Count-1)], edges2[Mod(i+2 + offset, edges2.Count-1)], out lines_intersect, out segments_intersect, out intersection, out close_p1, out close_p2);
+                    GetIntersection(edges2[i + offset], edges2[Mod(i+1 + offset, edges2.Count-1)], edges2[Mod(i+3 + offset, edges2.Count-1)], edges2[Mod(i+2 + offset, edges2.Count-1)], out lines_intersect, out segments_intersect, out intersection, out close_p1, out close_p2);
                     if (lines_intersect)
                         newEd[newEd.IndexOf(edges2[Mod(i + 1 + offset, edges2.Count - 1)])] = intersection;
                     newEd.Remove(edges2[Mod(i + 2 + offset, edges2.Count - 1)]);
@@ -477,7 +549,14 @@ namespace StraightSkeletonNet.Tests
 
             return edges2;
         }
-        public static List<Vector2d> optimizeMesh(int newMeshCount, List<Vector2d> mesh)
+        
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="newMeshCount"></param>
+        /// <param name="mesh"></param>
+        /// <returns></returns>
+        private static List<Vector2d> optimizeMesh(int newMeshCount, List<Vector2d> mesh)
         {
             int oldMeshLength = mesh.Count;
             int meshChunkLength = oldMeshLength / newMeshCount;
@@ -505,7 +584,7 @@ namespace StraightSkeletonNet.Tests
                     List<Vector2d> selectedPoints = mesh.Skip(meshChunkLength * i).Take(meshChunkLength).ToList();
                     if (i == newMeshCount - 1)
                     {
-                        var idx = GetFurthestPointIndex(new List<Vector2d>() { mesh[indexes[i]], mesh[indexes[i] * 0] }, selectedPoints);
+                        var idx = GetFurthestPointFromLineIndex(new List<Vector2d>() { mesh[indexes[i]], mesh[indexes[i] * 0] }, selectedPoints);
                         if (idx != -1)
                             indexes[i] = idx;
                         else
@@ -513,7 +592,7 @@ namespace StraightSkeletonNet.Tests
                     }
                     else
                     {
-                        var idx = GetFurthestPointIndex(new List<Vector2d>() { mesh[indexes[i]], mesh[indexes[i + 1]] }, selectedPoints);
+                        var idx = GetFurthestPointFromLineIndex(new List<Vector2d>() { mesh[indexes[i]], mesh[indexes[i + 1]] }, selectedPoints);
                         if (idx != -1)
                             indexes[i] = idx;
                         else

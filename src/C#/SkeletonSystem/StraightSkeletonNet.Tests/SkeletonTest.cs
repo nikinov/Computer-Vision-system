@@ -258,12 +258,12 @@ namespace StraightSkeletonNet.Tests
             {
                 if (iter == 0)
                 {
-                    optimizedPolygons.Add(SkeletonTestUtil.FindEdges(pol));
+                    optimizedPolygons.Add(SkeletonTestUtil.GetEdges(pol));
                 }
                 else
                 {
-                    if (pol.Count != 0 && iter == 3 || iter == 4)
-                        optimizedPolygons.Add(pol);
+                    if (pol.Count != 0 && iter == 10 || iter == 11)
+                        optimizedPolygons.Add(SkeletonTestUtil.GetQuadrantEdges(pol));
                 }
                 iter += 1;
             }
@@ -274,16 +274,25 @@ namespace StraightSkeletonNet.Tests
             {
                 foreach (var p in pol)
                 {
-                    full.Add(p);
+                    //full.Add(p);
                 }
             }
 
-            File.WriteAllText("../../../../../../resources/CoordinateData/maNiceOne.txt", SkeletonTestUtil.SaveGeometry(full));
 
             var outer = optimizedPolygons[0];
             optimizedPolygons.RemoveAt(0);
             
-            //var sk = SkeletonBuilder.Build(outer, optimizedPolygons);
+            var sk = SkeletonBuilder.Build(outer, optimizedPolygons);
+            
+            foreach (var pol in sk.Edges)
+            {
+                foreach (var p in pol.Polygon)
+                {
+                    full.Add(p);
+                }
+            }
+            
+            File.WriteAllText("../../../../../../resources/CoordinateData/maNiceOne.txt", SkeletonTestUtil.SaveGeometry(full));
         }
 
         [Test]
