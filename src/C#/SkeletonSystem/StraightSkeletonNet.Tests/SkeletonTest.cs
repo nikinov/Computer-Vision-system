@@ -281,16 +281,8 @@ namespace StraightSkeletonNet.Tests
 
             var outer = optimizedPolygons[0];
             optimizedPolygons.RemoveAt(0);
-            
-            var sk = SkeletonBuilder.Build(outer, optimizedPolygons);
-            
-            foreach (var pol in sk.Edges)
-            {
-                foreach (var p in pol.Polygon)
-                {
-                    full.Add(p);
-                }
-            }
+
+            SkeletonMaker.GetCouples(optimizedPolygons);
             
             File.WriteAllText("../../../../../../resources/CoordinateData/maNiceOne.txt", SkeletonTestUtil.SaveGeometry(full));
         }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using NUnit.Framework.Constraints;
 using StraightSkeletonNet.Primitives;
 
@@ -384,6 +385,54 @@ namespace StraightSkeletonNet.Tests
             gamma = (float)(gamma * 180 / Math.PI);
 
             return gamma;
+        }
+        private static double DotProduct(Vector2d A, Vector2d B, Vector2d C)
+        {
+            // Get the vectors' coordinates.
+            var BAx = A.X - B.X;
+            var BAy = A.Y - B.Y;
+            var BCx = C.X - B.X;
+            var BCy = C.Y - B.Y;
+
+            // Calculate the dot product.
+            return (BAx * BCx + BAy * BCy);
+        }
+
+        public static double CrossProductLength(Vector2d A, Vector2d B, Vector2d C)
+        {
+            // Get the vectors' coordinates.
+            var BAx = A.X - B.X;
+            var BAy = A.Y - B.Y;
+            var BCx = C.X - B.X;
+            var BCy = C.Y - B.Y;
+
+            // Calculate the Z coordinate of the cross product.
+            return (BAx * BCy - BAy * BCx);
+        }
+        public static float GetPointAngle(Vector2d A, Vector2d B, Vector2d C)
+        {
+            // Get the dot product.
+            var dot_product = DotProduct(A, B, C);
+
+            // Get the cross product.
+            var cross_product = CrossProductLength(A, B, C);
+
+            // Calculate the angle.
+            return (float)Math.Atan2(cross_product, dot_product);
+        }
+        
+        // Return True if the point is in the polygon.
+        public static bool PointInPolygon(Vector2d point, List<Vector2d> polygon)
+        {
+            int max_point = polygon.Count - 1;
+            float total_angle = GetPointAngle(polygon[max_point],point,polygon[0]);
+
+            for (int i = 0; i < max_point; i++)
+            {
+                total_angle += GetPointAngle(polygon[i],point,polygon[i + 1]);
+            }
+
+            return (Math.Abs(total_angle) > 1);
         }
 
         public static Vector2 GetClosestPointOnLineSegment(Vector2 a, Vector2 b, Vector2 p)

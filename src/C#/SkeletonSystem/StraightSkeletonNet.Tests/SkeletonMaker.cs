@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using NUnit.Framework;
@@ -10,59 +11,68 @@ namespace StraightSkeletonNet.Tests
 {
     public class SkeletonMaker
     {
-        public static float GetWidth(List<Vector2d> outer, List<List<Vector2d>> inners)
+        public static List<List<Vector2d>> GetCouples(List<List<Vector2d>> inners)
         {
-            var yHeighInner = inners[0][0].Y;
-            var yHeighOuter = outer[0].Y;
-            foreach (var inner in inners)
+            List<List<Vector2d>> couples = new List<List<Vector2d>>();
+
+            for (int i = 0; i < inners.Count; i++)
             {
-                foreach (var point in inner)
+                // heigh to low
+                var otherSignificant = inners[i].OrderBy(v => v.X).ToArray();
+                List<Vector2d> rightSigs = new List<Vector2d>()
                 {
-                    if (yHeighInner < point.Y)
-                        yHeighInner = point.Y;
+                    otherSignificant[0],
+                    otherSignificant[1]
+                };
+                rightSigs = rightSigs.OrderBy(v => v.Y).ToList();
+                List<Vector2d> leftSigs = new List<Vector2d>()
+                {
+                    otherSignificant[2],
+                    otherSignificant[3]
+                };
+                leftSigs = leftSigs.OrderBy(v => v.Y).ToList();
+                if (couples.Count != 0)
+                {
+                    couples[couples.Count-1].Add(leftSigs[0]);
+                    couples[couples.Count-1].Add(leftSigs[1]);
                 }
+                couples.Add(rightSigs);
             }
+            
+            // try
+            return couples;
+        }
 
-            foreach (var point in outer)
+        public static List<List<List<Vector2d>>> optimizeCouples(List<List<Vector2d>> couples, List<Vector2d> outer)
+        {
+            List<List<List<Vector2d>>> optimizedCouples = new List<List<List<Vector2d>>>();
+            List<List<Vector2d>> coupleTemp = new List<List<Vector2d>>();
+            foreach (var couple in couples)
             {
-                if (yHeighInner < point.Y)
-                    yHeighInner = point.Y;
+                if (SkeletonTestUtil.PointInPolygon(SkeletonTestUtil.GetMeshCenter(couple), outer))
+                {
+                    optimizedCouples.Add(coupleTemp);
+                    coupleTemp = new List<List<Vector2d>>();
+                }
+                else
+                    coupleTemp.Add(couple);
             }
-
-            if (yHeighInner >= yHeighOuter)
-                throw new InvalidOperationException("the heighest point in the outer polygon is lower the the heighest point in the finger polygons");
-            return (float)(yHeighOuter - yHeighInner);
+            
+            return optimizedCouples;
         }
 
-        public static bool GetInverse()
+        public static List<Vector2d> GetFingers(List<List<List<Vector2d>>> couplesGroups, List<Vector2d> outer)
         {
-            
-        }
-
-        public static Vector2d GetAnglePoint(Vector2d[] corner, float distance, bool inverse)
-        {
-            float radiansA = SkeletonTestUtil.GetDirection(corner[1], corner[0]);
-            float radiansB = SkeletonTestUtil.GetDirection(corner[1], corner[2]);
-
-            float radians = radiansA + radiansB;
-            
-            Vector2 vectorDirection = new Vector2((float)Math.Cos(radians), (float)Math.Sin(radians));
-            
-            return new Vector2d();
-        }
-
-        public static List<Vector2d> GetOuterSkeleton(List<Vector2d> outer, float length)
-        {
-            List<float> directionsLeft = new List<float>();
-            List<float> directionsRight = new List<float>();
-            for (int i = 0; i < outer.Count; i++)
+            foreach (var couples in couplesGroups)
             {
-                directionsLeft.Add(SkeletonTestUtil.GetDirection(outer[i], outer[SkeletonTestUtil.Mod(i+1, outer.Count)]));
-                directionsRight.Add(SkeletonTestUtil.GetDirection(outer[i], outer[SkeletonTestUtil.Mod(i-1, outer.Count)]));
+                foreach (var couple in couples)
+                {
+                    
+                }
             }
             return 
         }
-        
+
         public static List<Vector2d> BuildSkeleton(List<Vector2d> outer, List<List<Vector2d>> inners)
         {
             List<Vector2d> skeleton = new List<Vector2d>();
