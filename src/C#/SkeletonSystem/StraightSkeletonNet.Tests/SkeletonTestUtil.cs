@@ -68,7 +68,7 @@ namespace StraightSkeletonNet.Tests
                 List<Vector2d> pol = new List<Vector2d>();
                 foreach (var vertex in polygon.Split(','))
                 {
-                    if (vertex != "")
+                    if (vertex != "" && vertex != "\r")
                     {
                         var vert = vertex.Split('|');
                         pol.Add(new Vector2d(Double.Parse(vert[0]), Double.Parse(vert[1])));

@@ -262,7 +262,7 @@ namespace StraightSkeletonNet.Tests
                 }
                 else
                 {
-                    if (pol.Count != 0 && iter == 10 || iter == 11)
+                    if (pol.Count != 0)
                         optimizedPolygons.Add(SkeletonTestUtil.GetQuadrantEdges(pol));
                 }
                 iter += 1;
@@ -282,7 +282,7 @@ namespace StraightSkeletonNet.Tests
             var outer = optimizedPolygons[0];
             optimizedPolygons.RemoveAt(0);
 
-            SkeletonMaker.GetCouples(optimizedPolygons);
+            SkeletonMaker.GetFingers(optimizedPolygons, outer);
             
             File.WriteAllText("../../../../../../resources/CoordinateData/maNiceOne.txt", SkeletonTestUtil.SaveGeometry(full));
         }

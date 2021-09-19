@@ -38,7 +38,7 @@ namespace StraightSkeletonNet.Tests
                 }
                 couples.Add(rightSigs);
             }
-            
+            couples.RemoveAt(couples.Count - 1);
             // try
             return couples;
         }
@@ -61,16 +61,62 @@ namespace StraightSkeletonNet.Tests
             return optimizedCouples;
         }
 
-        public static List<Vector2d> GetFingers(List<List<List<Vector2d>>> couplesGroups, List<Vector2d> outer)
+        public static List<Vector2d> GetFingers(List<List<Vector2d>> inners, List<Vector2d> outer)
         {
+            var couplesGroups = optimizeCouples(GetCouples(inners), outer);
             foreach (var couples in couplesGroups)
             {
                 foreach (var couple in couples)
                 {
-                    
+                    // define intersection points
+                    List<Vector2d> oposites;
+                    for (int j = 0; j < couple.Count; j++)
+                    {
+                        int other;
+                        if (j == 0)
+                            other = 1;
+                        else if (j == 1)
+                            other = 0;
+                        else if (j == 2)
+                            other = 3;
+                        else
+                            other = 2;
+                        
+                        var intersections = new List<Vector2d>();
+                        Vector2d ClosestIter;
+                        float closestDistance = float.PositiveInfinity;
+                        for (int i = 0; i < outer.Count; i++)
+                        {
+                            bool lines_intersect;
+                            bool segment_intersect;
+                            Vector2d intersection;
+                            Vector2d close_P1;
+                            Vector2d close_P2;
+                            SkeletonTestUtil.GetIntersection(couple[j], couple[other], outer[i], outer[SkeletonTestUtil.Mod(i+1, outer.Count)],
+                                out lines_intersect,
+                                out segment_intersect,
+                                out intersection,
+                                out close_P1,
+                                out close_P2
+                            );
+                            if (lines_intersect)
+                            {
+                                var distance = Vector2.Distance(SkeletonTestUtil.VdToV(intersection),
+                                    SkeletonTestUtil.VdToV(couple[1]));
+
+                                if (distance < closestDistance)
+                                {
+                                    ClosestIter = intersection;
+                                    closestDistance = distance;
+                                }
+                            }
+                        }
+                        
+                    }
                 }
             }
-            return 
+
+            return new List<Vector2d>();
         }
 
         public static List<Vector2d> BuildSkeleton(List<Vector2d> outer, List<List<Vector2d>> inners)
