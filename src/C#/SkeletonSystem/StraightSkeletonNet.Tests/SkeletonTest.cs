@@ -267,24 +267,23 @@ namespace StraightSkeletonNet.Tests
                 }
                 iter += 1;
             }
-
+            
             List<Vector2d> full = new List<Vector2d>();
-
-            foreach (var pol in optimizedPolygons)
-            {
-                foreach (var p in pol)
-                {
-                    //full.Add(p);
-                }
-            }
-
 
             var outer = optimizedPolygons[0];
             optimizedPolygons.RemoveAt(0);
 
-            SkeletonMaker.GetFingers(optimizedPolygons, outer);
+            var sk = SkeletonMaker.GetFingers(optimizedPolygons, outer);
+            foreach (var s in sk)
+            {
+                foreach (var pol in s)
+                {
+                    full.Add(pol);
+                }
+            }
+
             
-            File.WriteAllText("../../../../../../resources/CoordinateData/maNiceOne.txt", SkeletonTestUtil.SaveGeometry(full));
+            File.WriteAllText("../../../../../../resources/CoordinateData/maNiceOne.txt", SkeletonTestUtil.SaveGeometry(sk[sk.Count-1]));
         }
 
         [Test]

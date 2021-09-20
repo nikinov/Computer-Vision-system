@@ -599,6 +599,27 @@ namespace StraightSkeletonNet.Tests
             return edges2;
         }
         
+        public static Vector2d GetCentroid(List<Vector2d> poly)
+        {
+            double accumulatedArea = 0.0f;
+            double centerX = 0.0f;
+            double centerY = 0.0f;
+
+            for (int i = 0, j = poly.Count - 1; i < poly.Count; j = i++)
+            {
+                double temp = poly[i].X * poly[j].Y - poly[j].X * poly[i].Y;
+                accumulatedArea += temp;
+                centerX += (poly[i].X + poly[j].X) * temp;
+                centerY += (poly[i].Y + poly[j].Y) * temp;
+            }
+
+            if (Math.Abs(accumulatedArea) < 1E-7f)
+                return Vector2d.Empty;  // Avoid division by zero
+
+            accumulatedArea *= 3f;
+            return new Vector2d(centerX / accumulatedArea, centerY / accumulatedArea);
+        }
+        
         /// <summary>
         /// Deprecated
         /// </summary>
