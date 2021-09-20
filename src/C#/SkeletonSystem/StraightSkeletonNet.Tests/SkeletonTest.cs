@@ -282,8 +282,7 @@ namespace StraightSkeletonNet.Tests
                 }
             }
 
-            
-            File.WriteAllText("../../../../../../resources/CoordinateData/maNiceOne.txt", SkeletonTestUtil.SaveGeometry(sk[sk.Count-1]));
+            File.WriteAllText("../../../../../../resources/CoordinateData/maNiceOne.txt", SkeletonTestUtil.SaveGeometry(full));
         }
 
         [Test]

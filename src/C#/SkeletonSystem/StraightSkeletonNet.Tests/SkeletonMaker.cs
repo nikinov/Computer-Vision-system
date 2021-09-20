@@ -88,13 +88,13 @@ namespace StraightSkeletonNet.Tests
                 for (int i = 0; i < outer.Count; i++)
                 {
                     bool lines_intersect;
-                    bool segment_intersect;
+                    bool segments_intersect;
                     Vector2d intersection;
                     Vector2d close_P1;
                     Vector2d close_P2;
                     SkeletonTestUtil.GetIntersection(couple[j], couple[other], outer[i], outer[SkeletonTestUtil.Mod(i+1, outer.Count)],
                         out lines_intersect,
-                        out segment_intersect,
+                        out segments_intersect,
                         out intersection,
                         out close_P1,
                         out close_P2
@@ -103,7 +103,7 @@ namespace StraightSkeletonNet.Tests
                     {
                         var distance = Vector2.Distance(SkeletonTestUtil.VdToV(intersection),
                             SkeletonTestUtil.VdToV(couple[other]));
-
+                        
                         if (distance < closestDistance)
                         {
                             closestPos = intersection;
@@ -111,19 +111,24 @@ namespace StraightSkeletonNet.Tests
                         }
                     }
                 }
+
+                if (closestDistance > 100)
+                    closestDistance = 10;
                 intersectionPoints.Add(closestPos);
             }
-            for (int i = 0; i < 2; i++)
-            {
-                List<Vector2d> nailMesh = new List<Vector2d>();
-                nailMesh.Add(intersectionPoints[i]);
-                nailMesh.Add(couple[i]);
-                nailMesh.Add(intersectionPoints[2]);
-                nailMesh.Add(couple[i+2]);
-                finger.Add(SkeletonTestUtil.GetCentroid(nailMesh));
-            }
-            
 
+            List<Vector2d> nailMesh = new List<Vector2d>();
+            nailMesh.Add(intersectionPoints[0]);
+            nailMesh.Add(couple[1]);
+            nailMesh.Add(intersectionPoints[2]);
+            nailMesh.Add(couple[3]);
+            finger.Add(SkeletonTestUtil.GetMeshCenter(nailMesh));
+            List<Vector2d> nailMesh2 = new List<Vector2d>();
+            nailMesh2.Add(intersectionPoints[1]);
+            nailMesh2.Add(couple[0]);
+            nailMesh2.Add(intersectionPoints[3]);
+            nailMesh2.Add(couple[2]);
+            finger.Add(SkeletonTestUtil.GetMeshCenter(nailMesh2));
             
             return finger;
         }
@@ -140,7 +145,7 @@ namespace StraightSkeletonNet.Tests
                 }
             }
 
-            return GetCouples(inners);
+            return fingers;
         }
 
         public static List<Vector2d> BuildSkeleton(List<Vector2d> outer, List<List<Vector2d>> inners)
