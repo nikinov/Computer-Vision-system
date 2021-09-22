@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using StraightSkeletonNet.Primitives;
 using System.IO;
 using System.Threading.Tasks;
+using NUnit.Framework.Constraints;
 
 namespace StraightSkeletonNet.Tests
 {
@@ -252,6 +254,7 @@ namespace StraightSkeletonNet.Tests
         {
             List<List<Vector2d>> polygons = SkeletonTestUtil.GetVerts("../../../../../../resources/CoordinateData/pythonCoordinates.txt");
             List<List<Vector2d>> optimizedPolygons = new List<List<Vector2d>>();
+            //List<List<Vector2d>> optimizedPolygons2 = new List<List<Vector2d>>();
 
             int iter = 0;
             foreach (var pol in polygons)
@@ -262,8 +265,12 @@ namespace StraightSkeletonNet.Tests
                 }
                 else
                 {
-                    if (pol.Count != 0)
-                        optimizedPolygons.Add(SkeletonTestUtil.GetQuadrantEdges(pol));
+                    if (pol.Count != 0 && iter == 50 || iter == 51)
+                    {
+                        //optimizedPolygons.Add(SkeletonTestUtil.GetEdges(pol, segment:2, bigLineSize:60, processSimplification: true, tolerance:5));
+                        //optimizedPolygons.Add(SkeletonTestUtil.GetQuadrantEdges(pol));
+                        optimizedPolygons.Add(pol);
+                    }
                 }
                 iter += 1;
             }
@@ -272,16 +279,30 @@ namespace StraightSkeletonNet.Tests
 
             var outer = optimizedPolygons[0];
             optimizedPolygons.RemoveAt(0);
+            var sk = SkeletonBuilder.Build(outer, optimizedPolygons);
+            var tt = SkeletonTestUtil.GetOrderedInners(optimizedPolygons);
 
-            var sk = SkeletonMaker.GetFingers(optimizedPolygons, outer);
-            foreach (var s in sk)
+            foreach (var skEdge in sk.Edges)
             {
-                foreach (var pol in s)
+                foreach (var point in skEdge.Polygon)
                 {
-                    full.Add(pol);
+                    full.Add(point);
                 }
             }
-
+            
+            foreach (var polygon in optimizedPolygons)
+            {
+                foreach (var point in polygon)
+                {
+                    //outer.Add(point);
+                }
+            }
+            
+            foreach (var t in tt)
+            {
+                Console.WriteLine(SkeletonTestUtil.GetMeshCenter(t));
+            }
+            
             File.WriteAllText("../../../../../../resources/CoordinateData/maNiceOne.txt", SkeletonTestUtil.SaveGeometry(full));
         }
 

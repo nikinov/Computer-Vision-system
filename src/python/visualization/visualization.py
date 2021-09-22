@@ -29,7 +29,7 @@ def plot_lines():
         except:
             pass
 
-def plot_polygon():
+def plot_polygon(just_points=False):
     fig,ax = plt.subplots(1)
 
     new_coords = []
@@ -50,8 +50,9 @@ def plot_polygon():
 
     for cor in new_coords:
         xs, ys = zip(*cor)
-        fig = plt.figure()
+        if just_points:
+            fig = plt.figure()
         plt.plot(xs, ys)
 
-plot_polygon()
+plot_polygon(just_points=False)
 plt.show()

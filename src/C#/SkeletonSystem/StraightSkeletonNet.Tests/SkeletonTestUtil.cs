@@ -457,7 +457,141 @@ namespace StraightSkeletonNet.Tests
                 return a + ab * distance;
             }
         }
+        
+        public static bool GetIntersectionStatus(Vector2d A1, Vector2d A2, Vector2d B1, Vector2d B2)
+        {
+            int orientation(Vector2d p, Vector2d q, Vector2d r)
+            {
+                // See https://www.geeksforgeeks.org/orientation-3-ordered-points/
+                // for details of below formula.
+                var val = (q.Y - p.Y) * (r.X - q.X) -
+                          (q.X - p.X) * (r.Y - q.Y);
+ 
+                if (val == 0) return 0; // collinear
+ 
+                return (val > 0)? 1: 2; // clock or counterclock wise
+            }
+            
+            bool onSegment(Vector2d p, Vector2d q, Vector2d r)
+            {
+                if (q.X <= Math.Max(p.X, r.X) && q.X >= Math.Min(p.X, r.X) &&
+                    q.Y <= Math.Max(p.Y, r.Y) && q.Y >= Math.Min(p.Y, r.Y))
+                    return true;
+ 
+                return false;
+            }
+            
+            // Find the four orientations needed for general and
+            // special cases
+            int o1 = orientation(A1, A2, B1);
+            int o2 = orientation(A1, A2, B2);
+            int o3 = orientation(B1, B2, A1);
+            int o4 = orientation(B1, B2, A2);
+ 
+            // General case
+            if (o1 != o2 && o3 != o4)
+                return true;
+ 
+            // Special Cases
+            // p1, q1 and p2 are collinear and p2 lies on segment p1q1
+            if (o1 == 0 && onSegment(A1, B1, A2)) return true;
+ 
+            // p1, q1 and q2 are collinear and q2 lies on segment p1q1
+            if (o2 == 0 && onSegment(A1, B2, A2)) return true;
+ 
+            // p2, q2 and p1 are collinear and p1 lies on segment p2q2
+            if (o3 == 0 && onSegment(B1, A1, B2)) return true;
+ 
+            // p2, q2 and q1 are collinear and q1 lies on segment p2q2
+            if (o4 == 0 && onSegment(B1, A2, B2)) return true;
+ 
+            return false; // Doesn't fall in any of the above cases
+        }
 
+        public static List<List<Vector2d>> GetOrderedInners(List<List<Vector2d>> inners)
+        {
+            List<Vector2d> innerCenters = new List<Vector2d>();
+            foreach (var inner in inners)
+            {
+                innerCenters.Add(GetMeshCenter(inner));
+            }
+            var side = new Vector2d();
+            float distance = 0;
+            foreach (var innerCenter in innerCenters)
+            {
+                var ds = Vector2.Distance(VdToV(innerCenter), VdToV(innerCenters[0]));
+                if (ds > distance)
+                {
+                    distance = ds;
+                    side = innerCenter;
+                }
+            }
+            inners.Sort((a, b) => Vector2.Distance(VdToV(GetMeshCenter(a)),
+                VdToV(side)).CompareTo(Vector2.Distance(VdToV(GetMeshCenter(b)), VdToV(side))));
+            return inners;
+        }
+
+        // broken 
+        public static List<List<Vector2d>> GetInnterOutline(List<List<Vector2d>> inners, List<Vector2d> outer)
+        {
+            List<List<Vector2d>> innerOutlines = new List<List<Vector2d>>();
+            List<Vector2d> innersMesh = new List<Vector2d>();
+            foreach (var inner in inners)
+            {
+                foreach (var point in inner)
+                {
+                    innersMesh.Add(point);
+                }
+            }
+            List<Vector2d> innerOutline = new List<Vector2d>();
+            innerOutline.Add(innersMesh[0]);
+            innersMesh.RemoveAt(0);
+            while (innersMesh.Count >= 0)
+            {
+                Vector2d next = Vector2d.Empty;
+                float distance = Vector2.Distance(VdToV(innersMesh[0]), VdToV(innerOutline[innerOutline.Count() - 1]));
+                foreach (var point in innersMesh)
+                {
+                    if (distance > Vector2.Distance(VdToV(point), VdToV(innerOutline[innerOutline.Count() - 1])))
+                    {
+                        List<bool> intersectionStatuses = new List<bool>();
+                        for (int i = 0; i < outer.Count-1; i++)
+                        {
+                            intersectionStatuses.Add(GetIntersectionStatus(outer[i], outer[Mod(i + 1, outer.Count - 1)], point,
+                                innerOutline[innerOutline.Count - 1]));
+                        }
+
+                        if (intersectionStatuses.All(c => c != true))
+                        {
+                            next = point;
+                            distance = Vector2.Distance(VdToV(point),
+                                VdToV(innerOutline[innerOutline.Count() - 1]));
+                        }
+                    }  
+                }
+
+                if (next == Vector2d.Empty)
+                {
+                    if (innersMesh.Count == 0)
+                    {
+                        innerOutlines.Add(innerOutline);
+                                                break;
+                    }
+                    
+                    innerOutlines.Add(innerOutline);
+                    innerOutline = new List<Vector2d>();
+                    innerOutline.Add(innersMesh[0]);
+                }
+                else
+                {
+                    innersMesh.Remove(next);
+                    innerOutline.Add(next);
+                }
+            }
+
+            return innerOutlines;
+        }
+        
         public static bool GetSanityCheck(Vector2d a, Vector2d b, Vector2d point)
         {
             if (GetAngle(a, b, point) < 135)
@@ -510,6 +644,11 @@ namespace StraightSkeletonNet.Tests
                 return Array.IndexOf(distances, largestDistance);
         }
 
+        public static void GetOuterAngleFacing(List<Vector2d> outer)
+        {
+            
+        }
+
         public static List<Vector2d> GetQuadrantEdges(List<Vector2d> mesh)
         {
             List<Vector2d> edges = new List<Vector2d>();
@@ -548,10 +687,10 @@ namespace StraightSkeletonNet.Tests
             return edges;
         }
 
-        public static List<Vector2d> GetEdges(List<Vector2d> mesh, int segment=15, float bigLineSize=100)
+        public static List<Vector2d> GetEdges(List<Vector2d> mesh, int segment=15, float bigLineSize=100, bool processSimplification=false, int tolerance=2)
         {
             List<Vector2d> edges = new List<Vector2d>();
-            var inconsistency = CheckForInconsistency(GetSegments(ConvertIntoDirections(mesh), segment), tolerance: 2);
+            var inconsistency = CheckForInconsistency(GetSegments(ConvertIntoDirections(mesh), segment), tolerance: tolerance);
             foreach (var it in inconsistency)
             {
                 foreach (var seg in Select<Vector2d>(mesh, it*segment, segment))
@@ -559,12 +698,21 @@ namespace StraightSkeletonNet.Tests
             }
             var edg = GetBigLines(edges, bigLineSize:bigLineSize);
 
-            var icon = CheckForInconsistency(ConvertIntoDirections(edg), tolerance: 2);
+            List<int> icon;
             List<Vector2d> edges2 = new List<Vector2d>();
-            foreach (var it in icon)
+            if (!processSimplification)
             {
-                edges2.Add(edg[it]);
+                icon = CheckForInconsistency(ConvertIntoDirections(edg), tolerance: 2);
+                foreach (var it in icon)
+                {
+                    edges2.Add(edg[it]);
+                }
             }
+            else
+            {
+                edges2 = edg;
+            }
+
             
             List<int> correctionIndexes =new List<int>();
             var angles = ConvertIntoDirections(edges2);
@@ -594,7 +742,7 @@ namespace StraightSkeletonNet.Tests
                 }
             }
             
-            File.WriteAllText("../../../../../../resources/CoordinateData/generatedTest.txt", SaveGeometry(edges2));
+            //File.WriteAllText("../../../../../../resources/CoordinateData/generatedTest.txt", SaveGeometry(edges2));
 
             return edges2;
         }

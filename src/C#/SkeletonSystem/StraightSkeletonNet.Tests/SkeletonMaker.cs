@@ -13,6 +13,7 @@ namespace StraightSkeletonNet.Tests
     {
         public static List<List<Vector2d>> GetCouples(List<List<Vector2d>> inners)
         {
+            
             List<List<Vector2d>> couples = new List<List<Vector2d>>();
 
             for (int i = 0; i < inners.Count; i++)
@@ -116,7 +117,7 @@ namespace StraightSkeletonNet.Tests
                     closestDistance = 10;
                 intersectionPoints.Add(closestPos);
             }
-
+            
             List<Vector2d> nailMesh = new List<Vector2d>();
             nailMesh.Add(intersectionPoints[0]);
             nailMesh.Add(couple[1]);
