@@ -51,13 +51,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\StraightSkeletonNet.Tests\StraightSkeletonNet.Tests.csproj">
-      <Project>{3898af36-98e4-4ebf-bb2c-06ec91f1ec8e}</Project>
-      <Name>StraightSkeletonNet.Tests</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\StraightSkeletonNet\StraightSkeletonNet.csproj">
-      <Project>{4b85469b-a41f-4e31-a7f1-c7337a78dc6a}</Project>
-      <Name>StraightSkeletonNet</Name>
+    <ProjectReference Include="..\CGAL_StraightSkeleton_Dotnet\CGAL_StraightSkeleton_Dotnet.csproj">
+      <Project>{288ee894-0f7f-46be-82d2-0dbcdc5e065f}</Project>
+      <Name>CGAL_StraightSkeleton_Dotnet</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
