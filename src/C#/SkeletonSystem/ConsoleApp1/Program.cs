@@ -5,9 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using StraightSkeletonNet.Tests;
-using StraightSkeletonNet;
-using StraightSkeletonNet.Primitives;
+using CGAL_StraightSkeleton_Dotnet;
 
 namespace ConsoleApp1
 {
@@ -15,9 +13,6 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-
-            SkeletonTest skeletonTest = new SkeletonTest();
-            skeletonTest.SkeletonTest_hole_4();
             /*
             List<Vector2d> line = new List<Vector2d>()
             {
@@ -38,7 +33,6 @@ namespace ConsoleApp1
             Console.WriteLine(points[SkeletonTestUtil.GetFurthestPointIndex(line, points)]);
 */
             // stuff here is for CGAL
-
 
             Stopwatch w = new Stopwatch();
             w.Start();
