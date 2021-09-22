@@ -2,89 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Numerics;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
-using NUnit.Framework.Constraints;
-using StraightSkeletonNet.Primitives;
+using System.Threading.Tasks;
 
-namespace StraightSkeletonNet.Tests
+namespace Skeletonizer
 {
-    public static class SkeletonTestUtil
+    class SkeletonMath
     {
-        public static List<Vector2d> GetFacePoints(Skeleton sk)
-        {
-            List<Vector2d> ret = new List<Vector2d>();
-
-            foreach (EdgeResult edgeOutput in sk.Edges)
-            {
-                List<Vector2d> points = edgeOutput.Polygon;
-                foreach (Vector2d vector2d in points)
-                {
-                    if (!ContainsEpsilon(ret, vector2d))
-                        ret.Add(vector2d);
-                }
-            }
-            return ret;
-        }
-
-        public static void AssertExpectedPoints(List<Vector2d> expectedList, List<Vector2d> givenList)
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (Vector2d expected in expectedList)
-            {
-                if (!ContainsEpsilon(givenList, expected))
-                    sb.AppendFormat("Can't find expected point ({0}, {1}) in given list\n", expected.X, expected.Y);
-            }
-
-            foreach (Vector2d given in givenList)
-            {
-                if (!ContainsEpsilon(expectedList, given))
-                    sb.AppendFormat("Can't find given point ({0}, {1}) in expected list\n", given.X, given.Y);
-            }
-
-            if (sb.Length > 0)
-                throw new InvalidOperationException(sb.ToString());
-        }
-
-        public static bool ContainsEpsilon(List<Vector2d> list, Vector2d p)
-        {
-            return list.Any(l => EqualEpsilon(l.X, p.X) && EqualEpsilon(l.Y, p.Y));
-        }
-
-        public static bool EqualEpsilon(double d1, double d2)
-        {
-            return Math.Abs(d1 - d2) < 5E-6;
-        }
-
-        public static List<List<Vector2d>> GetVerts(string textFile)
-        {
-            string text = File.ReadAllText(textFile);
-
-            List<List<Vector2d>> Verts = new List<List<Vector2d>>();
-            foreach (var polygon in text.Split('\n'))
-            {
-                List<Vector2d> pol = new List<Vector2d>();
-                foreach (var vertex in polygon.Split(','))
-                {
-                    if (vertex != "" && vertex != "\r")
-                    {
-                        var vert = vertex.Split('|');
-                        pol.Add(new Vector2d(Double.Parse(vert[0]), Double.Parse(vert[1])));
-                    }
-                }
-                Verts.Add(pol);
-            }
-            return Verts;
-        }
-
-        // ----------------------------
-        //
-        // this is where my code starts
-        //
-        // ----------------------------
-
         public static string SaveGeometry(List<Vector2d> vert)
         {
             string text = "";
@@ -100,12 +24,12 @@ namespace StraightSkeletonNet.Tests
         public static Vector2 VdToV(Vector2d vec)
         {
             return new Vector2((float)vec.X, (float)vec.Y);
-        } 
+        }
         public static Vector2d VToVd(Vector2 vec)
         {
             return new Vector2d((double)vec.X, (double)vec.Y);
-        } 
-        
+        }
+
         // returns square of distance b/w two points
         static double lengthSquare(Vector2d p1, Vector2d p2)
         {
@@ -126,7 +50,7 @@ namespace StraightSkeletonNet.Tests
         {
             return num % mod;
         }
-        public static bool IsClose(List<float> angles, float tolerance=0.1f)
+        public static bool IsClose(List<float> angles, float tolerance = 0.1f)
         {
             foreach (var ang in angles)
             {
@@ -141,7 +65,7 @@ namespace StraightSkeletonNet.Tests
             return fullList.Skip(start).Take(take).ToList();
         }
 
-        public static List<Vector2d> GetBigLines(List<Vector2d> allPoints, float bigLineSize=10)
+        public static List<Vector2d> GetBigLines(List<Vector2d> allPoints, float bigLineSize = 10)
         {
             List<Vector2d> edges = new List<Vector2d>();
 
@@ -193,7 +117,7 @@ namespace StraightSkeletonNet.Tests
                 mesh[0].Y,
                 mesh[0].Y
             };
-            
+
             foreach (var pos in mesh)
             {
                 if (pos.X < posittions[0])
@@ -221,8 +145,8 @@ namespace StraightSkeletonNet.Tests
             double yDiff = endPoint.Y - startPoint.Y;
             return (float)(Math.Atan2(yDiff, xDiff) * 180.0 / Math.PI);
         }
-        
-        public static List<int> CheckForInconsistency(List<float>segment, int tolerance=5)
+
+        public static List<int> CheckForInconsistency(List<float> segment, int tolerance = 5)
         {
             List<int> indexes = new List<int>();
 
@@ -252,13 +176,13 @@ namespace StraightSkeletonNet.Tests
 
             for (int i = 0; i < points.Count; i++)
             {
-                if (i == points.Count-1)
+                if (i == points.Count - 1)
                 {
                     directions.Add(GetDirection(points[i], points[0]));
                 }
                 else
                 {
-                    directions.Add(GetDirection(points[i], points[i+1]));
+                    directions.Add(GetDirection(points[i], points[i + 1]));
                 }
             }
             return directions;
@@ -276,7 +200,6 @@ namespace StraightSkeletonNet.Tests
             return outSegment;
         }
 
-
         public static float GetAvaragePointDistance(Vector2d mainPoint, List<Vector2d> otherPoints)
         {
             Vector2 mainPointV = new Vector2((float)mainPoint.X, (float)mainPoint.Y);
@@ -293,7 +216,7 @@ namespace StraightSkeletonNet.Tests
 
             return allDistances.Average();
         }
-        
+
         public static void GetIntersection(
             Vector2d p1, Vector2d p2, Vector2d p3, Vector2d p4,
             out bool lines_intersect, out bool segments_intersect,
@@ -420,16 +343,16 @@ namespace StraightSkeletonNet.Tests
             // Calculate the angle.
             return (float)Math.Atan2(cross_product, dot_product);
         }
-        
+
         // Return True if the point is in the polygon.
         public static bool PointInPolygon(Vector2d point, List<Vector2d> polygon)
         {
             int max_point = polygon.Count - 1;
-            float total_angle = GetPointAngle(polygon[max_point],point,polygon[0]);
+            float total_angle = GetPointAngle(polygon[max_point], point, polygon[0]);
 
             for (int i = 0; i < max_point; i++)
             {
-                total_angle += GetPointAngle(polygon[i],point,polygon[i + 1]);
+                total_angle += GetPointAngle(polygon[i], point, polygon[i + 1]);
             }
 
             return (Math.Abs(total_angle) > 1);
@@ -497,7 +420,7 @@ namespace StraightSkeletonNet.Tests
                 new Vector2((float)line[1].X, (float)line[1].Y)
             };
 
-            for (int i=0; i<pointCount; i++)
+            for (int i = 0; i < pointCount; i++)
             {
                 Vector2 P = new Vector2((float)points[i].X, (float)points[i].Y);
                 distances[i] = Vector2.Distance(GetClosestPointOnLineSegment(newLine[0], newLine[1], P), P);
@@ -548,16 +471,16 @@ namespace StraightSkeletonNet.Tests
             return edges;
         }
 
-        public static List<Vector2d> GetEdges(List<Vector2d> mesh, int segment=15, float bigLineSize=100)
+        public static List<Vector2d> GetEdges(List<Vector2d> mesh, int segment = 15, float bigLineSize = 100)
         {
             List<Vector2d> edges = new List<Vector2d>();
             var inconsistency = CheckForInconsistency(GetSegments(ConvertIntoDirections(mesh), segment), tolerance: 2);
             foreach (var it in inconsistency)
             {
-                foreach (var seg in Select<Vector2d>(mesh, it*segment, segment))
+                foreach (var seg in Select<Vector2d>(mesh, it * segment, segment))
                     edges.Add(seg);
             }
-            var edg = GetBigLines(edges, bigLineSize:bigLineSize);
+            var edg = GetBigLines(edges, bigLineSize: bigLineSize);
 
             var icon = CheckForInconsistency(ConvertIntoDirections(edg), tolerance: 2);
             List<Vector2d> edges2 = new List<Vector2d>();
@@ -565,8 +488,8 @@ namespace StraightSkeletonNet.Tests
             {
                 edges2.Add(edg[it]);
             }
-            
-            List<int> correctionIndexes =new List<int>();
+
+            List<int> correctionIndexes = new List<int>();
             var angles = ConvertIntoDirections(edges2);
             for (int i = 0; i < angles.Count; i++)
             {
@@ -578,7 +501,7 @@ namespace StraightSkeletonNet.Tests
 
             var newEd = edges2;
             var offset = -1;
-            for (int i = edges2.Count-1; i >= 0; i--)
+            for (int i = edges2.Count - 1; i >= 0; i--)
             {
                 if (correctionIndexes.Contains(i))
                 {
@@ -587,18 +510,18 @@ namespace StraightSkeletonNet.Tests
                     Vector2d intersection;
                     Vector2d close_p1;
                     Vector2d close_p2;
-                    GetIntersection(edges2[i + offset], edges2[Mod(i+1 + offset, edges2.Count-1)], edges2[Mod(i+3 + offset, edges2.Count-1)], edges2[Mod(i+2 + offset, edges2.Count-1)], out lines_intersect, out segments_intersect, out intersection, out close_p1, out close_p2);
+                    GetIntersection(edges2[i + offset], edges2[Mod(i + 1 + offset, edges2.Count - 1)], edges2[Mod(i + 3 + offset, edges2.Count - 1)], edges2[Mod(i + 2 + offset, edges2.Count - 1)], out lines_intersect, out segments_intersect, out intersection, out close_p1, out close_p2);
                     if (lines_intersect)
                         newEd[newEd.IndexOf(edges2[Mod(i + 1 + offset, edges2.Count - 1)])] = intersection;
                     newEd.Remove(edges2[Mod(i + 2 + offset, edges2.Count - 1)]);
                 }
             }
-            
+
             File.WriteAllText("../../../../../../resources/CoordinateData/generatedTest.txt", SaveGeometry(edges2));
 
             return edges2;
         }
-        
+
         public static Vector2d GetCentroid(List<Vector2d> poly)
         {
             double accumulatedArea = 0.0f;
@@ -619,7 +542,7 @@ namespace StraightSkeletonNet.Tests
             accumulatedArea *= 3f;
             return new Vector2d(centerX / accumulatedArea, centerY / accumulatedArea);
         }
-        
+
         /// <summary>
         /// Deprecated
         /// </summary>
@@ -649,7 +572,7 @@ namespace StraightSkeletonNet.Tests
             {
                 newMesh = new List<Vector2d>();
                 corrects = 0;
-                for (int i=0; i<newMeshCount; i++)
+                for (int i = 0; i < newMeshCount; i++)
                 {
                     List<Vector2d> selectedPoints = mesh.Skip(meshChunkLength * i).Take(meshChunkLength).ToList();
                     if (i == newMeshCount - 1)

@@ -1,16 +1,15 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("StraightSkeletonNet.Tests")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("CGAL_StraightSkeleton_Dotnet")]
+[assembly: AssemblyDescription("Wrapper around CGAL Straight Skeleton functions")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("StraightSkeletonNet.Tests")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyProduct("CGAL_StraightSkeleton_Dotnet")]
+[assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("11f01a71-1332-4e7f-9cfd-f963f72c36b8")]
+[assembly: Guid("90239fdf-d4ad-477c-a317-dec4ff06bcea")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,5 +31,4 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("3.0.2")]
