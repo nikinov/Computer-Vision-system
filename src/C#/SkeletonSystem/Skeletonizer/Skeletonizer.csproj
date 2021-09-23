@@ -8,4 +8,8 @@
       <PackageReference Include="NUnit" Version="3.13.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\CGAL_StraightSkeleton_Dotnet\CGAL_StraightSkeleton_Dotnet.csproj" />
+    </ItemGroup>
+
 </Project>

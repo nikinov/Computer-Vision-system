@@ -52,7 +52,7 @@ def plot_polygon(just_points=False):
         xs, ys = zip(*cor)
         if just_points:
             fig = plt.figure()
-        plt.plot(xs, ys)
+        plt.plot(xs, ys, ".")
 
 plot_polygon(just_points=False)
 plt.show()

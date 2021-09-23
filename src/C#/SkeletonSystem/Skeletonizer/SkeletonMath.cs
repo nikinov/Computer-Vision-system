@@ -13,18 +13,17 @@ using NUnit.Framework.Constraints;
 
 namespace Skeletonizer
 {
-    class SkeletonMath
+    public class SkeletonMath
     {
-        public static string SaveGeometry(List<Vector2> vert)
+        public static List<List<Vector2>> GetVerts(string textFile)
         {
-            string text = "";
+            var text = File.ReadAllText(textFile);
 
-            foreach (var ver in vert)
-            {
-                text = text + ver.X + "|" + ver.Y + ",";
-            }
-
-            return text;
+            return text.Split('\n').Select(polygon => (from vertex in polygon.Split(',') where vertex != "" && vertex != "\r" select vertex.Split('|') into vertex select new Vector2(float.Parse(vertex[0]), float.Parse(vertex[1]))).ToList()).ToList();
+        }
+        public static string SaveGeometry(Vector2[] vert)
+        {
+            return vert.Aggregate("", (current, ver) => current + ver.X + "|" + ver.Y + ",");
         }
 
         // returns square of distance b/w two points
@@ -62,7 +61,7 @@ namespace Skeletonizer
             return fullList.Skip(start).Take(take).ToList();
         }
 
-        public static List<Vector2> GetBigLines(List<Vector2> allPoints)
+        public static List<Vector2> GetBigLines(List<Vector2> allPoints, float bigLine=50)
         {
             var edges = new List<Vector2>();
 
@@ -73,7 +72,7 @@ namespace Skeletonizer
                     next = 0;
                 else
                     next = i + 1;
-                if (Vector2.Distance(new Vector2(allPoints[i].X, allPoints[i].Y), new Vector2(allPoints[next].X, allPoints[next].Y)) > 50)
+                if (Vector2.Distance(new Vector2(allPoints[i].X, allPoints[i].Y), new Vector2(allPoints[next].X, allPoints[next].Y)) > bigLine)
                 {
                     edges.Add(allPoints[i]);
                 }
@@ -102,7 +101,7 @@ namespace Skeletonizer
         public static Vector2 GetMeshCenter(List<Vector2> mesh)
         {
             var center = new Vector2();
-            float[] posittions = {
+            float[] positions = {
                 mesh[0].X,
                 mesh[0].X,
                 mesh[0].Y,
@@ -111,18 +110,18 @@ namespace Skeletonizer
             
             foreach (var pos in mesh)
             {
-                if (pos.X < posittions[0])
-                    posittions[0] = pos.X;
-                if (pos.X > posittions[1])
-                    posittions[1] = pos.X;
-                if (pos.Y < posittions[2])
-                    posittions[2] = pos.Y;
-                if (pos.Y > posittions[3])
-                    posittions[3] = pos.Y;
+                if (pos.X < positions[0])
+                    positions[0] = pos.X;
+                if (pos.X > positions[1])
+                    positions[1] = pos.X;
+                if (pos.Y < positions[2])
+                    positions[2] = pos.Y;
+                if (pos.Y > positions[3])
+                    positions[3] = pos.Y;
             }
 
-            var yVal = posittions[0] + (posittions[1] - posittions[0]) / 2;
-            var xVal = posittions[2] + (posittions[3] - posittions[2]) / 2;
+            var yVal = positions[0] + (positions[1] - positions[0]) / 2;
+            var xVal = positions[2] + (positions[3] - positions[2]) / 2;
 
             center.X = yVal;
             center.Y = xVal;
@@ -143,15 +142,15 @@ namespace Skeletonizer
 
             var prevSeg = segment[segment.Count - 1];
             var iter = 0;
-            var leftTolarance = -180 + tolerance;
-            var rightTolarance = 180 - tolerance;
+            var leftTolerance = -180 + tolerance;
+            var rightTolerance = 180 - tolerance;
 
             foreach (var seg in segment)
             {
                 if (seg + tolerance > prevSeg && seg - tolerance < prevSeg) { }
                 else
                 {
-                    if ((prevSeg < leftTolarance && seg > rightTolarance && 180 / seg + 180 + prevSeg < tolerance) || (prevSeg > leftTolarance && seg < rightTolarance && 180 / prevSeg + 180 + seg < tolerance)) { }
+                    if ((prevSeg < leftTolerance && seg > rightTolerance && 180 / seg + 180 + prevSeg < tolerance) || (prevSeg > leftTolerance && seg < rightTolerance && 180 / prevSeg + 180 + seg < tolerance)) { }
                     else
                         indexes.Add(iter);
                 }
@@ -538,12 +537,11 @@ namespace Skeletonizer
             return edges;
         }
 
-        public static List<Vector2> GetEdges(List<Vector2> mesh, int segment=15, bool processSimplification=false, int tolerance=2)
+        public static List<Vector2> GetEdges(List<Vector2> mesh, int segment = 15, bool processSimplification = false, int tolerance = 2, float bigLineSize = 50)
         {
             var inconsistency = CheckForInconsistency(GetSegments(ConvertIntoDirections(mesh), segment), tolerance);
             var edges = inconsistency.SelectMany(it => Select(mesh, it * segment, segment)).ToList();
-            var edg = GetBigLines(edges);
-
+            var edg = GetBigLines(edges, bigLine: bigLineSize);
             var edges2 = new List<Vector2>();
             if (!processSimplification)
             {
@@ -555,7 +553,7 @@ namespace Skeletonizer
                 edges2 = edg;
             }
 
-            var correctionIndexes =new List<int>();
+            var correctionIndexes = new List<int>();
             var angles = ConvertIntoDirections(edges2);
             for (var i = 0; i < angles.Count; i++)
             {
@@ -567,10 +565,10 @@ namespace Skeletonizer
 
             var newEd = edges2;
             const int offset = -1;
-            for (var i = edges2.Count-1; i >= 0; i--)
+            for (var i = edges2.Count - 1; i >= 0; i--)
             {
                 if (!correctionIndexes.Contains(i)) continue;
-                GetIntersection(edges2[i + offset], edges2[Mod(i+1 + offset, edges2.Count-1)], edges2[Mod(i+3 + offset, edges2.Count-1)], edges2[Mod(i+2 + offset, edges2.Count-1)], out var linesIntersect, out _, out var intersection, out _, out _);
+                GetIntersection(edges2[i + offset], edges2[Mod(i + 1 + offset, edges2.Count - 1)], edges2[Mod(i + 3 + offset, edges2.Count - 1)], edges2[Mod(i + 2 + offset, edges2.Count - 1)], out var linesIntersect, out _, out var intersection, out _, out _);
                 if (linesIntersect)
                     newEd[newEd.IndexOf(edges2[Mod(i + 1 + offset, edges2.Count - 1)])] = intersection;
                 newEd.Remove(edges2[Mod(i + 2 + offset, edges2.Count - 1)]);
@@ -578,7 +576,7 @@ namespace Skeletonizer
 
             return edges2;
         }
-        
+
         public static Vector2 GetCentroid(List<Vector2> poly)
         {
             var accumulatedArea = 0.0f;
