@@ -459,6 +459,11 @@ namespace Skeletonizer
 
             return innerOutlines;
         }
+
+        public Vector2[] GetIsMeshClockwise(Vector2[] mesh)
+        {
+            
+        }
         
         public static bool GetSanityCheck(Vector2 a, Vector2 b, Vector2 point)
         {
