@@ -42,9 +42,9 @@ namespace Skeletonizer
                 .ToList();
         }
 
-        public static int Mod(int num, int mod)
+        public static int Mod(int x, int m)
         {
-            return num % mod;
+            return (x % m + m) % m;
         }
         public static bool IsClose(List<float> angles, float tolerance=0.1f)
         {
@@ -568,7 +568,7 @@ namespace Skeletonizer
             for (var i = edges2.Count - 1; i >= 0; i--)
             {
                 if (!correctionIndexes.Contains(i)) continue;
-                GetIntersection(edges2[i + offset], edges2[Mod(i + 1 + offset, edges2.Count - 1)], edges2[Mod(i + 3 + offset, edges2.Count - 1)], edges2[Mod(i + 2 + offset, edges2.Count - 1)], out var linesIntersect, out _, out var intersection, out _, out _);
+                GetIntersection(edges2[Mod(i + offset, edges2.Count - 1)], edges2[Mod(i + 1 + offset, edges2.Count - 1)], edges2[Mod(i + 3 + offset, edges2.Count - 1)], edges2[Mod(i + 2 + offset, edges2.Count - 1)], out var linesIntersect, out _, out var intersection, out _, out _);
                 if (linesIntersect)
                     newEd[newEd.IndexOf(edges2[Mod(i + 1 + offset, edges2.Count - 1)])] = intersection;
                 newEd.Remove(edges2[Mod(i + 2 + offset, edges2.Count - 1)]);
@@ -576,6 +576,7 @@ namespace Skeletonizer
 
             return edges2;
         }
+
 
         public static Vector2 GetCentroid(List<Vector2> poly)
         {
@@ -679,7 +680,8 @@ namespace Skeletonizer
                 var closestDistance = float.PositiveInfinity;
                 for (var i = 0; i < outer.Count; i++)
                 {
-                    GetIntersection(couple[j], couple[other], outer[i], outer[Mod(i+1, outer.Count)],
+                    
+                        GetIntersection(couple[j], couple[other], outer[i], outer[Mod(i+1, outer.Count)],
                         out var linesIntersect,
                         out _,
                         out var intersection,

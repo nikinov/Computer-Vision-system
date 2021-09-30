@@ -109,7 +109,7 @@ namespace ConsoleApp1
         public static void SkeletonTest2()
         {
             List<List<Vector2>> polygons =
-                SkeletonMath.GetVerts("../../../../../../resources/CoordinateData/pythonCoordinates.txt");
+                SkeletonMath.GetVerts("C:/pythonCoordinates2.txt");
             List<Vector2[]> optimizedPolygons = new List<Vector2[]>();
             //List<List<Vector2d>> optimizedPolygons2 = new List<List<Vector2d>>();
 
@@ -150,6 +150,7 @@ namespace ConsoleApp1
             {
                 outer2.Add(outer[i]);
             }
+            File.WriteAllText("../../../../../../resources/CoordinateData/skeletonLines.txt", SkeletonMath.SaveGeometry(outer2.ToArray()));
 
             var sk = StraightSkeleton.Generate(outer2.ToArray(), optimizedPolygons.ToArray());
             string text = "";
