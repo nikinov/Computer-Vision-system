@@ -10,21 +10,28 @@ namespace Skeletonizer
 {
     public class SkeletonMaker
     {
-        public static void Build(List<Vector2> outer, List<List<Vector2>> inners = null, bool outerPreprocessing = true, bool innerPreprocessing = true)
+        private delegate List<Vector2> vectorOptimizer(Vector2[] param);
+        
+        private static IEnumerable<Vector2[]> GetOptimizedInners(IEnumerable<Vector2[]> inners, vectorOptimizer action) => inners.Select(inner => action(inner).ToArray());
+        
+        private static IEnumerable<Vector2[]> GetOptimizedInners(IEnumerable<Vector2[]> inners) => inners.Select(inner => inner.ToArray());
+        
+        public static void Build(Vector2[] outer, List<Vector2[]> inners = null, bool outerPreprocessing = true, string innerPreprocessingType = "small")
         {
             // preprocessing
-            List<Vector2[]> optimizedInners;
+            
             if (inners != null)
             {
-                optimizedInners = new List<Vector2[]>();
-                foreach (var inner in inners)
-                {
-                    optimizedInners.Add(SkeletonMath.GetEdges(inner).ToArray());
-                }
+                if (innerPreprocessingType == "Quad")
+                    inners = GetOptimizedInners(inners, ctx => SkeletonMath.GetQuadrantEdges(ctx.ToList())).ToList();
+                else if (innerPreprocessingType == "Small")
+                    inners = GetOptimizedInners(inners, ctx => SkeletonMath.GetEdges(ctx.ToList(), segment:2, bigLineSize:60, processSimplification: true, tolerance:5)).ToList();
+                else
+                    inners = GetOptimizedInners(inners).ToList();
             }
 
-            var optimizedOuter = SkeletonMath.GetEdges(outer);
-            //var sk = StraightSkeleton.Generate()
+            outer = SkeletonMath.GetEdges(outer.ToList()).ToArray();
+            var sk = StraightSkeleton.Generate(outer, inners);
         }
     }
 }

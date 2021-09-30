@@ -15,11 +15,11 @@ namespace Skeletonizer
 {
     public class SkeletonMath
     {
-        public static List<List<Vector2>> GetVerts(string textFile)
+        public static List<Vector2[]> GetVerts(string textFile)
         {
             var text = File.ReadAllText(textFile);
 
-            return text.Split('\n').Select(polygon => (from vertex in polygon.Split(',') where vertex != "" && vertex != "\r" select vertex.Split('|') into vertex select new Vector2(float.Parse(vertex[0]), float.Parse(vertex[1]))).ToList()).ToList();
+            return text.Split('\n').Select(polygon => (from vertex in polygon.Split(',') where vertex != "" && vertex != "\r" select vertex.Split('|') into vertex select new Vector2(float.Parse(vertex[0]), float.Parse(vertex[1]))).ToArray()).ToList();
         }
         public static string SaveGeometry(Vector2[] vert)
         {

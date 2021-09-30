@@ -108,8 +108,7 @@ namespace ConsoleApp1
 
         public static void SkeletonTest2()
         {
-            List<List<Vector2>> polygons =
-                SkeletonMath.GetVerts("C:/pythonCoordinates2.txt");
+            List<Vector2[]> polygons = SkeletonMath.GetVerts("C:/pythonCoordinates2.txt");
             List<Vector2[]> optimizedPolygons = new List<Vector2[]>();
             //List<List<Vector2d>> optimizedPolygons2 = new List<List<Vector2d>>();
 
@@ -118,21 +117,21 @@ namespace ConsoleApp1
             {
                 if (iter == 0)
                 {
-                    optimizedPolygons.Add(SkeletonMath.GetEdges(pol).ToArray());
+                    optimizedPolygons.Add(SkeletonMath.GetEdges(pol.ToList()).ToArray());
                 }
                 else
                 {
-                    if (pol.Count != 0)
+                    if (pol.Length != 0)
                     {
                         //optimizedPolygons.Add(SkeletonTestUtil.GetEdges(pol, segment:2, bigLineSize:60, processSimplification: true, tolerance:5));
                         //optimizedPolygons.Add(SkeletonTestUtil.GetQuadrantEdges(pol));
                         var pol2 = new List<Vector2>();
-                        for (int i = pol.Count - 1; i >= 0; i--)
+                        for (int i = pol.Length - 1; i >= 0; i--)
                         {
                             pol2.Add(pol[i]);
                         }
 
-                        optimizedPolygons.Add(SkeletonMath.GetEdges(pol, segment: 10, bigLineSize: 30,
+                        optimizedPolygons.Add(SkeletonMath.GetEdges(pol.ToList(), segment: 10, bigLineSize: 30,
                             processSimplification: true, tolerance: 20).ToArray());
                     }
                 }
@@ -167,7 +166,7 @@ namespace ConsoleApp1
 
         public static void SkeletonTest3()
         {
-            List<List<Vector2>> polygons = SkeletonMath.GetVerts("../../../../../../resources/CoordinateData/pythonCoordinates.txt");
+            List<Vector2[]> polygons = SkeletonMath.GetVerts("../../../../../../resources/CoordinateData/pythonCoordinates.txt");
             List<Vector2> full = new List<Vector2>();
             string text = "";
             foreach (var pol in polygons)
@@ -175,7 +174,7 @@ namespace ConsoleApp1
                 //optimizedPolygons.Add(SkeletonTestUtil.GetEdges(pol, segment:2, bigLineSize:60, processSimplification: true, tolerance:5));
                 //optimizedPolygons.Add(SkeletonTestUtil.GetQuadrantEdges(pol));
                 var pol2 = new List<Vector2>();
-                for (int i = pol.Count - 1; i >= 0; i--)
+                for (int i = pol.Length - 1; i >= 0; i--)
                 {
                     pol2.Add(pol[i]);
                 }
@@ -191,6 +190,14 @@ namespace ConsoleApp1
                 }
             }
             File.WriteAllText("../../../../../../resources/CoordinateData/skeletonLines.txt", text);
+        }
+
+        public static void SkeletonTest4()
+        {
+            List<Vector2[]> polygons = SkeletonMath.GetVerts("../../../../../../resources/CoordinateData/pythonCoordinates.txt");
+            var outer = polygons[0];
+            polygons.RemoveAt(0);
+            SkeletonMaker.Build(outer, polygons);
         }
     }
 }
