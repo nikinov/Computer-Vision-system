@@ -163,7 +163,7 @@ namespace CGAL_StraightSkeleton_Dotnet
                             holePolys[i] = new Poly((float*)(&pointsPtr[holeStartIndex]), holes[i].Count);
                             holeStartIndex += holes[i].Count;
                         }
-
+                        
                         //Generate skeleton
                         if (holePolys.Length > 0)
                         {

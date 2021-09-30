@@ -12,7 +12,7 @@ namespace Skeletonizer
     {
         private delegate List<Vector2> vectorOptimizer(Vector2[] param);
         
-        private static IEnumerable<Vector2[]> GetOptimizedInners(IEnumerable<Vector2[]> inners, vectorOptimizer action) => inners.Select(inner => action(inner).ToArray());
+        private static IEnumerable<Vector2[]> GetOptimizedInners(IEnumerable<Vector2[]> inners, vectorOptimizer action) => inners.Where(inner => inner.Length != 0).Select(inner => action(inner).ToArray());
         
         private static IEnumerable<Vector2[]> GetOptimizedInners(IEnumerable<Vector2[]> inners) => inners.Select(inner => inner.ToArray());
         
@@ -22,9 +22,9 @@ namespace Skeletonizer
             
             if (inners != null)
             {
-                if (innerPreprocessingType == "Quad")
+                if (innerPreprocessingType == "quad")
                     inners = GetOptimizedInners(inners, ctx => SkeletonMath.GetQuadrantEdges(ctx.ToList())).ToList();
-                else if (innerPreprocessingType == "Small")
+                else if (innerPreprocessingType == "small")
                     inners = GetOptimizedInners(inners, ctx => SkeletonMath.GetEdges(ctx.ToList(), segment:2, bigLineSize:60, processSimplification: true, tolerance:5)).ToList();
                 else
                     inners = GetOptimizedInners(inners).ToList();

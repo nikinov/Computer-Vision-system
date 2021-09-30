@@ -68,19 +68,11 @@ Polygon_2 CreatePolygon(float* vertices, int length)
 extern "C" __declspec(dllexport) void* GenerateStraightSkeleton(Poly* outer, Poly* holes, int holesCount, Poly* outStraightSkeleton, Poly* outSpokes)
 {
 	//Construct outer polygon (no holes yet)
-	Polygon_2 pol = CreatePolygon(outer->vertices, outer->verticesCount);
-	if (pol.is_clockwise_oriented())
-		pol.reverse_orientation();
-	Polygon_with_holes poly(pol);
+	Polygon_with_holes poly(CreatePolygon(outer->vertices, outer->verticesCount));
 
 	//Add holes
 	for (int h = 0; h < holesCount; h++)
-	{
-		Polygon_2 inner_pol = CreatePolygon(holes[h].vertices, holes[h].verticesCount);
-		if (inner_pol.is_clockwise_oriented())
-			inner_pol.reverse_orientation();
-		poly.add_hole(inner_pol);
-	}
+		poly.add_hole(CreatePolygon(holes[h].vertices, holes[h].verticesCount));
 
 	//Construct skeleton
 	SsPtr iss = CGAL::create_interior_straight_skeleton_2(poly);

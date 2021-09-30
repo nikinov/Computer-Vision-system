@@ -108,7 +108,8 @@ namespace ConsoleApp1
 
         public static void SkeletonTest2()
         {
-            List<Vector2[]> polygons = SkeletonMath.GetVerts("C:/pythonCoordinates2.txt");
+            //List<Vector2[]> polygons = SkeletonMath.GetVerts("C:/pythonCoordinates2.txt");
+            List<Vector2[]> polygons = SkeletonMath.GetVerts("../../../../../../resources/CoordinateData/pythonCoordinates.txt");
             List<Vector2[]> optimizedPolygons = new List<Vector2[]>();
             //List<List<Vector2d>> optimizedPolygons2 = new List<List<Vector2d>>();
 
