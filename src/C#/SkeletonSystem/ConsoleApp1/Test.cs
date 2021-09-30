@@ -132,8 +132,7 @@ namespace ConsoleApp1
                             pol2.Add(pol[i]);
                         }
 
-                        optimizedPolygons.Add(SkeletonMath.GetEdges(pol.ToList(), segment: 10, bigLineSize: 30,
-                            processSimplification: true, tolerance: 20).ToArray());
+                        optimizedPolygons.Add(SkeletonMath.GetEdges(pol.ToList(), segment:2, bigLineSize:60, processSimplification: true, tolerance:5).ToArray());
                     }
                 }
 
