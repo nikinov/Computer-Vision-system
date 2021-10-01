@@ -14,7 +14,7 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            Test.SkeletonTest2();
+            Test.SkeletonTest4();
         }
     }
 }

@@ -15,22 +15,38 @@ namespace Skeletonizer
         private static IEnumerable<Vector2[]> GetOptimizedInners(IEnumerable<Vector2[]> inners, vectorOptimizer action) => inners.Where(inner => inner.Length != 0).Select(inner => action(inner).ToArray());
         
         private static IEnumerable<Vector2[]> GetOptimizedInners(IEnumerable<Vector2[]> inners) => inners.Select(inner => inner.ToArray());
-        
+
         public static void Build(Vector2[] outer, List<Vector2[]> inners = null, bool outerPreprocessing = true, string innerPreprocessingType = "small")
         {
             // preprocessing
-            
+
             if (inners != null)
             {
-                if (innerPreprocessingType == "quad")
-                    inners = GetOptimizedInners(inners, ctx => SkeletonMath.GetQuadrantEdges(ctx.ToList())).ToList();
-                else if (innerPreprocessingType == "small")
-                    inners = GetOptimizedInners(inners, ctx => SkeletonMath.GetEdges(ctx.ToList(), segment:2, bigLineSize:60, processSimplification: true, tolerance:5)).ToList();
-                else
-                    inners = GetOptimizedInners(inners).ToList();
+                switch (innerPreprocessingType)
+                {
+                    case "quad":
+                        inners = GetOptimizedInners(inners, ctx => SkeletonMath.GetQuadrantEdges(ctx.ToList())).ToList();
+                        break;
+                    case "small":
+                        inners = GetOptimizedInners(inners,
+                            ctx => SkeletonMath.GetEdges(ctx.ToList(), 2, bigLineSize: 60,
+                                processSimplification: true, tolerance: 5)).ToList();
+                        break;
+                    default:
+                        inners = GetOptimizedInners(inners).ToList();
+                        break;
+                }
+                for (var i = 0; i < inners.Count; i++)
+                {
+                    if (SkeletonMath.IsClockwise(inners[i]))
+                        inners[i] = SkeletonMath.ReverseList(inners[i].ToList()).ToArray();
+                }
             }
 
-            outer = SkeletonMath.GetEdges(outer.ToList()).ToArray();
+
+            if (outerPreprocessing)
+                outer = SkeletonMath.GetEdges(outer.ToList()).ToArray();
+            
             var sk = StraightSkeleton.Generate(outer, inners);
         }
     }

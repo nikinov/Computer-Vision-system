@@ -460,11 +460,27 @@ namespace Skeletonizer
             return innerOutlines;
         }
 
-        public Vector2[] GetIsMeshClockwise(Vector2[] mesh)
+        public static bool IsClockwise(IList<Vector2> vertices)
         {
-            
+            double sum = 0.0;
+            for (int i = 0; i < vertices.Count; i++) {
+                Vector2 v1 = vertices[i];
+                Vector2 v2 = vertices[(i + 1) % vertices.Count];
+                sum += (v2.X - v1.X) * (v2.Y + v1.Y);
+            }
+            return sum > 0.0;
         }
-        
+
+        public static List<T> ReverseList<T>(List<T> mesh)
+        {
+            List<T> output = new List<T>();
+            for (int i = mesh.Count - 1; i >= 0; i--)
+            {
+                output.Add(mesh[i]);
+            }
+            return output;
+        }
+
         public static bool GetSanityCheck(Vector2 a, Vector2 b, Vector2 point)
         {
             return !(GetAngle(a, b, point) < 135);
