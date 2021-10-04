@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -40,14 +41,29 @@ namespace Skeletonizer
                 {
                     if (SkeletonMath.IsClockwise(inners[i]))
                         inners[i] = SkeletonMath.ReverseList(inners[i].ToList()).ToArray();
+                    if (inners[i].Length == 0)
+                        inners.RemoveAt(i);
                 }
             }
-
-
+            
             if (outerPreprocessing)
                 outer = SkeletonMath.GetEdges(outer.ToList()).ToArray();
-            
+
+            if (!SkeletonMath.IsClockwise(outer))
+                outer = SkeletonMath.ReverseList(outer.ToList()).ToArray();
+
             var sk = StraightSkeleton.Generate(outer, inners);
+            var full = new List<Vector2>();
+            string text = "";
+            foreach (var edge in sk.Spokes)
+            {
+                full = new List<Vector2>();
+                full.Add(edge.Start.Position);
+                full.Add(edge.End.Position);
+                text = text + SkeletonMath.SaveGeometry(full.ToArray()) + "\n";
+            }
+
+            File.WriteAllText("../../../../../../resources/CoordinateData/skeletonLines.txt", text);
         }
     }
 }

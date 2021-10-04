@@ -287,9 +287,9 @@ namespace CGAL_StraightSkeleton_Dotnet
             return holes;
         }
 
-        private const string dllName = @"C:\github\WickonHightech\src\C#\SkeletonSystem\Debug\CGAL_StraightSkeleton_Wrapper.dll";
+        //private const string dllName = @"C:\github\WickonHightech\src\C#\SkeletonSystem\Debug\CGAL_StraightSkeleton_Wrapper.dll";
 
-        [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("CGAL_StraightSkeleton_Wrapper", CallingConvention = CallingConvention.Cdecl)]
         private static extern unsafe void* GenerateStraightSkeleton(Poly* outer, Poly* holes, int holesCount, Poly* straightSkeleton, Poly* spokesResult);
 
         [DllImport("CGAL_StraightSkeleton_Wrapper", CallingConvention = CallingConvention.Cdecl)]

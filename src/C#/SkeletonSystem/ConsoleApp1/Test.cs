@@ -194,9 +194,15 @@ namespace ConsoleApp1
 
         public static void SkeletonTest4()
         {
-            List<Vector2[]> polygons = SkeletonMath.GetVerts("../../../../../../resources/CoordinateData/pythonCoordinates.txt");
+            List<Vector2[]> polygons = SkeletonMath.GetVerts("C:/pythonCoordinates2.txt");
             var outer = polygons[0];
             polygons.RemoveAt(0);
+            var pol = new List<Vector2[]>();
+            int count = polygons.Count-1;
+            for (int i = 0; i < count; i++)
+            {
+                pol.Add(polygons[i]);
+            }
             SkeletonMaker.Build(outer, polygons);
         }
     }

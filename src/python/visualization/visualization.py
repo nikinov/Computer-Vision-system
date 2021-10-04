@@ -3,8 +3,9 @@ from shapely.geometry.polygon import LinearRing, Polygon
 from shapely.ops import cascaded_union
 
 
-path = "../../../resources/CoordinateData/maNiceOne.txt"
-f = open(path)
+path = "C:/pythonCoordinates2.txt"
+path2 = "../../../resources/CoordinateData/skeletonLines.txt"
+f = open(path2)
 
 def plot_lines():
     all_lines = []
@@ -52,7 +53,7 @@ def plot_polygon(just_points=False):
         xs, ys = zip(*cor)
         if just_points:
             fig = plt.figure()
-        plt.plot(xs, ys, ".")
+        plt.plot(xs, ys)
 
 plot_polygon(just_points=False)
 plt.show()
