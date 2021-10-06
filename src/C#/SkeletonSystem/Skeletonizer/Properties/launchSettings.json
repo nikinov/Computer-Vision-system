@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Skeletonizer": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
