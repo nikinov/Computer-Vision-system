@@ -9,7 +9,7 @@ In here you will find different usefull plugins that you can use in your test mo
 ## Test mode
 
 Test mode represents the part of the process where the product is being tested there are different types of test modes
-you can use and create, to get started go [here](https://github.com/nikinov/WickonHightech/tree/main/WisonDocks/TestMode/BASE.md).
+you can use and create, to get started go [here](https://github.com/nikinov/WickonHightech/tree/RealDocksForTestMode/WisonDocks/TestMode/BASE.md).
 
 ## custom libraries
 
