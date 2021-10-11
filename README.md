@@ -17,4 +17,4 @@ for now here are some basic libraries that we have that you can use:
 
 [TorchAISystem](https://github.com/nikinov/WickonHightech/tree/main/src/AIVisionSystem/README.md)
 ___
-[SkeletonSystem with Geometry functions](https://github.com/nikinov/WickonHightech/blob/RealDocksForTestMode/src/C%23/AIVisionSystem/README.md)
+[SkeletonSystem with Geometry functions](https://github.com/nikinov/WickonHightech/blob/RealDocksForTestMode/WisonDocks/CSharpeSource/Calculations/SkeletonSystem/Skeletonizer/SKELETONIZER.md)
