@@ -204,6 +204,35 @@ namespace ConsoleApp1
                 pol.Add(polygons[i]);
             }
             SkeletonMaker.Build(outer, polygons);
+
+            Vector2[] myOuterPolygon = new[]
+            {
+                new Vector2(0, 0),
+                new Vector2(0, 10),
+                new Vector2(5, 10),
+                new Vector2(5, 0)
+            };
+
+            Vector2[] myInnerPolygon1 = new[]
+            {
+                new Vector2(1, 1),
+                new Vector2(1, 4),
+                new Vector2(4, 4),
+                new Vector2(4, 1)
+            };
+
+            Vector2[] myInnerPolygon2 = new[]
+            {
+                new Vector2(1, 6),
+                new Vector2(1, 9),
+                new Vector2(4, 9),
+                new Vector2(4, 6)
+            };
+
+            List<Vector2[]> myInnerPolygons = new List<Vector2[]>();
+            myInnerPolygons.Add(myInnerPolygon1);
+            myInnerPolygons.Add(myInnerPolygon2);
+            List<Vector2[]> mySkeleton = SkeletonMaker.Build(myOuterPolygon, myInnerPolygons, outerPreprocessing: false, innerPreprocessingType: "");
         }
     }
 }

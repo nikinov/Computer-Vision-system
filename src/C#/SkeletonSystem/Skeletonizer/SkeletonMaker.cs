@@ -17,7 +17,7 @@ namespace Skeletonizer
         
         private static IEnumerable<Vector2[]> GetOptimizedInners(IEnumerable<Vector2[]> inners) => inners.Select(inner => inner.ToArray());
 
-        public static void Build(Vector2[] outer, List<Vector2[]> inners = null, bool outerPreprocessing = true, string innerPreprocessingType = "small")
+        public static void Build(Vector2[] outer, List<Vector2[]> inners = null, bool outerPreprocessing = true, string innerPreprocessingType = "quad")
         {
             // preprocessing
 
@@ -39,7 +39,7 @@ namespace Skeletonizer
                 }
                 for (var i = 0; i < inners.Count; i++)
                 {
-                    if (SkeletonMath.IsClockwise(inners[i]))
+                    if (!SkeletonMath.IsClockwise(inners[i]))
                         inners[i] = SkeletonMath.ReverseList(inners[i].ToList()).ToArray();
                     if (inners[i].Length == 0)
                         inners.RemoveAt(i);
@@ -55,7 +55,7 @@ namespace Skeletonizer
             var sk = StraightSkeleton.Generate(outer, inners);
             var full = new List<Vector2>();
             string text = "";
-            foreach (var edge in sk.Spokes)
+            foreach (var edge in sk.Skeleton)
             {
                 full = new List<Vector2>();
                 full.Add(edge.Start.Position);

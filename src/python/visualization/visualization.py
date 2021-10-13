@@ -5,7 +5,8 @@ from shapely.ops import cascaded_union
 
 path = "C:/pythonCoordinates2.txt"
 path2 = "../../../resources/CoordinateData/skeletonLines.txt"
-f = open(path2)
+path3 = "C:/WisonGenerated.txt"
+f = open(path3)
 
 def plot_lines():
     all_lines = []
