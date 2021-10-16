@@ -202,3 +202,8 @@ Simple and very computationally light function for polygon optimization
 ```cs
 List<Vector2> optimizedPolygon = SkeletonMath.GetSimplePolyOptimization((List<Vector2>) myPolygon);
 ```
+
+Moves a point closer to another pooint
+```cs
+MovePointTowards(Vector2 PointIWannaMove, Vector2 SecondPoint, double distance);
+```
