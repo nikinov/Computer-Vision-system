@@ -158,9 +158,14 @@ bool areIntersecting = SkeletonMath.GetIntersectionStatus((Vector2)firstLineStar
 ```
 
 Sort a list of polygons by creating a hypothetical straight line
-and sorting it from the start to the end of that line
+and sorting it from the start to the end of that line you can do
+the same for a list of points
 ```cs
-List<List<Vector2>> sorteredPolygons = SkeletonMath.GetOrderedInners((List<List<Vector2>>)ListOfMyPolygons);
+// for lines
+List<List<Vector2>> sorteredPolygons = SkeletonMath.GetSortedLines((List<List<Vector2>>)ListOfMyPolygons);
+
+// for points
+List<Vector2> sortedPoints = SkeletonMath.GetSortedPoints((List<Vector2>) myPoints);
 ```
 
 Check if a polygon is clockwise or counter
