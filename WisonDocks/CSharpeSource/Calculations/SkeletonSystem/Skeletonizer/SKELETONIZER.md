@@ -212,3 +212,18 @@ Moves a point closer to another pooint
 ```cs
 MovePointTowards(Vector2 PointIWannaMove, Vector2 SecondPoint, double distance);
 ```
+
+Save and load skeleton Data
+```
+class myBuild
+{
+    // you set the inners and outers here and the type of layout
+}
+
+var buildBase = myBuild(
+    // your params
+)
+
+SkeletonMath.Data(layout, buildBase)
+```
+
