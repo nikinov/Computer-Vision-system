@@ -1,5 +1,4 @@
 # TorchAISystem
-[Discord server](https://discord.gg/Qcme78MB)
 **Version 1.0.0**
 
 This is a an image classifier that uses pytorch in Python and torchscript in C++ to train and make a prediction on a inseption model.
