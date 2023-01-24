@@ -3,6 +3,8 @@
 
 This is a an image classifier that uses pytorch in Python and torchscript in C++ to train and make a prediction on a inseption model.
 
+check out other branches for much more!!!
+
 ## Before you start
 
 ---
